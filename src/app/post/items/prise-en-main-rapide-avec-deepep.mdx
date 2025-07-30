@@ -1,0 +1,68 @@
+---
+title: "DeepEP : la bibliothèque de communication ultime pour vos modèles MoE"
+summary: "Découvrez comment DeepEP propulse l’entraînement et l’inférence des architectures Mixture‑of‑Experts grâce à des kernels all‑to‑all ultra‑performants, une prise en charge FP8 et un chevauchement communication‑calcul sans occuper les SM."
+image: "/images/og/deepep-cover.jpg"
+publishedAt: "2025-07-24"
+tag: "DeepEP"
+---
+
+> **TL;DR :**
+>
+> - **Jusqu’à 150 GB/s** de bande passante intranœud et **~40‑60 GB/s** inter‑nœuds
+> - Kernels **basse latence** spécialement pensés pour le décodage en production
+> - Support **FP8** et **contrôle du nombre de SM** pour des tâches gour­mandes en calcul
+> - Licence **MIT**, prêt à être forké et adapté à votre cluster
+
+---
+
+## Pourquoi DeepEP ?
+
+Les modèles **Mixture‑of‑Experts (MoE)** ont démontré un rapport capacité/performance exceptionnel, mais leur _talon d’Achille_ reste la **communication all‑to‑all** (dispatch/combine) entre GPU.  
+DeepEP, développé par l’équipe **DeepSeek‑AI**, relève ce défi grâce à :
+
+1. **Kernels haut débit** optimisés NVLink ↔ RDMA, idéaux pour l’entraînement et le _prefilling_ d’inférence.
+2. **Kernels basse latence** pure RDMA pour le décodage token‑par‑token.
+3. Un **hook** de chevauchement comm‑calc **sans monopoliser de SM**.
+4. Un design évolutif : SM80 (Ampere) et SM90 (Hopper) ; FP8 dispatch / BF16 combine.
+
+---
+
+## Performances clés
+
+| Scénario                   | # experts  | Bande passante / Latence |
+| -------------------------- | ---------- | ------------------------ |
+| **Intranœud (NVLink)**     | 8          | ~155 GB/s                |
+| **Internœud (RDMA)**       | 16‑64      | ~43‑58 GB/s              |
+| **Décodage RDMA (8 exp.)** | 128 tokens | **77 µs**                |
+
+> _À noter :_ grâce aux optimisations réseau (avril 2025) en collaboration avec Tencent, les perfs ont gagné **jusqu’à 30 %** 🔥.
+
+---
+
+## Installation express
+
+#1 Cloner le dépôt
+
+<CodeBlock
+  compact
+  marginBottom="16"
+  codeInstances={[
+    {
+      code: "git clone https://github.com/deepseek-ai/DeepEP",
+      language: "bash",
+    },
+  ]}
+/>
+
+#2 Compiler NVSHMEM (requis pour l’inter‑nœuds)
+
+<CodeBlock
+  compact
+  marginBottom="16"
+  codeInstances={[
+    {
+      code: "NVSHMEM_DIR=/chemin/vers/nvshmem python setup.py install",
+      language: "bash",
+    },
+  ]}
+/>
