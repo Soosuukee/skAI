@@ -1,0 +1,6 @@
+[
+  { "image_id": 1, "article_id": 1, "title": "deepep-cover", "url": "/images/blog/deepep/deepep-cover.jpg" },
+  { "image_id": 2, "article_id": 2, "title": "gpu-health", "url": "/images/blog/health/gpu-health.jpg" },
+  { "image_id": 3, "article_id": 3, "title": "hopper-cover", "url": "/images/blog/hopper/cover-1.png" },
+  { "image_id": 4, "article_id": 4, "title": "infra-cover", "url": "/images/blog/infrastructure/cover.jpg" }
+]

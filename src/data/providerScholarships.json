@@ -1,0 +1,22 @@
+[
+  {
+    "diploma_id": 1,
+    "provider_id": 1,
+    "diploma_title": "Bachelor en Génie Électrique",
+    "institution_name": "Université de l'État d'Oregon",
+    "description": "Parcours accrédité ABET couvrant les fondements du génie électrique.",
+    "start_date": "1980-01-01",
+    "end_date": "1984-12-31",
+    "diploma_image_url": "/images/projects/project-01/Dennys.png"
+  },
+  {
+    "diploma_id": 2,
+    "provider_id": 1,
+    "diploma_title": "Master en Génie Électrique",
+    "institution_name": "Université de Stanford",
+    "description": "Cycle de recherche axé sur les architectures matérielles avancées et le calcul parallèle.",
+    "start_date": "1990-01-01",
+    "end_date": "1992-12-31",
+    "diploma_image_url": null
+  }
+]

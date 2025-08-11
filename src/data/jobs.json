@@ -1,0 +1,8 @@
+[
+  { "job_id": 1, "title": "Architecte de Solution IA" },
+  { "job_id": 2, "title": "Ingénieure Machine Learning" },
+  { "job_id": 3, "title": "Data Scientist" },
+  { "job_id": 4, "title": "Chercheur en IA" },
+  { "job_id": 5, "title": "Ingénieure Vision par Ordinateur" },
+  { "job_id": 6, "title": "Spécialiste Deep Learning" }
+]

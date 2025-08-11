@@ -1,0 +1,22 @@
+[
+  { "language_id": 1, "name": "Anglais" },
+  { "language_id": 2, "name": "Hokkien taïwanais" },
+  { "language_id": 3, "name": "Chinois Mandarin" },
+  { "language_id": 4, "name": "Français" },
+  { "language_id": 5, "name": "Espagnol" },
+  { "language_id": 6, "name": "Allemand" },
+  { "language_id": 7, "name": "Arabe" },
+  { "language_id": 8, "name": "Portugais" },
+  { "language_id": 9, "name": "Russe" },
+  { "language_id": 10, "name": "Japonais" },
+  { "language_id": 11, "name": "Coréen" },
+  { "language_id": 12, "name": "Italien" },
+  { "language_id": 13, "name": "Hindi" },
+  { "language_id": 14, "name": "Bengali" },
+  { "language_id": 15, "name": "Turc" },
+  { "language_id": 16, "name": "Vietnamien" },
+  { "language_id": 17, "name": "Indonésien" },
+  { "language_id": 18, "name": "Polonais" },
+  { "language_id": 19, "name": "Néerlandais" },
+  { "language_id": 20, "name": "Thaï" }
+]

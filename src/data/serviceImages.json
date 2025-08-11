@@ -1,0 +1,13 @@
+[
+  { "image_id": 1, "service_id": 1, "title": "cover-01", "url": "/images/services/keynote/cover-01.jpg" },
+  { "image_id": 2, "service_id": 1, "title": "cover-02", "url": "/images/services/keynote/cover-02.jpg" },
+  { "image_id": 3, "service_id": 1, "title": "cover-03", "url": "/images/services/keynote/cover-03.jpg" },
+
+  { "image_id": 4, "service_id": 2, "title": "cover-01", "url": "/images/services/ia-gpu/cover-01.jpg" },
+  { "image_id": 5, "service_id": 2, "title": "cover-02", "url": "/images/services/ia-gpu/cover-02.jpg" },
+  { "image_id": 6, "service_id": 2, "title": "cover-03", "url": "/images/services/ia-gpu/cover-03.jpg" },
+
+  { "image_id": 7, "service_id": 3, "title": "cover-01", "url": "/images/services/accelerator/cover-01.jpg" },
+  { "image_id": 8, "service_id": 3, "title": "cover-02", "url": "/images/services/accelerator/cover-02.jpg" },
+  { "image_id": 9, "service_id": 3, "title": "cover-03", "url": "/images/services/accelerator/cover-03.jpg" }
+]

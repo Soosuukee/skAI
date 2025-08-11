@@ -1,0 +1,32 @@
+[
+  {
+    "service_id": 1,
+    "provider_id": 1,
+    "slug": "conferences-keynotes",
+    "title": "Conférences & Keynotes",
+    "content": "/service/items/conferences-keynotes.mdx",
+    "created_at": "2025-07-23",
+    "min_price": 15000,
+    "max_price": 15000
+  },
+  {
+    "service_id": 2,
+    "provider_id": 1,
+    "slug": "conseil-strategique-ia-gpu",
+    "title": "Conseil stratégique IA & GPU",
+    "content": "/service/items/conseil-strategique-ia-gpu.mdx",
+    "created_at": "2025-07-23",
+    "min_price": null,
+    "max_price": null
+  },
+  {
+    "service_id": 3,
+    "provider_id": 1,
+    "slug": "programmes-acceleration-startups-ia",
+    "title": "Programmes d’accélération startups IA",
+    "content": "/service/items/programmes-acceleration-startups-ia.mdx",
+    "created_at": "2025-07-23",
+    "min_price": 9500,
+    "max_price": 9500
+  }
+]

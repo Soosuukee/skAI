@@ -1,0 +1,80 @@
+[
+  {
+    "id": 1,
+    "provider_id": 1,
+    "slug": "jensen-huang",
+    "firstName": "Jensen",
+    "lastName": "Huang",
+    "role": "Architecte de Solution IA",
+    "job": "Architecte de Solution IA",
+    "email": "example@gmail.com",
+    "avatar": "/images/avatar-jh.jpg",
+    "location": "Asie/Taipei",
+    "languages": ["Anglais", "Hokkien taïwanais", "Chinois Mandarin"]
+  },
+  {
+    "id": 2,
+    "provider_id": 2,
+    "slug": "marie-dubois",
+    "firstName": "Marie",
+    "lastName": "Dubois",
+    "role": "Ingénieure Machine Learning",
+    "job": "Ingénieure Machine Learning",
+    "email": "marie.dubois@example.com",
+    "avatar": "/images/avatar-md.jpg",
+    "location": "Europe/Paris",
+    "languages": ["Français", "Anglais"]
+  },
+  {
+    "id": 3,
+    "provider_id": 3,
+    "slug": "carlos-garcia",
+    "firstName": "Carlos",
+    "lastName": "Garcia",
+    "role": "Data Scientist",
+    "job": "Data Scientist",
+    "email": "carlos.garcia@example.com",
+    "avatar": "/images/avatar-cg.jpg",
+    "location": "America/Mexico_City",
+    "languages": ["Espagnol", "Anglais"]
+  },
+  {
+    "id": 4,
+    "provider_id": 4,
+    "slug": "akira-tanaka",
+    "firstName": "Akira",
+    "lastName": "Tanaka",
+    "role": "Chercheur en IA",
+    "job": "Chercheur en IA",
+    "email": "akira.tanaka@example.com",
+    "avatar": "/images/avatar-at.jpg",
+    "location": "Asia/Tokyo",
+    "languages": ["Japonais", "Anglais"]
+  },
+  {
+    "id": 5,
+    "provider_id": 5,
+    "slug": "elena-rossi",
+    "firstName": "Elena",
+    "lastName": "Rossi",
+    "role": "Ingénieure Vision par Ordinateur",
+    "job": "Ingénieure Vision par Ordinateur",
+    "email": "elena.rossi@example.com",
+    "avatar": "/images/avatar-er.jpg",
+    "location": "Europe/Rome",
+    "languages": ["Italien", "Anglais"]
+  },
+  {
+    "id": 6,
+    "provider_id": 6,
+    "slug": "raj-patel",
+    "firstName": "Raj",
+    "lastName": "Patel",
+    "role": "Spécialiste Deep Learning",
+    "job": "Spécialiste Deep Learning",
+    "email": "raj.patel@example.com",
+    "avatar": "/images/avatar-rp.jpg",
+    "location": "Asia/Mumbai",
+    "languages": ["Hindi", "Anglais"]
+  }
+]
