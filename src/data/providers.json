@@ -21,7 +21,7 @@
     "role": "Ingénieure Machine Learning",
     "job": "Ingénieure Machine Learning",
     "email": "marie.dubois@example.com",
-    "avatar": "/images/avatar-md.jpg",
+    "avatar": "/images/avatar.jpg",
     "location": "Europe/Paris",
     "languages": ["Français", "Anglais"]
   },
@@ -34,7 +34,7 @@
     "role": "Data Scientist",
     "job": "Data Scientist",
     "email": "carlos.garcia@example.com",
-    "avatar": "/images/avatar-cg.jpg",
+    "avatar": "/images/avatar.jpg",
     "location": "America/Mexico_City",
     "languages": ["Espagnol", "Anglais"]
   },
@@ -47,7 +47,7 @@
     "role": "Chercheur en IA",
     "job": "Chercheur en IA",
     "email": "akira.tanaka@example.com",
-    "avatar": "/images/avatar-at.jpg",
+    "avatar": "/images/avatar.jpg",
     "location": "Asia/Tokyo",
     "languages": ["Japonais", "Anglais"]
   },
@@ -60,7 +60,7 @@
     "role": "Ingénieure Vision par Ordinateur",
     "job": "Ingénieure Vision par Ordinateur",
     "email": "elena.rossi@example.com",
-    "avatar": "/images/avatar-er.jpg",
+    "avatar": "/images/avatar.jpg",
     "location": "Europe/Rome",
     "languages": ["Italien", "Anglais"]
   },
@@ -73,7 +73,7 @@
     "role": "Spécialiste Deep Learning",
     "job": "Spécialiste Deep Learning",
     "email": "raj.patel@example.com",
-    "avatar": "/images/avatar-rp.jpg",
+    "avatar": "/images/avatar.jpg",
     "location": "Asia/Mumbai",
     "languages": ["Hindi", "Anglais"]
   }

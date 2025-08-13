@@ -3,8 +3,10 @@
   { "social_id": 2, "provider_id": 1, "network": "LinkedIn", "url": "https://www.linkedin.com/company/once-ui/" },
   { "social_id": 3, "provider_id": 1, "network": "X", "url": "https://x.com/nvidia" },
   { "social_id": 4, "provider_id": 2, "network": "LinkedIn", "url": "https://www.linkedin.com/in/marie-dubois" },
-  { "social_id": 5, "provider_id": 3, "network": "LinkedIn", "url": "https://www.linkedin.com/in/carlos-garcia" },
-  { "social_id": 6, "provider_id": 4, "network": "LinkedIn", "url": "https://www.linkedin.com/in/akira-tanaka" },
-  { "social_id": 7, "provider_id": 5, "network": "LinkedIn", "url": "https://www.linkedin.com/in/elena-rossi" },
-  { "social_id": 8, "provider_id": 6, "network": "LinkedIn", "url": "https://www.linkedin.com/in/raj-patel" }
+  { "social_id": 5, "provider_id": 2, "network": "GitHub", "url": "https://github.com/marie-dubois" },
+  { "social_id": 6, "provider_id": 2, "network": "X", "url": "https://x.com/mariedubois" },
+  { "social_id": 7, "provider_id": 3, "network": "LinkedIn", "url": "https://www.linkedin.com/in/carlos-garcia" },
+  { "social_id": 8, "provider_id": 4, "network": "LinkedIn", "url": "https://www.linkedin.com/in/akira-tanaka" },
+  { "social_id": 9, "provider_id": 5, "network": "LinkedIn", "url": "https://www.linkedin.com/in/elena-rossi" },
+  { "social_id": 10, "provider_id": 6, "network": "LinkedIn", "url": "https://www.linkedin.com/in/raj-patel" }
 ]

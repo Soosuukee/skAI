@@ -85,7 +85,7 @@ export const Header = () => {
           textVariant="body-default-s"
           gap="8"
         >
-          <SmartLink href="/home" unstyled>
+          <SmartLink href="/" unstyled>
             <img
               src="/trademark/Modern-_skAi_-Typography-Design.svg"
               alt="Logo"
@@ -105,11 +105,11 @@ export const Header = () => {
             zIndex={1}
           >
             <Flex gap="4" vertical="center" textVariant="body-default-s">
-              {routes["/home"] && (
+              {routes["/"] && (
                 <ToggleButton
                   prefixIcon="home"
-                  href="/home"
-                  selected={pathname === "/home"}
+                  href="/"
+                  selected={pathname === "/"}
                 />
               )}
               <Line background="neutral-alpha-medium" vert maxHeight="24" />

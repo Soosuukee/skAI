@@ -22,9 +22,32 @@ export async function GET(
     // Récupérer les articles du provider
     const articles = articlesData.filter(a => a.provider_id === provider.id);
     
+    // Articles par défaut si aucun n'est trouvé
+    const defaultArticles = [
+      {
+        article_id: 999,
+        provider_id: provider.id,
+        slug: `article-${provider.slug}`,
+        title: `Article de ${provider.firstName} ${provider.lastName}`,
+        summary: `Découvrez les dernières innovations et réflexions de ${provider.firstName} ${provider.lastName} dans le domaine de ${provider.role.toLowerCase()}.`,
+        published_at: "2024-01-15",
+        image: "/images/blog/health/gpu-health.jpg",
+        tag: "Technologie",
+        language: "Français",
+        content: {
+          sections: [
+            {
+              type: "paragraph",
+              content: `Cet article présente les dernières avancées technologiques et les perspectives d'avenir dans le domaine de ${provider.role.toLowerCase()}.`
+            }
+          ]
+        }
+      }
+    ];
+    
     return NextResponse.json({
       provider_id: provider.id,
-      articles: articles || []
+      articles: articles.length > 0 ? articles : defaultArticles
     });
   } catch (error) {
     return NextResponse.json(

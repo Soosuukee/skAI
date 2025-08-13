@@ -1,0 +1,30 @@
+[
+  {
+    "provider_id": 1,
+    "tableOfContent": {
+      "display": true,
+      "subItems": false
+    },
+    "avatar": {
+      "display": true
+    },
+    "calendar": {
+      "display": false,
+      "link": "https://cal.com"
+    }
+  },
+  {
+    "provider_id": 2,
+    "tableOfContent": {
+      "display": true,
+      "subItems": false
+    },
+    "avatar": {
+      "display": true
+    },
+    "calendar": {
+      "display": false,
+      "link": "https://cal.com"
+    }
+  }
+]

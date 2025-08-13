@@ -120,5 +120,127 @@
         ]
       }
     }
+  },
+  {
+    "provider_id": 2,
+    "about": {
+      "intro": {
+        "display": true,
+        "title": "Introduction",
+        "description": "Marie Dubois est une ingénieure Machine Learning passionnée par l'innovation technologique. Spécialisée dans le développement d'algorithmes d'IA avancés, elle combine expertise technique et vision stratégique pour créer des solutions intelligentes qui transforment les industries."
+      },
+      "work": {
+        "display": true,
+        "title": "Mon experience professionel",
+        "experiences": [
+          {
+            "company": "TechCorp",
+            "timeframe": "2020 - Aujourd'hui",
+            "role": "Lead Machine Learning Engineer",
+            "achievements": [
+              "Développé et déployé des modèles de deep learning pour l'analyse prédictive, améliorant la précision de 40% et réduisant les coûts opérationnels de 25%.",
+              "Dirigé une équipe de 8 ingénieurs ML, établissant les meilleures pratiques et optimisant les pipelines de données pour traiter 10M+ d'événements par jour."
+            ],
+            "images": [
+              {
+                "src": "/images/projects/project-01/NVIDIA.jpg",
+                "alt": "TechCorp",
+                "width": 16,
+                "height": 9
+              }
+            ]
+          },
+          {
+            "company": "DataLab",
+            "timeframe": "2018 - 2020",
+            "role": "Data Scientist Senior",
+            "achievements": [
+              "Conçu des algorithmes de recommandation personnalisés augmentant l'engagement utilisateur de 35%.",
+              "Implémenté des solutions de NLP pour l'analyse de sentiment, traitant plus de 1M de commentaires par mois."
+            ],
+            "images": [
+              {
+                "src": "/images/projects/project-01/Dennys.png",
+                "alt": "DataLab",
+                "width": 16,
+                "height": 9
+              }
+            ]
+          }
+        ]
+      },
+      "studies": {
+        "display": true,
+        "title": "Etude et Formation",
+        "institutions": [
+          {
+            "degreeTitle": "Master en Intelligence Artificielle",
+            "institutionName": "École Centrale Paris",
+            "yearsAttended": "2016 - 2018",
+            "programDescription": "Formation approfondie en machine learning, deep learning et traitement du langage naturel. Projet de fin d'études sur l'optimisation des réseaux de neurones pour la reconnaissance d'images."
+          },
+          {
+            "degreeTitle": "Ingénieur en Informatique",
+            "institutionName": "Polytechnique",
+            "yearsAttended": "2013 - 2016",
+            "programDescription": "Formation généraliste en informatique avec spécialisation en algorithmes et structures de données. Stage de recherche en optimisation combinatoire."
+          }
+        ]
+      },
+      "technical": {
+        "display": true,
+        "title": "Mes Technologies",
+        "skills": [
+          {
+            "title": "Deep Learning & Neural Networks",
+            "description": "Expertise en conception et optimisation de réseaux de neurones profonds, incluant CNN, RNN, LSTM et architectures transformer pour diverses applications.",
+            "images": [
+              {
+                "src": "/images/tech/cuda.jpg",
+                "alt": "Deep Learning",
+                "width": 16,
+                "height": 9
+              }
+            ]
+          },
+          {
+            "title": "Machine Learning Pipelines",
+            "description": "Développement de pipelines ML end-to-end avec MLOps, incluant la gestion des données, l'entraînement, le déploiement et le monitoring des modèles.",
+            "images": [
+              {
+                "src": "/images/tech/blackwell-die.png",
+                "alt": "ML Pipeline",
+                "width": 16,
+                "height": 9
+              }
+            ]
+          },
+          {
+            "title": "Big Data & Cloud Computing",
+            "description": "Maîtrise des technologies big data (Spark, Hadoop) et des plateformes cloud (AWS, GCP) pour le traitement à grande échelle de données.",
+            "images": [
+              {
+                "src": "/images/tech/dgx-station.jpg",
+                "alt": "Big Data",
+                "width": 16,
+                "height": 9
+              }
+            ]
+          },
+          {
+            "title": "Natural Language Processing",
+            "description": "Spécialisation en NLP avec expertise en BERT, GPT et autres modèles de langage pour l'analyse de texte et la génération de contenu.",
+            "images": [
+              {
+                "src": "/images/tech/omniverse.jpg",
+                "alt": "NLP",
+                "width": 16,
+                "height": 9
+              }
+            ]
+          }
+        ]
+      }
+    }
   }
 ]

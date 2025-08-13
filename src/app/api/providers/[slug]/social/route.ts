@@ -20,11 +20,39 @@ export async function GET(
     }
 
     // Récupérer les liens sociaux
-    const socialLinks = socialLinksData.find(s => s.provider_id === provider.id);
+    const socialLinks = socialLinksData.filter(s => s.provider_id === provider.id);
+    
+    // Liens sociaux par défaut si aucun n'est trouvé
+    const defaultSocial = [
+      {
+        name: "LinkedIn",
+        icon: "linkedin",
+        link: `https://www.linkedin.com/in/${provider.slug}`
+      },
+      {
+        name: "GitHub",
+        icon: "github",
+        link: `https://github.com/${provider.slug}`
+      },
+      {
+        name: "X",
+        icon: "x",
+        link: `https://x.com/${provider.slug}`
+      }
+    ];
+    
+    // Transformer les données pour correspondre au format attendu
+    const social = socialLinks.length > 0 
+      ? socialLinks.map(link => ({
+          name: link.network,
+          icon: link.network.toLowerCase(),
+          link: link.url
+        }))
+      : defaultSocial;
     
     return NextResponse.json({
       provider_id: provider.id,
-      social: socialLinks?.social || []
+      social: social
     });
   } catch (error) {
     return NextResponse.json(

@@ -25,20 +25,7 @@ export default function RootPage() {
         </Heading>
         <Flex gap="12" horizontal="center">
           <SmartLink
-            href="/home"
-            style={{
-              padding: "0.75rem 1.5rem",
-              borderRadius: "0.5rem",
-              background: "var(--surface)",
-              border: "1px solid var(--neutral-alpha-medium)",
-              textDecoration: "none",
-              color: "inherit",
-            }}
-          >
-            Go to Home
-          </SmartLink>
-          <SmartLink
-            href="/providers/jensen-huang"
+            href="/providers"
             style={{
               padding: "0.75rem 1.5rem",
               borderRadius: "0.5rem",
@@ -48,7 +35,7 @@ export default function RootPage() {
               color: "var(--brand-on-background)",
             }}
           >
-            View Jensen's Profile
+            Voir la liste des prestataires
           </SmartLink>
         </Flex>
       </Column>
