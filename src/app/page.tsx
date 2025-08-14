@@ -15,14 +15,36 @@ export async function generateMetadata() {
 export default function RootPage() {
   return (
     <Column maxWidth="m" gap="xl" horizontal="center" paddingY="24">
-      <Column maxWidth="s" horizontal="center">
-        <Heading wrap="balance" variant="display-strong-l" marginBottom="16">
-          Welcome to skAi Platform
+      <Column maxWidth="s" horizontal="center" gap="8">
+        <Heading
+          wrap="balance"
+          variant="display-strong-l"
+          style={{ marginBottom: "16" }}
+        >
+          Bienvenue sur
         </Heading>
-        <Heading variant="body-default-l" marginBottom="24">
-          This is the main landing page. Provider profiles will be accessible
-          here.
+
+        <img
+          src="/trademark/Modern-_skAi_-Typography-Design.svg"
+          alt="Logo skAi"
+          style={{
+            height: "15rem",
+            width: "auto",
+            filter: "invert(1)",
+            marginBottom: "-1rem",
+          }}
+        />
+
+        <Heading
+          wrap="balance"
+          variant="body-default-l"
+          marginBottom="16"
+          style={{ textAlign: "center", lineHeight: "1.6" }}
+        >
+          Votre plateforme de mise en relation de prestataires spécialisés dans
+          l'intelligence artificielle et vous
         </Heading>
+
         <Flex gap="12" horizontal="center">
           <SmartLink
             href="/providers"
@@ -33,9 +55,11 @@ export default function RootPage() {
               border: "1px solid var(--brand)",
               textDecoration: "none",
               color: "var(--brand-on-background)",
+              fontWeight: "600",
+              fontSize: "1rem",
             }}
           >
-            Voir la liste des prestataires
+            Voir les prestataires
           </SmartLink>
         </Flex>
       </Column>

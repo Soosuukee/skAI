@@ -1,0 +1,59 @@
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+// Routes qui nécessitent une authentification
+const protectedRoutes = [
+  "/providers",
+  "/dashboard",
+  "/profile",
+  "/admin",
+];
+
+// Routes d'authentification
+const authRoutes = [
+  "/login",
+  "/register",
+];
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const token = request.cookies.get("authToken")?.value || 
+                request.headers.get("authorization")?.replace("Bearer ", "");
+
+  // Vérifier si la route nécessite une authentification
+  const isProtectedRoute = protectedRoutes.some(route => 
+    pathname.startsWith(route)
+  );
+
+  // Vérifier si c'est une route d'authentification
+  const isAuthRoute = authRoutes.some(route => 
+    pathname.startsWith(route)
+  );
+
+  // Si c'est une route protégée et qu'il n'y a pas de token
+  if (isProtectedRoute && !token) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Si c'est une route d'auth et qu'il y a déjà un token
+  if (isAuthRoute && token) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
+};

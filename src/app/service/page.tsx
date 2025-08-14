@@ -3,7 +3,7 @@ import BrandSetter from "@/components/BrandSetter";
 import { baseURL } from "@/app/resources";
 import { about, person, service } from "@/app/resources/content";
 import { Meta, Schema } from "@/once-ui/modules";
-import { Services } from "@/components/service/Services";
+import { AllServices } from "@/components/service/AllServices";
 import { RevealFx } from "@/once-ui/components";
 import { Heading } from "@/once-ui/components";
 
@@ -40,10 +40,7 @@ function ServiceContent() {
         paddingBottom="32"
         paddingLeft="12"
       >
-        <Heading as="h1" marginBottom="16" variant="display-strong-s">
-          {service.title}
-        </Heading>
-        <Services />
+        <AllServices />
       </RevealFx>
     </Column>
   );

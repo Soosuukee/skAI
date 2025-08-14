@@ -11,6 +11,7 @@ import {
   Column,
   PasswordInput,
 } from "@/once-ui/components";
+import { useAuth } from "@/app/contexts/AuthContext";
 import NotFound from "@/app/not-found";
 
 interface RouteGuardProps {
@@ -19,19 +20,16 @@ interface RouteGuardProps {
 
 const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const pathname = usePathname();
+  const { user, isLoading } = useAuth();
   const [isRouteEnabled, setIsRouteEnabled] = useState(false);
   const [isPasswordRequired, setIsPasswordRequired] = useState(false);
   const [password, setPassword] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const performChecks = async () => {
-      setLoading(true);
+    const performChecks = () => {
       setIsRouteEnabled(false);
       setIsPasswordRequired(false);
-      setIsAuthenticated(false);
 
       const checkRouteEnabled = () => {
         if (!pathname) return false;
@@ -41,19 +39,12 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         }
 
         // Define dynamic route patterns with their corresponding base routes
-        // Only include routes that actually exist in the routes config
         const dynamicRoutePatterns = [
           { pattern: "/provider", baseRoute: "/providers" },
-          // Add more patterns here when you create the corresponding pages
-          // { pattern: "/settings", baseRoute: "/settings" },
-          // { pattern: "/profile", baseRoute: "/profile" },
-          // { pattern: "/dashboard", baseRoute: "/dashboard" },
-          // { pattern: "/admin", baseRoute: "/admin" },
         ] as const;
 
         for (const { pattern, baseRoute } of dynamicRoutePatterns) {
           if (pathname?.startsWith(pattern)) {
-            // Check if the base route exists in routes config
             if (routes[baseRoute as keyof typeof routes]) {
               return true;
             }
@@ -68,18 +59,13 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
 
       if (protectedRoutes[pathname as keyof typeof protectedRoutes]) {
         setIsPasswordRequired(true);
-
-        const response = await fetch("/api/check-auth");
-        if (response.ok) {
-          setIsAuthenticated(true);
-        }
       }
-
-      setLoading(false);
     };
 
-    performChecks();
-  }, [pathname]);
+    if (!isLoading) {
+      performChecks();
+    }
+  }, [pathname, isLoading]);
 
   const handlePasswordSubmit = async () => {
     const response = await fetch("/api/authenticate", {
@@ -89,14 +75,15 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     });
 
     if (response.ok) {
-      setIsAuthenticated(true);
       setError(undefined);
+      // Recharger la page pour mettre à jour l'état d'authentification
+      window.location.reload();
     } else {
       setError("Incorrect password");
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Flex fillWidth paddingY="128" horizontal="center">
         <Spinner />
@@ -108,7 +95,7 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     return <NotFound />;
   }
 
-  if (isPasswordRequired && !isAuthenticated) {
+  if (isPasswordRequired && !user) {
     return (
       <Column paddingY="128" maxWidth={24} gap="24" center>
         <Heading align="center" wrap="balance">

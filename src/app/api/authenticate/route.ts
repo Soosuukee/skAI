@@ -1,32 +1,70 @@
 import { NextRequest, NextResponse } from "next/server";
-import * as cookie from "cookie";
+import { validateUserCredentials, updateLastLogin } from "@/app/utils/userUtils";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const { password } = body;
-  const correctPassword = process.env.PAGE_ACCESS_PASSWORD;
+  try {
+    const body = await request.json();
+    const { email, password } = body;
 
-  if (!correctPassword) {
-    console.error('PAGE_ACCESS_PASSWORD environment variable is not set');
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
-  }
+    if (!email || !password) {
+      return NextResponse.json(
+        { message: "Email et mot de passe requis" }, 
+        { status: 400 }
+      );
+    }
 
-  if (password === correctPassword) {
-    const response = NextResponse.json({ success: true }, { status: 200 });
-    
-    response.headers.set(
-      "Set-Cookie",
-      cookie.serialize("authToken", "authenticated", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 60 * 60,
-        sameSite: "strict",
-        path: "/",
-      })
+    const user = validateUserCredentials(email, password);
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "Email ou mot de passe incorrect" }, 
+        { status: 401 }
+      );
+    }
+
+    // Mettre à jour la dernière connexion
+    updateLastLogin(user.user_id);
+
+    // Créer un token JWT
+    const token = jwt.sign(
+      { 
+        userId: user.user_id, 
+        email: user.email, 
+        role: user.role 
+      },
+      JWT_SECRET,
+      { expiresIn: "7d" }
     );
 
+    // Retourner les informations de l'utilisateur et le token
+    const response = NextResponse.json({
+      success: true,
+      user: {
+        id: user.user_id,
+        email: user.email,
+        role: user.role,
+        provider_id: user.provider_id
+      },
+      token,
+    });
+
+    // Définir le cookie pour le token
+    response.cookies.set("authToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60, // 7 jours
+    });
+
     return response;
-  } else {
-    return NextResponse.json({ message: "Incorrect password" }, { status: 401 });
+  } catch (error) {
+    console.error('Erreur d\'authentification:', error);
+    return NextResponse.json(
+      { message: "Erreur interne du serveur" }, 
+      { status: 500 }
+    );
   }
 }

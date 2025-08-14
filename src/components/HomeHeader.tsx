@@ -83,13 +83,6 @@ export const HomeHeader = () => {
           textVariant="body-default-s"
           gap="8"
         >
-          <SmartLink href="/" unstyled>
-            <img
-              src="/trademark/Modern-_skAi_-Typography-Design.svg"
-              alt="Logo"
-              style={{ height: "4rem", width: "auto", filter: "invert(1)" }}
-            />
-          </SmartLink>
           {display.location && <Flex hide="s">{person.location}</Flex>}
         </Flex>
         <Flex fillWidth horizontal="center">

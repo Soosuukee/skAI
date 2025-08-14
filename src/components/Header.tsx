@@ -9,12 +9,16 @@ import {
   Line,
   ToggleButton,
   SmartLink,
+  Button,
 } from "@/once-ui/components";
 import styles from "@/components/Header.module.scss";
 
 import { routes, display } from "@/app/resources";
 import { person, about, blog, service } from "@/app/resources/content";
 import { ThemeToggle } from "./ThemeToggle";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { LoginButton } from "./auth/LoginButton";
+import { UserMenu } from "./auth/UserMenu";
 
 type TimeDisplayProps = {
   timeZone: string;
@@ -52,8 +56,13 @@ const TimeDisplay: React.FC<TimeDisplayProps> = ({
 
 export default TimeDisplay;
 
-export const Header = () => {
+type HeaderProps = {
+  showLogo?: boolean;
+};
+
+export const Header = ({ showLogo = true }: HeaderProps) => {
   const pathname = usePathname() ?? "";
+  const { user, isLoading } = useAuth();
 
   return (
     <>
@@ -85,13 +94,15 @@ export const Header = () => {
           textVariant="body-default-s"
           gap="8"
         >
-          <SmartLink href="/" unstyled>
-            <img
-              src="/trademark/Modern-_skAi_-Typography-Design.svg"
-              alt="Logo"
-              style={{ height: "4rem", width: "auto", filter: "invert(1)" }}
-            />
-          </SmartLink>
+          {showLogo && (
+            <SmartLink href="/" unstyled>
+              <img
+                src="/trademark/Modern-_skAi_-Typography-Design.svg"
+                alt="Logo"
+                style={{ height: "4rem", width: "auto", filter: "invert(1)" }}
+              />
+            </SmartLink>
+          )}
           {display.location && <Flex hide="s">{person.location}</Flex>}
         </Flex>
         <Flex fillWidth horizontal="center">
@@ -184,6 +195,9 @@ export const Header = () => {
             <Flex hide="s">
               {display.time && <TimeDisplay timeZone={person.location} />}
             </Flex>
+
+            {/* Section authentification */}
+            {!isLoading && <>{user ? <UserMenu /> : <LoginButton />}</>}
           </Flex>
         </Flex>
       </Flex>
