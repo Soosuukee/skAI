@@ -3,20 +3,42 @@ import type { NextRequest } from "next/server";
 
 // Routes qui nécessitent une authentification
 const protectedRoutes = [
-  "/providers",
-  "/dashboard",
+  "/dashboard", 
   "/profile",
   "/admin",
 ];
 
-// Routes d'authentification
+// Routes d'authentification (pages de connexion/inscription)
 const authRoutes = [
   "/login",
-  "/register",
+  "/register", 
+  "/join",
+];
+
+// Routes publiques qui ne nécessitent pas de vérification
+const publicRoutes = [
+  "/",
+  "/about",
+  "/blog",
+  "/gallery",
+  "/providers",
+  "/service",
+  "/work",
+  "/api",
 ];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  
+  // Ignorer les routes publiques et les assets
+  if (publicRoutes.some(route => pathname.startsWith(route)) ||
+      pathname.startsWith("/_next") ||
+      pathname.startsWith("/favicon") ||
+      pathname.includes(".")) {
+    return NextResponse.next();
+  }
+
+  // Récupérer le token depuis les cookies ou les headers
   const token = request.cookies.get("authToken")?.value || 
                 request.headers.get("authorization")?.replace("Bearer ", "");
 
@@ -32,9 +54,11 @@ export function middleware(request: NextRequest) {
 
   // Si c'est une route protégée et qu'il n'y a pas de token
   if (isProtectedRoute && !token) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    // Rediriger vers la page d'accueil avec un paramètre pour ouvrir le modal de connexion
+    const homeUrl = new URL("/", request.url);
+    homeUrl.searchParams.set("login", "true");
+    homeUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(homeUrl);
   }
 
   // Si c'est une route d'auth et qu'il y a déjà un token

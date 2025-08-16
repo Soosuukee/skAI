@@ -10,6 +10,7 @@ import {
   ToggleButton,
   SmartLink,
   Button,
+  Text,
 } from "@/once-ui/components";
 import styles from "@/components/Header.module.scss";
 
@@ -19,6 +20,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { LoginButton } from "./auth/LoginButton";
 import { UserMenu } from "./auth/UserMenu";
+import { JoinButton } from "./auth/JoinButton";
 
 type TimeDisplayProps = {
   timeZone: string;
@@ -196,8 +198,57 @@ export const Header = ({ showLogo = true }: HeaderProps) => {
               {display.time && <TimeDisplay timeZone={person.location} />}
             </Flex>
 
+            {/* Indicateur de statut de connexion */}
+            <Flex gap="8" vertical="center">
+              {!isLoading && (
+                <>
+                  {user ? (
+                    <Flex gap="4" vertical="center">
+                      <Flex
+                        style={{
+                          width: "6px",
+                          height: "6px",
+                          borderRadius: "50%",
+                          backgroundColor: "var(--success-high)",
+                          boxShadow: "0 0 6px var(--success-high)",
+                        }}
+                      />
+                      <Text variant="body-default-xs" color="success">
+                        Connecté
+                      </Text>
+                    </Flex>
+                  ) : (
+                    <Flex gap="4" vertical="center">
+                      <Flex
+                        style={{
+                          width: "6px",
+                          height: "6px",
+                          borderRadius: "50%",
+                          backgroundColor: "var(--neutral-medium)",
+                        }}
+                      />
+                      <Text variant="body-default-xs" color="neutral-medium">
+                        Non connecté
+                      </Text>
+                    </Flex>
+                  )}
+                </>
+              )}
+            </Flex>
+
             {/* Section authentification */}
-            {!isLoading && <>{user ? <UserMenu /> : <LoginButton />}</>}
+            {!isLoading && (
+              <>
+                {user ? (
+                  <UserMenu />
+                ) : (
+                  <Flex gap="8" vertical="center">
+                    <JoinButton variant="tertiary" size="s" />
+                    <LoginButton />
+                  </Flex>
+                )}
+              </>
+            )}
           </Flex>
         </Flex>
       </Flex>

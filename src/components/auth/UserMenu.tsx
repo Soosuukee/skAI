@@ -27,19 +27,6 @@ export function UserMenu() {
     ? `${userWithProvider.provider.firstName} ${userWithProvider.provider.lastName}`
     : user.email.split("@")[0];
 
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case "provider":
-        return "Prestataire";
-      case "client":
-        return "Client";
-      case "admin":
-        return "Administrateur";
-      default:
-        return role;
-    }
-  };
-
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownTrigger asChild>
@@ -49,27 +36,31 @@ export function UserMenu() {
             padding: "8px 12px",
             borderRadius: "8px",
             background: "transparent",
-            border: "none",
+            border: "1px solid var(--neutral-alpha-medium)",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
             gap: "8px",
             color: "var(--neutral-high)",
             fontSize: "0.9rem",
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.borderColor = "var(--neutral-medium)";
+            e.currentTarget.style.background = "var(--neutral-alpha-weak)";
+          }}
+          onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.currentTarget.style.borderColor = "var(--neutral-alpha-medium)";
+            e.currentTarget.style.background = "transparent";
           }}
         >
           <Avatar
             src={userWithProvider?.provider?.avatar || "/images/avatar.jpg"}
             size="s"
           />
-          <Flex vertical="start" gap="2">
-            <Text variant="body-default-s" style={{ fontWeight: "500" }}>
-              Bonjour {displayName}
-            </Text>
-            <Text variant="body-default-xs" color="neutral-medium">
-              {getRoleLabel(user.role)}
-            </Text>
-          </Flex>
+          <Text variant="body-default-s" style={{ fontWeight: "500" }}>
+            {displayName}
+          </Text>
         </Button>
       </DropdownTrigger>
 

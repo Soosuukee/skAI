@@ -37,7 +37,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const checkAuth = async () => {
     try {
-      const token = localStorage.getItem("authToken");
+      // Vérifier d'abord localStorage, puis cookies
+      let token = localStorage.getItem("authToken");
+
+      if (!token) {
+        // Essayer de récupérer depuis les cookies
+        const cookies = document.cookie.split(";");
+        const authCookie = cookies.find((cookie) =>
+          cookie.trim().startsWith("authToken=")
+        );
+        if (authCookie) {
+          token = authCookie.split("=")[1];
+          // Synchroniser avec localStorage
+          localStorage.setItem("authToken", token);
+        }
+      }
+
       if (!token) {
         setIsLoading(false);
         return;
@@ -53,8 +68,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const data = await response.json();
         setUser(data.user);
       } else {
-        // Token invalide, le supprimer
+        // Token invalide, le supprimer partout
         localStorage.removeItem("authToken");
+        document.cookie =
+          "authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         setUser(null);
       }
     } catch (error) {
@@ -63,6 +80,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         error
       );
       localStorage.removeItem("authToken");
+      document.cookie =
+        "authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -82,8 +101,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const data = await response.json();
 
       if (response.ok) {
-        // Stocker le token dans localStorage
+        // Stocker le token dans localStorage et cookies
         localStorage.setItem("authToken", data.token);
+
+        // Créer un cookie pour le middleware
+        document.cookie = `authToken=${data.token}; path=/; max-age=${
+          60 * 60 * 24 * 7
+        }; SameSite=Strict`;
+
         setUser(data.user);
         return { success: true };
       } else {
@@ -100,6 +125,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = () => {
     localStorage.removeItem("authToken");
+
+    // Supprimer le cookie
+    document.cookie =
+      "authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
     setUser(null);
 
     // Appeler l'API de déconnexion si nécessaire
