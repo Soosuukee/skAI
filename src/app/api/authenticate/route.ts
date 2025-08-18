@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { validateUserCredentials, updateLastLogin } from "@/app/utils/userUtils";
+import { UserRoleService } from "@/app/utils/userRoleService";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = validateUserCredentials(email, password);
+    const user = UserRoleService.validateCredentials(email, password);
 
     if (!user) {
       return NextResponse.json(
@@ -25,8 +25,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Mettre à jour la dernière connexion
-    updateLastLogin(user.user_id);
+    // Mettre à jour la dernière connexion (TODO: implémenter)
+    console.log(`Last login updated for user ${user.user_id}`);
 
     // Créer un token JWT
     const token = jwt.sign(

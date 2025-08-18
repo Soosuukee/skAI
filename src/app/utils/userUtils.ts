@@ -5,8 +5,9 @@ export interface User {
   user_id: number;
   provider_id?: number;
   email: string;
-  password_hash: string;
+  password: string;
   role: 'provider' | 'client' | 'admin';
+  avatar?: string;
   is_active: boolean;
   created_at: string;
   last_login: string;
@@ -35,7 +36,26 @@ export function findUserById(userId: number): User | null {
 export function getUserWithProvider(userId: number): UserWithProvider | null {
   const user = findUserById(userId);
   
-  if (!user || !user.provider_id) {
+  if (!user) {
+    return null;
+  }
+
+  // Si c'est un client, retourner directement avec son avatar
+  if (user.role === 'client') {
+    return {
+      ...user,
+      provider: {
+        firstName: user.email.split('@')[0],
+        lastName: '',
+        slug: `client-${user.user_id}`,
+        avatar: user.avatar || '/images/avatar.jpg',
+        role: 'Client',
+      }
+    };
+  }
+
+  // Si c'est un prestataire, chercher les infos du provider
+  if (!user.provider_id) {
     return user as UserWithProvider;
   }
 
@@ -60,9 +80,8 @@ export function validateUserCredentials(email: string, password: string): User |
     return null;
   }
 
-  // TODO: Implémenter la vérification du hash du mot de passe
-  // Pour l'instant, on accepte n'importe quel mot de passe pour les tests
-  if (password === 'test123') {
+  // Vérification simple du mot de passe
+  if (user.password === password) {
     return user;
   }
 

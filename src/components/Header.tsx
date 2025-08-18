@@ -198,44 +198,6 @@ export const Header = ({ showLogo = true }: HeaderProps) => {
               {display.time && <TimeDisplay timeZone={person.location} />}
             </Flex>
 
-            {/* Indicateur de statut de connexion */}
-            <Flex gap="8" vertical="center">
-              {!isLoading && (
-                <>
-                  {user ? (
-                    <Flex gap="4" vertical="center">
-                      <Flex
-                        style={{
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          backgroundColor: "var(--success-high)",
-                          boxShadow: "0 0 6px var(--success-high)",
-                        }}
-                      />
-                      <Text variant="body-default-xs" color="success">
-                        Connecté
-                      </Text>
-                    </Flex>
-                  ) : (
-                    <Flex gap="4" vertical="center">
-                      <Flex
-                        style={{
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          backgroundColor: "var(--neutral-medium)",
-                        }}
-                      />
-                      <Text variant="body-default-xs" color="neutral-medium">
-                        Non connecté
-                      </Text>
-                    </Flex>
-                  )}
-                </>
-              )}
-            </Flex>
-
             {/* Section authentification */}
             {!isLoading && (
               <>
