@@ -2,10 +2,19 @@ export interface Service {
   serviceId: number;          // Identifiant unique du service
   providerId: number;         // Référence au prestataire
   title: string;              // Titre du service
-  createdAt: Date;            // Date de création
+  description: string;        // Description du service
+  isActive: boolean;          // Si le service est actif
+  isFeatured: boolean;        // Si le service est mis en avant
   minPrice: number | null;    // Prix minimum (peut être null)
   maxPrice: number | null;    // Prix maximum (peut être null)
   estimatedDuration: string;  // Durée estimée (en texte, ex: "2 heures", "3-5 jours")
+  availability: string;       // Disponibilité pour ce service
+  responseTime: string;       // Temps de réponse pour ce service
+  rating?: number;            // Note spécifique pour ce service
+  reviewCount?: number;       // Nombre d'avis pour ce service
+  completedProjects?: number; // Nombre de projets terminés pour ce service
+  createdAt: string;          // Date de création (format ISO)
+  updatedAt?: string;         // Date de dernière modification (format ISO)
 }
 
 // Interface étendue pour l'affichage avec slug calculé

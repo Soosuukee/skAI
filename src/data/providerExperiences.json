@@ -7,7 +7,7 @@
     "description": "Fondateur et CEO de NVIDIA, pionnier de l'IA et du GPU computing. Dirige la stratégie globale de l'entreprise et l'innovation technologique.",
     "task1": "Développement de l'architecture GPU révolutionnaire",
     "task2": "Expansion internationale et acquisitions stratégiques",
-    "startDate": "1993-01-01",
+    "startDate": "1993-01-01T00:00:00Z",
     "endDate": null,
     "experienceImage": "/images/companies/nvidia-logo.png"
   },

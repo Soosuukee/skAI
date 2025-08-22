@@ -1,13 +1,13 @@
 [
   {
-    "diploma_id": 1,
-    "provider_id": 1,
-    "diploma_title": "Bachelor en Génie Électrique",
-    "institution_name": "Université de l'État d'Oregon",
+    "diplomaId": 1,
+    "providerId": 1,
+    "diplomaTitle": "Bachelor en Génie Électrique",
+    "institutionName": "Université de l'État d'Oregon",
     "description": "Parcours accrédité ABET couvrant les fondements du génie électrique : circuits analogiques et numériques, électronique de puissance, électromagnétisme, traitement du signal et microprocesseurs.",
-    "start_date": "1980-01-01",
-    "end_date": "1984-12-31",
-    "diploma_image_url": "/images/institutions/oregon-state-logo.png"
+    "startDate": "1980-01-01T00:00:00Z",
+    "endDate": "1984-12-31T00:00:00Z",
+    "diplomaImageUrl": "/images/institutions/oregon-state-logo.png"
   },
   {
     "diploma_id": 2,

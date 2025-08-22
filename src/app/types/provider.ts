@@ -1,33 +1,89 @@
 import { Location } from './location';
+import { Skill } from './skill';
+import { Job } from './job';
+import { SocialLink } from './socialLink';
+import { Service } from './service';
+import { Article } from './article';
+import { ProviderSkill } from './providerSkill';
+import { ProviderExperience } from './providerExperience';
+import { ProviderEducation } from './providerEducation';
 
 export interface Provider {
-  providerId: number;         // Identifiant unique du provider
+  providerId: number;         // Identifiant unique du prestataire
+  slug: string;               // Slug pour l'URL
   firstName: string;          // Prénom
   lastName: string;           // Nom de famille
+  role: string;               // Rôle/titre professionnel actuel
+  job: string;                // Métier principal
   email: string;              // Email de contact
-  role: string;               // Rôle/titre professionnel
-  locationId: number;         // Référence à la location/pays
   avatar: string;             // Chemin vers l'avatar
+  location: string;           // Fuseau horaire/zone géographique
+  languages: string[];        // Langues parlées
   bio?: string;               // Biographie (optionnelle)
-  skills?: string[];          // Compétences (optionnelles)
-  experience?: string;        // Années d'expérience (optionnel)
-  languages?: string[];       // Langues parlées (optionnelles)
-  socialLinks?: {             // Liens sociaux (optionnels)
-    linkedin?: string;
-    twitter?: string;
-    github?: string;
-    website?: string;
+  summary?: string;           // Résumé professionnel
+  hourlyRate?: number;        // Tarif horaire (optionnel)
+  availability?: string;      // Disponibilité (optionnel)
+  timezone?: string;          // Fuseau horaire (optionnel)
+  website?: string;           // Site web personnel (optionnel)
+  isActive: boolean;          // Si le prestataire est actif
+  isVerified: boolean;        // Si le profil est vérifié
+  rating?: number;            // Note moyenne (optionnel)
+  reviewCount?: number;       // Nombre d'avis (optionnel)
+  completedProjects?: number; // Nombre de projets terminés (optionnel)
+  responseTime?: string;      // Temps de réponse moyen (optionnel)
+  createdAt: string;          // Date de création (format ISO)
+  updatedAt?: string;         // Date de dernière modification (format ISO)
+}
+
+// Interface étendue avec toutes les relations
+export interface ProviderWithDetails extends Provider {
+  skills: ProviderSkill[];    // Compétences détaillées
+  experiences: ProviderExperience[]; // Expériences professionnelles
+  education: ProviderEducation[]; // Formation/éducation
+  socialLinks: SocialLink[];  // Liens sociaux
+  services: Service[];        // Services proposés
+  articles: Article[];        // Articles publiés
+  jobDetails: Job;            // Détails du métier
+}
+
+// Interface pour l'affichage complet du profil
+export interface ProviderProfile extends ProviderWithDetails {
+  locationDetails: Location;  // Détails de la localisation
+  skillDetails: Skill[];      // Détails des compétences
+  averageRating: number;      // Note moyenne calculée
+  totalReviews: number;       // Nombre total d'avis
+  responseRate: number;       // Taux de réponse (%)
+  completionRate: number;     // Taux de réussite (%)
+}
+
+// Interface pour les options de filtrage des prestataires
+export interface ProviderFilters {
+  skills?: number[];          // IDs des compétences recherchées
+  location?: string;          // Zone géographique
+  languages?: string[];       // Langues requises
+  hourlyRate?: {              // Fourchette de tarif
+    min?: number;
+    max?: number;
   };
-  createdAt: Date;            // Date de création du profil
-  updatedAt?: Date;           // Date de dernière modification (optionnel)
+  availability?: string;      // Disponibilité requise
+  rating?: number;            // Note minimum
+  isVerified?: boolean;       // Profil vérifié uniquement
+  isActive?: boolean;         // Prestataires actifs uniquement
+  search?: string;            // Recherche textuelle
 }
 
-// Interface étendue pour l'affichage avec slug calculé
-export interface ProviderWithSlug extends Provider {
-  slug: string;               // Slug calculé à partir du nom
+// Interface pour le tri des prestataires
+export interface ProviderSortOptions {
+  field: 'rating' | 'hourlyRate' | 'completedProjects' | 'responseTime' | 'createdAt';
+  direction: 'asc' | 'desc';
 }
 
-// Interface étendue avec location complète
-export interface ProviderWithLocation extends ProviderWithSlug {
-  location: Location;         // Objet location complet
+// Interface pour les statistiques des prestataires
+export interface ProviderStats {
+  totalProviders: number;     // Nombre total de prestataires
+  activeProviders: number;    // Nombre de prestataires actifs
+  verifiedProviders: number;  // Nombre de prestataires vérifiés
+  averageRating: number;      // Note moyenne globale
+  topSkills: string[];        // Compétences les plus populaires
+  topLocations: string[];     // Localisations les plus populaires
 }

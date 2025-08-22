@@ -1,240 +1,50 @@
 [
   {
-    "article_id": 1,
-    "provider_id": 1,
-    "slug": "prise-en-main-rapide-avec-deepep",
+    "articleId": 1,
+    "providerId": 1,
     "title": "DeepEP : la bibliothèque de communication ultime pour vos modèles MoE",
     "summary": "Découvrez comment DeepEP révolutionne la communication entre experts dans les modèles MoE avec une approche simple et efficace.",
-    "published_at": "2025-07-24",
-    "image": "/images/blog/deepep/deepep-cover.jpg",
+    "publishedAt": "2024-01-10T09:00:00Z",
+    "articleCover": "/images/blog/deepep/deepep-cover.jpg",
     "tag": "Deep Learning",
     "language": "fr",
-    "content": {
-      "sections": [
-        {
-          "type": "heading",
-          "content": "Introduction à DeepEP",
-          "level": 1
-        },
-        {
-          "type": "paragraph",
-          "content": "DeepEP est une bibliothèque Python innovante conçue pour optimiser la communication entre experts dans les modèles MoE (Mixture of Experts). Elle simplifie considérablement l'implémentation et la gestion des communications inter-experts."
-        },
-        {
-          "type": "heading",
-          "content": "Installation",
-          "level": 2
-        },
-        {
-          "type": "code",
-          "content": "pip install deepep",
-          "language": "bash"
-        },
-        {
-          "type": "heading",
-          "content": "Utilisation de base",
-          "level": 2
-        },
-        {
-          "type": "code",
-          "content": "from deepep import DeepEP\n\n# Initialisation\ndeepep = DeepEP()\n\n# Configuration des experts\ndeepep.add_expert('expert1', model_path='path/to/model1')\ndeepep.add_expert('expert2', model_path='path/to/model2')\n\n# Communication entre experts\nresult = deepep.communicate('expert1', 'expert2', data)",
-          "language": "python"
-        },
-        {
-          "type": "heading",
-          "content": "Avantages",
-          "level": 2
-        },
-        {
-          "type": "list",
-          "items": [
-            "Communication optimisée entre experts",
-            "Gestion automatique des ressources",
-            "Interface simple et intuitive",
-            "Performance élevée"
-          ]
-        }
-      ]
-    }
+    "isPublished": true,
+    "isFeatured": true,
+    "viewCount": 1250,
+    "likeCount": 89,
+    "commentCount": 23,
+    "shareCount": 45,
+    "seoScore": 92,
+    "updatedAt": "2024-01-15T14:30:00Z"
   },
   {
-    "article_id": 2,
-    "provider_id": 1,
-    "slug": "les-supercalculateurs-gpu-au-service-de-la-sante",
+    "articleId": 2,
+    "providerId": 1,
     "title": "Les supercalculateurs GPU au service de la santé : comment accélérer la découverte médicale",
     "summary": "Explorez comment les supercalculateurs GPU révolutionnent la recherche médicale et accélèrent la découverte de nouveaux traitements.",
-    "published_at": "2025-07-26",
-    "image": "/images/blog/health/gpu-health.jpg",
+    "publishedAt": "2025-07-26",
+    "articleCover": "/images/blog/health/gpu-health.jpg",
     "tag": "Santé",
-    "language": "fr",
-    "content": {
-      "sections": [
-        {
-          "type": "heading",
-          "content": "Révolution GPU dans la santé",
-          "level": 1
-        },
-        {
-          "type": "paragraph",
-          "content": "Les supercalculateurs GPU transforment radicalement la recherche médicale en permettant des simulations complexes et l'analyse de vastes ensembles de données génomiques."
-        },
-        {
-          "type": "heading",
-          "content": "Applications médicales",
-          "level": 2
-        },
-        {
-          "type": "list",
-          "items": [
-            "Simulation moléculaire pour la découverte de médicaments",
-            "Analyse génomique à grande échelle",
-            "Imagerie médicale avancée",
-            "Modélisation des maladies"
-          ]
-        },
-        {
-          "type": "heading",
-          "content": "Exemple de pipeline",
-          "level": 2
-        },
-        {
-          "type": "code",
-          "content": "# Pipeline d'analyse génomique avec GPU\nimport cudf\nimport cupy as cp\n\n# Chargement des données\ndata = cudf.read_csv('genomic_data.csv')\n\n# Analyse parallèle\nresults = cp.array(data.values).reshape(-1, 1000)\nprocessed = cp.linalg.svd(results)\n\nprint('Analyse terminée en quelques secondes')",
-          "language": "python"
-        }
-      ]
-    }
+    "language": "fr"
   },
   {
-    "article_id": 3,
-    "provider_id": 1,
-    "slug": "propulser-innovation-ia",
+    "articleId": 3,
+    "providerId": 1,
     "title": "Propulser la prochaine vague d'innovation en IA",
     "summary": "Découvrez les technologies émergentes qui vont façonner l'avenir de l'intelligence artificielle et créer de nouvelles opportunités.",
-    "published_at": "2025-07-25",
-    "image": "/images/blog/hopper/hopper-arch-transformer.jpg",
+    "publishedAt": "2025-07-25",
+    "articleCover": "/images/blog/hopper/hopper-arch-transformer.jpg",
     "tag": "IA",
-    "language": "fr",
-    "content": {
-      "sections": [
-        {
-          "type": "heading",
-          "content": "L'avenir de l'IA",
-          "level": 1
-        },
-        {
-          "type": "paragraph",
-          "content": "L'intelligence artificielle évolue rapidement avec de nouvelles architectures et approches qui promettent de révolutionner de nombreux domaines."
-        },
-        {
-          "type": "heading",
-          "content": "Technologies émergentes",
-          "level": 2
-        },
-        {
-          "type": "list",
-          "items": [
-            "Transformers multi-modaux",
-            "IA générative avancée",
-            "Apprentissage fédéré",
-            "IA neuromorphique"
-          ]
-        },
-        {
-          "type": "heading",
-          "content": "Impact sur l'industrie",
-          "level": 2
-        },
-        {
-          "type": "paragraph",
-          "content": "Ces innovations vont transformer la façon dont nous développons et déployons les systèmes d'IA, créant de nouvelles opportunités pour les entreprises et les développeurs."
-        }
-      ]
-    }
+    "language": "fr"
   },
   {
-    "article_id": 4,
-    "provider_id": 1,
-    "slug": "cloud-hybride-edge-acceleration-strategie-nvidia",
+    "articleId": 4,
+    "providerId": 1,
     "title": "Cloud hybride, edge computing et accélération : la vision stratégique de NVIDIA pour l'infrastructure de demain",
     "summary": "Explorez comment NVIDIA façonne l'avenir des infrastructures TI avec une approche hybride, de l'edge computing à l'accélération GPU.",
-    "published_at": "2025-07-27",
-    "image": "/images/blog/infrastructure/cover.jpg",
+    "publishedAt": "2025-07-27",
+    "articleCover": "/images/blog/infrastructure/cover.jpg",
     "tag": "Infrastructure TI",
-    "language": "fr",
-    "content": {
-      "sections": [
-        {
-          "type": "heading",
-          "content": "NVIDIA pour l'infrastructure de demain",
-          "level": 1
-        },
-        {
-          "type": "image",
-          "src": "/images/blog/infrastructure/nvidia-infrastructure.png",
-          "alt": "NVIDIA infrastructure cloud hybride",
-          "aspectRatio": "16/9"
-        },
-        {
-          "type": "heading",
-          "content": "Contexte",
-          "level": 2
-        },
-        {
-          "type": "paragraph",
-          "content": "L'évolution rapide des usages et la multiplication des données poussent les organisations à repenser leur infrastructure, entre cloud central et edge computing."
-        },
-        {
-          "type": "heading",
-          "content": "Les piliers de la stratégie NVIDIA",
-          "level": 2
-        },
-        {
-          "type": "list",
-          "items": [
-            "Cloud hybride : intégration transparente entre centres de données privés et cloud public",
-            "Edge computing : traitement en périphérie pour réduire la latence et renforcer la sécurité",
-            "Accélération IA : GPU et frameworks optimisés pour l'intelligence artificielle et le calcul haute performance"
-          ]
-        },
-        {
-          "type": "heading",
-          "content": "Cas d'usage",
-          "level": 2
-        },
-        {
-          "type": "code",
-          "content": "# Exemple de déploiement Terraform pour un cluster hybride NVIDIA\nterraform init\nterraform apply -var=\"enable_gpu=true\"",
-          "language": "bash"
-        },
-        {
-          "type": "heading",
-          "content": "Conclusion",
-          "level": 2
-        },
-        {
-          "type": "paragraph",
-          "content": "La synergie entre cloud hybride, edge computing et accélération GPU permet à NVIDIA d'offrir une plateforme modulaire, évolutive et sécurisée pour répondre aux enjeux des workloads de demain."
-        },
-        {
-          "type": "heading",
-          "content": "Pour aller plus loin",
-          "level": 2
-        },
-        {
-          "type": "links",
-          "items": [
-            {
-              "text": "NVIDIA Data Center",
-              "url": "https://www.nvidia.com/en-us/data-center/"
-            },
-            {
-              "text": "Edge Computing NVIDIA",
-              "url": "https://developer.nvidia.com/edge-computing"
-            }
-          ]
-        }
-      ]
-    }
+    "language": "fr"
   }
 ]

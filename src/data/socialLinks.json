@@ -1,12 +1,62 @@
 [
-  { "social_id": 1, "provider_id": 1, "network": "GitHub", "url": "https://github.com/once-ui-system/nextjs-starter" },
-  { "social_id": 2, "provider_id": 1, "network": "LinkedIn", "url": "https://www.linkedin.com/company/once-ui/" },
-  { "social_id": 3, "provider_id": 1, "network": "X", "url": "https://x.com/nvidia" },
-  { "social_id": 4, "provider_id": 2, "network": "LinkedIn", "url": "https://www.linkedin.com/in/marie-dubois" },
-  { "social_id": 5, "provider_id": 2, "network": "GitHub", "url": "https://github.com/marie-dubois" },
-  { "social_id": 6, "provider_id": 2, "network": "X", "url": "https://x.com/mariedubois" },
-  { "social_id": 7, "provider_id": 3, "network": "LinkedIn", "url": "https://www.linkedin.com/in/carlos-garcia" },
-  { "social_id": 8, "provider_id": 4, "network": "LinkedIn", "url": "https://www.linkedin.com/in/akira-tanaka" },
-  { "social_id": 9, "provider_id": 5, "network": "LinkedIn", "url": "https://www.linkedin.com/in/elena-rossi" },
-  { "social_id": 10, "provider_id": 6, "network": "LinkedIn", "url": "https://www.linkedin.com/in/raj-patel" }
+  {
+    "socialLinkId": 1,
+    "providerId": 1,
+    "network": "GitHub",
+    "url": "https://github.com/once-ui-system/nextjs-starter"
+  },
+  {
+    "socialLinkId": 2,
+    "providerId": 1,
+    "network": "LinkedIn",
+    "url": "https://www.linkedin.com/company/once-ui/"
+  },
+  {
+    "socialLinkId": 3,
+    "providerId": 1,
+    "network": "X",
+    "url": "https://x.com/nvidia"
+  },
+  {
+    "socialLinkId": 4,
+    "providerId": 2,
+    "network": "LinkedIn",
+    "url": "https://www.linkedin.com/in/marie-dubois"
+  },
+  {
+    "socialLinkId": 5,
+    "providerId": 2,
+    "network": "GitHub",
+    "url": "https://github.com/marie-dubois"
+  },
+  {
+    "socialLinkId": 6,
+    "providerId": 2,
+    "network": "X",
+    "url": "https://x.com/mariedubois"
+  },
+  {
+    "socialLinkId": 7,
+    "providerId": 3,
+    "network": "LinkedIn",
+    "url": "https://www.linkedin.com/in/carlos-garcia"
+  },
+  {
+    "socialLinkId": 8,
+    "providerId": 4,
+    "network": "LinkedIn",
+    "url": "https://www.linkedin.com/in/akira-tanaka"
+  },
+  {
+    "socialLinkId": 9,
+    "providerId": 5,
+    "network": "LinkedIn",
+    "url": "https://www.linkedin.com/in/elena-rossi"
+  },
+  {
+    "socialLinkId": 10,
+    "providerId": 6,
+    "network": "LinkedIn",
+    "url": "https://www.linkedin.com/in/raj-patel"
+  }
 ]
