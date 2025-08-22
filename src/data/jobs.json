@@ -4,5 +4,9 @@
   { "job_id": 3, "title": "Data Scientist" },
   { "job_id": 4, "title": "Chercheur en IA" },
   { "job_id": 5, "title": "Ingénieure Vision par Ordinateur" },
-  { "job_id": 6, "title": "Spécialiste Deep Learning" }
+  { "job_id": 6, "title": "Spécialiste Deep Learning" },
+  { "job_id": 7, "title": "Expert en Optimisation GPU" },
+  { "job_id": 8, "title": "Consultant en Infrastructure IA" },
+  { "job_id": 9, "title": "Développeur d'Algorithmes Avancés" },
+  { "job_id": 10, "title": "Spécialiste en Traitement du Langage Naturel" }
 ]

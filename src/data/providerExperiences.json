@@ -1,246 +1,62 @@
 [
   {
-    "provider_id": 1,
-    "about": {
-      "intro": {
-        "display": true,
-        "title": "Introduction",
-        "description": "Jensen Huang est un entrepreneur taïwano‑américain basé dans la Silicon Valley, cofondateur et PDG de NVIDIA. Visionnaire des processeurs graphiques et de l'IA, il transforme des défis technologiques complexes en innovations qui font avancer l'informatique, la recherche et la création numérique."
-      },
-      "work": {
-        "display": true,
-        "title": "Mon experience professionel",
-        "experiences": [
-          {
-            "company": "Nvidia",
-            "timeframe": "1993 - Aujourd'hui",
-            "role": "Fondateur et President Directeur Generale",
-            "achievements": [
-              "A lancé la plateforme CUDA en 2006, ouvrant le GPU au calcul général ; certaines charges HPC ont été accélérées jusqu'à 1 000 ×, faisant chuter le coût du calcul d'un facteur 1 000.",
-              "A transformé Nvidia en leader de l'IA : le chiffre d'affaires est passé d'environ 3 G$ en 2010 à plus de 130 G$ en 2025 (+3 600 %), hissant l'entreprise parmi les toutes premières capitalisations mondiales."
-            ],
-            "images": [
-              {
-                "src": "/images/projects/project-01/NVIDIA.jpg",
-                "alt": "Nvidia",
-                "width": 16,
-                "height": 9
-              }
-            ]
-          },
-          {
-            "company": "Denny's",
-            "timeframe": "1978 - 1983",
-            "role": "Plongeur, Commis debarrasseur et Serveur",
-            "achievements": [
-              "Optimisé le circuit de plonge en instaurant un tri préalable et un remplissage méthodique des machines, réduisant le temps de rotation de la vaisselle de 25 %.",
-              "Mis en place un protocole de débarrassage et de remise en place des tables en équipe, accélérant la préparation des couverts de 30 % et augmentant le chiffre d'affaires du service du soir de 12 %."
-            ],
-            "images": [
-              {
-                "src": "/images/projects/project-01/Dennys.png",
-                "alt": "Denny's",
-                "width": 16,
-                "height": 9
-              }
-            ]
-          }
-        ]
-      },
-      "studies": {
-        "display": true,
-        "title": "Etude et Formation",
-        "institutions": [
-          {
-            "degreeTitle": "Bachelor en Genie Electrique",
-            "institutionName": "Université de l'état d'Oregon",
-            "yearsAttended": "1980 - 1984",
-            "programDescription": "Parcours accrédité ABET couvrant les fondements du génie électrique : circuits analogiques et numériques, électronique de puissance, électromagnétisme, traitement du signal et microprocesseurs. Le cursus inclut des laboratoires pratiques chaque trimestre et un projet capstone en équipe consacré à la conception d'un système embarqué complet."
-          },
-          {
-            "degreeTitle": "Master en Genie Electrique",
-            "institutionName": "Universite de Stanford",
-            "yearsAttended": "1990 - 1992",
-            "programDescription": "Cycle de recherche axé sur les architectures matérielles avancées et le calcul parallèle : VLSI, conception de processeurs graphiques et algorithmes accélérés. Mémoire de fin d'études réalisé au Stanford Graphics Lab sur l'usage des GPU pour le rendu 3D en temps réel, aboutissant à une publication scientifique et à un prototype fonctionnel."
-          }
-        ]
-      },
-      "technical": {
-        "display": true,
-        "title": "Mes Technologies",
-        "skills": [
-          {
-            "title": "Cuda",
-            "description": "Plateforme de calcul parallèle lancée en 2006 : elle expose la puissance des GPU via C/C++ et Python, devenant le standard de facto pour l'IA, la HPC et le rendu scientifique.",
-            "images": [
-              {
-                "src": "/images/tech/cuda.jpg",
-                "alt": "Project image",
-                "width": 16,
-                "height": 9
-              }
-            ]
-          },
-          {
-            "title": "Architectures GPU (Tesla → Blackwell)",
-            "description": "Direction technique de générations phares : Tesla, Fermi, Pascal, Volta, Turing, Ampere, Hopper puis Blackwell (208 milliards de transistors, annoncé en 2024). Chaque itération double (ou plus) les performances et introduit des blocs dédiés : Tensor Cores, RT Cores, Transformer Engines…",
-            "images": [
-              {
-                "src": "/images/tech/blackwell-die.png",
-                "alt": "Project image",
-                "width": 16,
-                "height": 9
-              }
-            ]
-          },
-          {
-            "title": "Systèmes DGX & Superchips",
-            "description": "Conception des stations DGX (AI supercomputer « clé en main ») et des superchips Grace Hopper / Grace Blackwell, capables de délivrer jusqu'à plusieurs dizaines de PFLOPS IA par nœud.",
-            "images": [
-              {
-                "src": "/images/tech/dgx-station.jpg",
-                "alt": "NVIDIA DGX Station",
-                "width": 16,
-                "height": 9
-              }
-            ]
-          },
-          {
-            "title": "Omniverse & Génération 3D",
-            "description": "Plateforme de simulation collaborative temps‑réel basée sur l'USD : jumeaux numériques, rendu photoréaliste et pipelines d'IA générative pour l'industrie, la robotique et le divertissement.",
-            "images": [
-              {
-                "src": "/images/tech/omniverse.jpg",
-                "alt": "Capture d'écran Omniverse",
-                "width": 16,
-                "height": 9
-              }
-            ]
-          }
-        ]
-      }
-    }
+    "experienceId": 1,
+    "providerId": 1,
+    "jobTitle": "CEO & Founder",
+    "companyName": "NVIDIA",
+    "description": "Fondateur et CEO de NVIDIA, pionnier de l'IA et du GPU computing. Dirige la stratégie globale de l'entreprise et l'innovation technologique.",
+    "task1": "Développement de l'architecture GPU révolutionnaire",
+    "task2": "Expansion internationale et acquisitions stratégiques",
+    "startDate": "1993-01-01",
+    "endDate": null,
+    "experienceImage": "/images/companies/nvidia-logo.png"
   },
   {
-    "provider_id": 2,
-    "about": {
-      "intro": {
-        "display": true,
-        "title": "Introduction",
-        "description": "Marie Dubois est une ingénieure Machine Learning passionnée par l'innovation technologique. Spécialisée dans le développement d'algorithmes d'IA avancés, elle combine expertise technique et vision stratégique pour créer des solutions intelligentes qui transforment les industries."
-      },
-      "work": {
-        "display": true,
-        "title": "Mon experience professionel",
-        "experiences": [
-          {
-            "company": "TechCorp",
-            "timeframe": "2020 - Aujourd'hui",
-            "role": "Lead Machine Learning Engineer",
-            "achievements": [
-              "Développé et déployé des modèles de deep learning pour l'analyse prédictive, améliorant la précision de 40% et réduisant les coûts opérationnels de 25%.",
-              "Dirigé une équipe de 8 ingénieurs ML, établissant les meilleures pratiques et optimisant les pipelines de données pour traiter 10M+ d'événements par jour."
-            ],
-            "images": [
-              {
-                "src": "/images/projects/project-01/NVIDIA.jpg",
-                "alt": "TechCorp",
-                "width": 16,
-                "height": 9
-              }
-            ]
-          },
-          {
-            "company": "DataLab",
-            "timeframe": "2018 - 2020",
-            "role": "Data Scientist Senior",
-            "achievements": [
-              "Conçu des algorithmes de recommandation personnalisés augmentant l'engagement utilisateur de 35%.",
-              "Implémenté des solutions de NLP pour l'analyse de sentiment, traitant plus de 1M de commentaires par mois."
-            ],
-            "images": [
-              {
-                "src": "/images/projects/project-01/Dennys.png",
-                "alt": "DataLab",
-                "width": 16,
-                "height": 9
-              }
-            ]
-          }
-        ]
-      },
-      "studies": {
-        "display": true,
-        "title": "Etude et Formation",
-        "institutions": [
-          {
-            "degreeTitle": "Master en Intelligence Artificielle",
-            "institutionName": "École Centrale Paris",
-            "yearsAttended": "2016 - 2018",
-            "programDescription": "Formation approfondie en machine learning, deep learning et traitement du langage naturel. Projet de fin d'études sur l'optimisation des réseaux de neurones pour la reconnaissance d'images."
-          },
-          {
-            "degreeTitle": "Ingénieur en Informatique",
-            "institutionName": "Polytechnique",
-            "yearsAttended": "2013 - 2016",
-            "programDescription": "Formation généraliste en informatique avec spécialisation en algorithmes et structures de données. Stage de recherche en optimisation combinatoire."
-          }
-        ]
-      },
-      "technical": {
-        "display": true,
-        "title": "Mes Technologies",
-        "skills": [
-          {
-            "title": "Deep Learning & Neural Networks",
-            "description": "Expertise en conception et optimisation de réseaux de neurones profonds, incluant CNN, RNN, LSTM et architectures transformer pour diverses applications.",
-            "images": [
-              {
-                "src": "/images/tech/cuda.jpg",
-                "alt": "Deep Learning",
-                "width": 16,
-                "height": 9
-              }
-            ]
-          },
-          {
-            "title": "Machine Learning Pipelines",
-            "description": "Développement de pipelines ML end-to-end avec MLOps, incluant la gestion des données, l'entraînement, le déploiement et le monitoring des modèles.",
-            "images": [
-              {
-                "src": "/images/tech/blackwell-die.png",
-                "alt": "ML Pipeline",
-                "width": 16,
-                "height": 9
-              }
-            ]
-          },
-          {
-            "title": "Big Data & Cloud Computing",
-            "description": "Maîtrise des technologies big data (Spark, Hadoop) et des plateformes cloud (AWS, GCP) pour le traitement à grande échelle de données.",
-            "images": [
-              {
-                "src": "/images/tech/dgx-station.jpg",
-                "alt": "Big Data",
-                "width": 16,
-                "height": 9
-              }
-            ]
-          },
-          {
-            "title": "Natural Language Processing",
-            "description": "Spécialisation en NLP avec expertise en BERT, GPT et autres modèles de langage pour l'analyse de texte et la génération de contenu.",
-            "images": [
-              {
-                "src": "/images/tech/omniverse.jpg",
-                "alt": "NLP",
-                "width": 16,
-                "height": 9
-              }
-            ]
-          }
-        ]
-      }
-    }
+    "experienceId": 2,
+    "providerId": 1,
+    "jobTitle": "Ingénieur Senior",
+    "companyName": "LSI Logic",
+    "description": "Développement de puces graphiques et de processeurs spécialisés pour le marché professionnel.",
+    "task1": "Conception de circuits intégrés haute performance",
+    "task2": "Optimisation des architectures de processeurs",
+    "startDate": "1990-01-01",
+    "endDate": "1992-12-31",
+    "experienceImage": "/images/companies/lsi-logic-logo.png"
+  },
+  {
+    "experienceId": 3,
+    "providerId": 2,
+    "jobTitle": "AI Researcher & Educator",
+    "companyName": "deeplearning.ai",
+    "description": "Chercheur en IA et fondateur de deeplearning.ai, spécialisé dans l'éducation et la recherche en machine learning.",
+    "task1": "Développement de cours en ligne sur le deep learning",
+    "task2": "Recherche sur les réseaux de neurones",
+    "startDate": "2017-01-01",
+    "endDate": null,
+    "experienceImage": "/images/companies/deeplearning-ai-logo.png"
+  },
+  {
+    "experienceId": 4,
+    "providerId": 2,
+    "jobTitle": "Chief Scientist",
+    "companyName": "Baidu",
+    "description": "Responsable scientifique de Baidu, leader de la recherche en IA pour le plus grand moteur de recherche chinois.",
+    "task1": "Direction de l'équipe de recherche en IA",
+    "task2": "Développement d'algorithmes de reconnaissance vocale",
+    "startDate": "2014-01-01",
+    "endDate": "2017-12-31",
+    "experienceImage": "/images/companies/baidu-logo.png"
+  },
+  {
+    "experienceId": 5,
+    "providerId": 2,
+    "jobTitle": "Co-fondateur",
+    "companyName": "Coursera",
+    "description": "Co-fondateur de Coursera, plateforme d'éducation en ligne qui a révolutionné l'apprentissage à distance.",
+    "task1": "Développement de la plateforme d'apprentissage en ligne",
+    "task2": "Création de partenariats avec les universités",
+    "startDate": "2012-01-01",
+    "endDate": "2014-12-31",
+    "experienceImage": "/images/companies/coursera-logo.png"
   }
 ]

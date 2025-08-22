@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Retourner les informations de l'utilisateur (sans le mot de passe)
-    const { password_hash, ...userWithoutPassword } = user;
+    const { password, ...userWithoutPassword } = user;
 
     return NextResponse.json({
       user: userWithoutPassword,

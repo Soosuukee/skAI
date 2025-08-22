@@ -14,7 +14,7 @@ import {
   Text,
   RevealFx,
 } from "@/once-ui/components";
-import BrandSetter from "@/components/BrandSetter";
+
 import { baseURL } from "@/app/resources";
 import TableOfContents from "@/components/about/TableOfContents";
 import styles from "@/components/about/about.module.scss";
@@ -49,7 +49,6 @@ export default function ProviderAboutPage({ params }: ProviderAboutPageProps) {
 
   return (
     <>
-      <BrandSetter brand="yellow" />
       <About provider={provider} social={social} about={about} />
     </>
   );

@@ -1,39 +1,101 @@
 [
-  { "provider_id": 1, "skill_id": 1 },
-  { "provider_id": 1, "skill_id": 9 },
-  { "provider_id": 1, "skill_id": 17 },
-  { "provider_id": 1, "skill_id": 38 },
-  { "provider_id": 1, "skill_id": 50 },
-
-  { "provider_id": 2, "skill_id": 2 },
-  { "provider_id": 2, "skill_id": 5 },
-  { "provider_id": 2, "skill_id": 46 },
-  { "provider_id": 2, "skill_id": 47 },
-  { "provider_id": 2, "skill_id": 48 },
-
-  { "provider_id": 3, "skill_id": 3 },
-  { "provider_id": 3, "skill_id": 29 },
-  { "provider_id": 3, "skill_id": 35 },
-  { "provider_id": 3, "skill_id": 36 },
-  { "provider_id": 3, "skill_id": 28 },
-
-  { "provider_id": 4, "skill_id": 4 },
-  { "provider_id": 4, "skill_id": 11 },
-  { "provider_id": 4, "skill_id": 12 },
-  { "provider_id": 4, "skill_id": 22 },
-  { "provider_id": 4, "skill_id": 37 },
-
-  { "provider_id": 5, "skill_id": 19 },
-  { "provider_id": 5, "skill_id": 20 },
-  { "provider_id": 5, "skill_id": 21 },
-  { "provider_id": 5, "skill_id": 22 },
-  { "provider_id": 5, "skill_id": 57 },
-
-  { "provider_id": 6, "skill_id": 1 },
-  { "provider_id": 6, "skill_id": 3 },
-  { "provider_id": 6, "skill_id": 40 },
-  { "provider_id": 6, "skill_id": 41 },
-  { "provider_id": 6, "skill_id": 43 },
-  { "provider_id": 6, "skill_id": 44 },
-  { "provider_id": 6, "skill_id": 45 }
+  {
+    "providerSkillId": 1,
+    "providerId": 1,
+    "skillId": 1,
+    "level": "Expert",
+    "yearsOfExperience": 25,
+    "certified": true,
+    "certificationDate": "2010-01-01"
+  },
+  {
+    "providerSkillId": 2,
+    "providerId": 1,
+    "skillId": 9,
+    "level": "Expert",
+    "yearsOfExperience": 20,
+    "certified": true,
+    "certificationDate": null
+  },
+  {
+    "providerSkillId": 3,
+    "providerId": 1,
+    "skillId": 19,
+    "level": "Avancé",
+    "yearsOfExperience": 15,
+    "certified": false,
+    "certificationDate": null
+  },
+  {
+    "providerSkillId": 4,
+    "providerId": 1,
+    "skillId": 20,
+    "level": "Avancé",
+    "yearsOfExperience": 12,
+    "certified": false,
+    "certificationDate": null
+  },
+  {
+    "providerSkillId": 5,
+    "providerId": 1,
+    "skillId": 21,
+    "level": "Avancé",
+    "yearsOfExperience": 10,
+    "certified": false,
+    "certificationDate": null
+  },
+  {
+    "providerSkillId": 6,
+    "providerId": 2,
+    "skillId": 2,
+    "level": "Expert",
+    "yearsOfExperience": 10,
+    "certified": true,
+    "certificationDate": "2018-01-01"
+  },
+  {
+    "providerSkillId": 7,
+    "providerId": 2,
+    "skillId": 3,
+    "level": "Expert",
+    "yearsOfExperience": 8,
+    "certified": false,
+    "certificationDate": null
+  },
+  {
+    "providerSkillId": 8,
+    "providerId": 2,
+    "skillId": 28,
+    "level": "Expert",
+    "yearsOfExperience": 15,
+    "certified": true,
+    "certificationDate": "2015-01-01"
+  },
+  {
+    "providerSkillId": 9,
+    "providerId": 2,
+    "skillId": 47,
+    "level": "Avancé",
+    "yearsOfExperience": 5,
+    "certified": false,
+    "certificationDate": null
+  },
+  {
+    "providerSkillId": 10,
+    "providerId": 2,
+    "skillId": 48,
+    "level": "Avancé",
+    "yearsOfExperience": 7,
+    "certified": false,
+    "certificationDate": null
+  },
+  {
+    "providerSkillId": 11,
+    "providerId": 2,
+    "skillId": 50,
+    "level": "Intermédiaire",
+    "yearsOfExperience": 3,
+    "certified": false,
+    "certificationDate": null
+  }
 ]

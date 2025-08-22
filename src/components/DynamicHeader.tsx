@@ -1,23 +1,19 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { Header } from "./Header";
-import { HomeHeader } from "./HomeHeader";
 import { ProviderHeader } from "./ProviderHeader";
+import { useNavigationContext } from "@/app/hooks/useNavigationContext";
 
-export const DynamicHeader = () => {
-  const pathname = usePathname() ?? "";
+type DynamicHeaderProps = {
+  showLogo?: boolean;
+};
 
-  // Si on est sur la page d'accueil (/)
-  if (pathname === "/") {
-    return <HomeHeader />;
+export const DynamicHeader = ({ showLogo = true }: DynamicHeaderProps) => {
+  const navigationContext = useNavigationContext();
+
+  if (navigationContext === "provider") {
+    return <ProviderHeader showLogo={showLogo} />;
   }
 
-  // Si on est sur une page provider (/providers/[slug]/*)
-  if (pathname.startsWith("/providers/")) {
-    return <ProviderHeader />;
-  }
-
-  // Pour toutes les autres pages, utiliser le header par défaut
-  return <Header />;
+  return <Header showLogo={showLogo} />;
 };

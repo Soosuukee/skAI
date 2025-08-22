@@ -14,6 +14,7 @@ import {
   Text,
 } from "@/once-ui/components";
 import BrandSetter from "@/components/BrandSetter";
+
 import { baseURL } from "@/app/resources";
 import { about, person, service } from "@/app/resources/content";
 import { formatDate } from "@/app/utils/formatDate";

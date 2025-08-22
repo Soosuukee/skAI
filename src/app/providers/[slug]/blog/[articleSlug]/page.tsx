@@ -16,7 +16,7 @@ import providersData from "@/data/providers.json";
 import { notFound } from "next/navigation";
 
 interface ProviderArticlePageProps {
-  params: { slug: string; articleSlug: string };
+  params: Promise<{ slug: string; articleSlug: string }>;
 }
 
 // Fonction pour générer les paramètres statiques
@@ -40,7 +40,7 @@ export async function generateStaticParams() {
 export default async function ProviderArticlePage({
   params,
 }: ProviderArticlePageProps) {
-  const { slug, articleSlug } = params;
+  const { slug, articleSlug } = await params;
 
   // Trouver le provider
   const provider = providersData.find((p) => p.slug === slug);

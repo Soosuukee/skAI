@@ -1,5 +1,5 @@
 import { Column } from "@/once-ui/components";
-import BrandSetter from "@/components/BrandSetter";
+
 import { baseURL } from "@/app/resources";
 import { about, person, service } from "@/app/resources/content";
 import { Meta, Schema } from "@/once-ui/modules";
@@ -49,7 +49,6 @@ function ServiceContent() {
 export default function Service() {
   return (
     <>
-      <BrandSetter brand="red" />
       <ServiceContent />
     </>
   );

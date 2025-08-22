@@ -9,59 +9,34 @@ import {
   Line,
   ToggleButton,
   SmartLink,
+  Button,
+  Text,
 } from "@/once-ui/components";
 import styles from "@/components/Header.module.scss";
 
-import { routes, display } from "@/app/resources";
-import { person, about, blog, service } from "@/app/resources/content";
 import { ThemeToggle } from "./ThemeToggle";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { LoginButton } from "./auth/LoginButton";
+import { UserMenu } from "./auth/UserMenu";
+import { JoinButton } from "./auth/JoinButton";
+import { useProvider } from "@/app/hooks/useProvider";
+import { useProviderSlug } from "@/app/hooks/useNavigationContext";
 
-type TimeDisplayProps = {
-  timeZone: string;
-  locale?: string;
+type ProviderHeaderProps = {
+  showLogo?: boolean;
 };
 
-const TimeDisplay: React.FC<TimeDisplayProps> = ({
-  timeZone,
-  locale = "en-GB",
-}) => {
-  const [currentTime, setCurrentTime] = useState("");
-
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const options: Intl.DateTimeFormatOptions = {
-        timeZone,
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-      };
-      const timeString = new Intl.DateTimeFormat(locale, options).format(now);
-      setCurrentTime(timeString);
-    };
-
-    updateTime();
-    const intervalId = setInterval(updateTime, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [timeZone, locale]);
-
-  return <>{currentTime}</>;
-};
-
-export const ProviderHeader = () => {
+export const ProviderHeader = ({ showLogo = true }: ProviderHeaderProps) => {
   const pathname = usePathname() ?? "";
+  const { user, isLoading } = useAuth();
+  const providerSlug = useProviderSlug();
+  const { provider } = useProvider(providerSlug || "");
 
-  // Extraire le slug du provider depuis le pathname
-  const pathSegments = pathname.split("/");
-  const providerSlug = pathSegments[2]; // /providers/[slug]/...
+  if (!providerSlug) {
+    return null;
+  }
 
-  // Chemins dynamiques pour le provider
-  const homePath = `/providers/${providerSlug}`;
-  const aboutPath = `/providers/${providerSlug}/about`;
-  const servicePath = `/providers/${providerSlug}/service`;
-  const blogPath = `/providers/${providerSlug}/blog`;
+  const baseProviderPath = `/providers/${providerSlug}`;
 
   return (
     <>
@@ -93,14 +68,22 @@ export const ProviderHeader = () => {
           textVariant="body-default-s"
           gap="8"
         >
-          <SmartLink href="/" unstyled>
-            <img
-              src="/trademark/Modern-_skAi_-Typography-Design.svg"
-              alt="Logo"
-              style={{ height: "4rem", width: "auto", filter: "invert(1)" }}
-            />
-          </SmartLink>
-          {display.location && <Flex hide="s">{person.location}</Flex>}
+          {showLogo && (
+            <SmartLink href="/" unstyled>
+              <img
+                src="/trademark/Modern-_skAi_-Typography-Design.svg"
+                alt="Logo"
+                style={{ height: "4rem", width: "auto", filter: "invert(1)" }}
+              />
+            </SmartLink>
+          )}
+          {provider && (
+            <Flex hide="s">
+              <Text variant="body-default-s" color="neutral-medium">
+                {provider.firstName} {provider.lastName}
+              </Text>
+            </Flex>
+          )}
         </Flex>
         <Flex fillWidth horizontal="center">
           <Flex
@@ -113,58 +96,63 @@ export const ProviderHeader = () => {
             zIndex={1}
           >
             <Flex gap="4" vertical="center" textVariant="body-default-s">
+              {/* Portfolio (page principale du provider) */}
               <ToggleButton
                 prefixIcon="home"
-                href={homePath}
+                href={baseProviderPath}
                 label="Portfolio"
-                selected={pathname === homePath}
+                selected={pathname === baseProviderPath}
               />
               <Line background="neutral-alpha-medium" vert maxHeight="24" />
+
+              {/* À propos */}
               <ToggleButton
                 className="s-flex-hide"
                 prefixIcon="person"
-                href={aboutPath}
+                href={`${baseProviderPath}/about`}
                 label="À propos"
-                selected={pathname === aboutPath}
+                selected={pathname === `${baseProviderPath}/about`}
               />
               <ToggleButton
                 className="s-flex-show"
                 prefixIcon="person"
-                href={aboutPath}
-                selected={pathname === aboutPath}
+                href={`${baseProviderPath}/about`}
+                selected={pathname === `${baseProviderPath}/about`}
               />
+
+              {/* Services */}
               <ToggleButton
                 className="s-flex-hide"
                 prefixIcon="grid"
-                href={servicePath}
+                href={`${baseProviderPath}/service`}
                 label="Services"
-                selected={pathname === servicePath}
+                selected={pathname.startsWith(`${baseProviderPath}/service`)}
               />
               <ToggleButton
                 className="s-flex-show"
                 prefixIcon="grid"
-                href={servicePath}
-                selected={pathname === servicePath}
+                href={`${baseProviderPath}/service`}
+                selected={pathname.startsWith(`${baseProviderPath}/service`)}
               />
+
+              {/* Blog */}
               <ToggleButton
                 className="s-flex-hide"
                 prefixIcon="book"
-                href={blogPath}
+                href={`${baseProviderPath}/blog`}
                 label="Blog"
-                selected={pathname === blogPath}
+                selected={pathname.startsWith(`${baseProviderPath}/blog`)}
               />
               <ToggleButton
                 className="s-flex-show"
                 prefixIcon="book"
-                href={blogPath}
-                selected={pathname === blogPath}
+                href={`${baseProviderPath}/blog`}
+                selected={pathname.startsWith(`${baseProviderPath}/blog`)}
               />
-              {display.themeSwitcher && (
-                <>
-                  <Line background="neutral-alpha-medium" vert maxHeight="24" />
-                  <ThemeToggle />
-                </>
-              )}
+
+              {/* Toggle thème */}
+              <Line background="neutral-alpha-medium" vert maxHeight="24" />
+              <ThemeToggle />
             </Flex>
           </Flex>
         </Flex>
@@ -176,9 +164,19 @@ export const ProviderHeader = () => {
             textVariant="body-default-s"
             gap="20"
           >
-            <Flex hide="s">
-              {display.time && <TimeDisplay timeZone={person.location} />}
-            </Flex>
+            {/* Section authentification */}
+            {!isLoading && (
+              <>
+                {user ? (
+                  <UserMenu />
+                ) : (
+                  <Flex gap="8" vertical="center">
+                    <JoinButton variant="tertiary" size="s" />
+                    <LoginButton />
+                  </Flex>
+                )}
+              </>
+            )}
           </Flex>
         </Flex>
       </Flex>

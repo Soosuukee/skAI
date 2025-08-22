@@ -1,5 +1,5 @@
 import { Column, Heading } from "@/once-ui/components";
-import BrandSetter from "@/components/BrandSetter";
+
 import { CustomRevealFx } from "@/components/CustomRevealFx";
 import { Posts } from "@/components/blog/Posts";
 import { baseURL } from "@/app/resources";
@@ -19,7 +19,6 @@ export async function generateMetadata() {
 export default function Blog() {
   return (
     <>
-      <BrandSetter brand="green" />
       <Column maxWidth="s">
         <Schema
           as="blog"

@@ -91,7 +91,10 @@ export class UserRoleService {
       return null;
     }
 
-    let userWithDetails: UserWithDetails = { ...user };
+    let userWithDetails: UserWithDetails = { 
+      ...user, 
+      role: user.role as 'provider' | 'client' | 'admin' 
+    };
 
     switch (user.role) {
       case 'provider':
@@ -155,7 +158,9 @@ export class UserRoleService {
    * Récupère tous les utilisateurs d'un rôle spécifique
    */
   static getUsersByRole(role: 'provider' | 'client' | 'admin'): User[] {
-    return users.filter(user => user.role === role);
+    return users
+      .filter(user => user.role === role)
+      .map(user => ({ ...user, role: user.role as 'provider' | 'client' | 'admin' }));
   }
 
   /**
@@ -199,7 +204,7 @@ export class UserRoleService {
     }
 
     if (user.password === password) {
-      return user;
+      return { ...user, role: user.role as 'provider' | 'client' | 'admin' };
     }
 
     return null;
@@ -210,7 +215,7 @@ export class UserRoleService {
    */
   static getUserByEmail(email: string): User | null {
     const user = users.find(u => u.email === email);
-    return user || null;
+    return user ? { ...user, role: user.role as 'provider' | 'client' | 'admin' } : null;
   }
 
   /**
@@ -218,6 +223,6 @@ export class UserRoleService {
    */
   static getUserById(userId: number): User | null {
     const user = users.find(u => u.user_id === userId);
-    return user || null;
+    return user ? { ...user, role: user.role as 'provider' | 'client' | 'admin' } : null;
   }
 }

@@ -1,0 +1,145 @@
+.service-content {
+  line-height: 1.6;
+  color: var(--neutral-strong);
+
+  h1, h2, h3, h4, h5, h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  h1 {
+    font-size: 2rem;
+    color: var(--brand-strong);
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    color: var(--brand-medium);
+    border-bottom: 2px solid var(--brand-alpha-medium);
+    padding-bottom: 0.5rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    color: var(--neutral-strong);
+  }
+
+  h4 {
+    font-size: 1.25rem;
+    color: var(--neutral-strong);
+  }
+
+  p {
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+
+  ul, ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+
+  strong {
+    font-weight: 600;
+    color: var(--brand-medium);
+  }
+
+  em {
+    font-style: italic;
+    color: var(--neutral-medium);
+  }
+
+  blockquote {
+    border-left: 4px solid var(--brand-medium);
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: var(--neutral-medium);
+    background: var(--neutral-alpha-weak);
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  code {
+    background: var(--neutral-alpha-medium);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+  }
+
+  pre {
+    background: var(--neutral-alpha-medium);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    background: var(--surface);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  th, td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--neutral-alpha-medium);
+  }
+
+  th {
+    background: var(--neutral-alpha-medium);
+    font-weight: 600;
+    color: var(--neutral-strong);
+  }
+
+  tr:hover {
+    background: var(--neutral-alpha-weak);
+  }
+
+  a {
+    color: var(--brand-medium);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-bottom-color: var(--brand-medium);
+    }
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  hr {
+    border: none;
+    border-top: 2px solid var(--neutral-alpha-medium);
+    margin: 2rem 0;
+  }
+
+  .highlight {
+    background: var(--brand-alpha-weak);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    border-left: 3px solid var(--brand-medium);
+  }
+}

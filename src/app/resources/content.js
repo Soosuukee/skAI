@@ -1,6 +1,4 @@
 import { Logo } from "@/once-ui/components";
-import path from "path";
-import { title } from "process";
 
 const person = {
   firstName: "Jensen",

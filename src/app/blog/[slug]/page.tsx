@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import BrandSetter from "@/components/BrandSetter";
+
 import {
   AvatarGroup,
   Button,

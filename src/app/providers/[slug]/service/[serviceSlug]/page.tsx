@@ -3,18 +3,19 @@
 import React from "react";
 import {
   Heading,
-  RevealFx,
   Column,
   Text,
+  Button,
+  RevealFx,
   Flex,
-  Avatar,
-  SmartLink,
 } from "@/once-ui/components";
 import { CustomRevealFx } from "@/components/CustomRevealFx";
+import { ServiceContent } from "@/components/service/ServiceContent";
 import { useProvider } from "@/app/hooks/useProvider";
+import { useProviderServices } from "@/app/hooks/useServices";
+import { formatPrice } from "@/app/utils/priceUtils";
 import { baseURL } from "@/app/resources";
 import { Meta, Schema } from "@/once-ui/modules";
-import { getServicesByProvider } from "@/app/utils/serviceUtils";
 
 interface ProviderServiceDetailPageProps {
   params: Promise<{ slug: string; serviceSlug: string }>;
@@ -24,15 +25,20 @@ export default function ProviderServiceDetailPage({
   params,
 }: ProviderServiceDetailPageProps) {
   const resolvedParams = React.use(params);
-  const { provider, loading, error } = useProvider(resolvedParams.slug);
+  const {
+    provider,
+    loading: providerLoading,
+    error: providerError,
+  } = useProvider(resolvedParams.slug);
+  const {
+    services,
+    loading: servicesLoading,
+    error: servicesError,
+  } = useProviderServices(resolvedParams.slug);
 
-  // Récupérer les services du prestataire
-  const services = getServicesByProvider(resolvedParams.slug);
-  const currentService = services.find(
-    (service) => service.slug === resolvedParams.serviceSlug
-  );
+  // Le service est maintenant chargé directement via le hook useProviderServices
 
-  if (loading) {
+  if (providerLoading || servicesLoading) {
     return (
       <Column maxWidth="m" gap="xl" horizontal="center">
         <Heading>Chargement...</Heading>
@@ -40,19 +46,29 @@ export default function ProviderServiceDetailPage({
     );
   }
 
-  if (error || !provider) {
+  if (providerError || !provider) {
     return (
       <Column maxWidth="m" gap="xl" horizontal="center">
-        <Heading>Erreur: {error || "Provider non trouvé"}</Heading>
+        <Heading>Erreur: {providerError || "Provider non trouvé"}</Heading>
       </Column>
     );
   }
 
-  if (!currentService) {
+  const service = services.find((s) => s.slug === resolvedParams.serviceSlug);
+
+  if (!service) {
     return (
       <Column maxWidth="m" gap="xl" horizontal="center">
         <Heading>Service non trouvé</Heading>
-        <Text>Le service demandé n'existe pas pour ce prestataire.</Text>
+        <Text variant="body-default-l" color="neutral-medium">
+          Le service demandé n'existe pas.
+        </Text>
+        <Button
+          href={`/providers/${resolvedParams.slug}/service`}
+          variant="primary"
+        >
+          Retour aux services
+        </Button>
       </Column>
     );
   }
@@ -62,11 +78,11 @@ export default function ProviderServiceDetailPage({
       <Schema
         as="webPage"
         baseURL={baseURL}
-        path={`/providers/${provider.slug}/service/${currentService.slug}`}
-        title={currentService.title}
-        description={`Service ${currentService.title} proposé par ${provider.firstName} ${provider.lastName}`}
+        path={`/providers/${provider.slug}/service/${service.slug}`}
+        title={`${service.title} - ${provider.firstName} ${provider.lastName}`}
+        description={`Service ${service.title} proposé par ${provider.firstName} ${provider.lastName}`}
         image={`${baseURL}/og?title=${encodeURIComponent(
-          currentService.title
+          `${service.title} - ${provider.firstName} ${provider.lastName}`
         )}`}
         author={{
           name: `${provider.firstName} ${provider.lastName}`,
@@ -75,88 +91,59 @@ export default function ProviderServiceDetailPage({
         }}
       />
 
-      {/* Header */}
-      <Column fillWidth paddingY="24" gap="m">
-        <CustomRevealFx translateY={4} delay={0.1} fillWidth>
-          <Heading wrap="balance" variant="display-strong-l">
-            {currentService.title}
-          </Heading>
-        </CustomRevealFx>
-        <RevealFx translateY={4} fillWidth delay={0.2}>
-          <Flex gap="12" vertical="center">
-            <Avatar src={provider.avatar} size="m" />
-            <Text variant="body-default-l" color="neutral-medium">
-              Proposé par{" "}
-              <strong>
-                {provider.firstName} {provider.lastName}
-              </strong>
-            </Text>
-          </Flex>
-        </RevealFx>
-      </Column>
-
       {/* Contenu du service */}
-      <RevealFx translateY={4} fillWidth delay={0.3}>
-        <Column gap="24" fillWidth>
-          {/* Image du service */}
-          <div
-            style={{
-              width: "100%",
-              height: "300px",
-              background: "var(--neutral-alpha-low)",
-              borderRadius: "12px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "var(--neutral-alpha-medium)",
-              fontSize: "3rem",
-            }}
-          >
-            📋
-          </div>
-
-          {/* Description */}
-          <Column gap="16">
-            <Heading variant="heading-strong-m">Description du service</Heading>
-            <Text variant="body-default-l" color="neutral-high">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
+      {service ? (
+        <RevealFx translateY={4} fillWidth delay={0.3}>
+          <Column gap="l" fillWidth>
+            <Heading as="h2" variant="display-strong-m">
+              {service.title}
+            </Heading>
+            <Text variant="body-default-l" color="neutral-medium">
+              Durée estimée : {service.estimatedDuration}
+            </Text>
+            <Text variant="body-default-l">
+              Prix : {formatPrice(service.minPrice, service.maxPrice)}
             </Text>
           </Column>
+        </RevealFx>
+      ) : (
+        <RevealFx translateY={4} fillWidth delay={0.3}>
+          <Column gap="l" fillWidth>
+            <Heading as="h2" variant="display-strong-m">
+              Description du service
+            </Heading>
+            <Text variant="body-default-l" color="neutral-medium">
+              Le contenu détaillé de ce service sera bientôt disponible. Ce
+              service est proposé par {provider.firstName} {provider.lastName},
+              {provider.role} basé à {provider.location}.
+            </Text>
 
-          {/* Prix */}
-          {currentService.min_price && currentService.max_price && (
-            <Column gap="16">
-              <Heading variant="heading-strong-m">Tarification</Heading>
-              <Text variant="body-default-l" color="neutral-high">
-                Prix :{" "}
-                {currentService.min_price === currentService.max_price
-                  ? `${currentService.min_price}€`
-                  : `${currentService.min_price}€ - ${currentService.max_price}€`}
-              </Text>
-            </Column>
-          )}
+            <Text variant="body-default-l">
+              Pour plus d'informations sur ce service, veuillez contacter{" "}
+              {provider.firstName}
+              directement via son profil ou utiliser les informations de contact
+              disponibles.
+            </Text>
+          </Column>
+        </RevealFx>
+      )}
 
-          {/* Bouton de contact */}
-          <Flex horizontal="center" paddingY="24">
-            <SmartLink
-              href={`/providers/${provider.slug}`}
-              style={{
-                padding: "12px 24px",
-                borderRadius: "8px",
-                background: "var(--brand)",
-                color: "var(--brand-on-background)",
-                textDecoration: "none",
-                fontSize: "1rem",
-                fontWeight: "600",
-              }}
-            >
-              Contacter {provider.firstName}
-            </SmartLink>
-          </Flex>
-        </Column>
+      {/* Actions */}
+      <RevealFx translateY={4} fillWidth delay={0.4}>
+        <Flex gap="m" horizontal="center">
+          <Button
+            href={`/providers/${resolvedParams.slug}/service`}
+            variant="secondary"
+          >
+            Retour aux services
+          </Button>
+          <Button
+            href={`/providers/${resolvedParams.slug}/about`}
+            variant="primary"
+          >
+            Contacter {provider.firstName}
+          </Button>
+        </Flex>
       </RevealFx>
     </Column>
   );

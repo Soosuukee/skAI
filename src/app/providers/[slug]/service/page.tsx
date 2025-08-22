@@ -4,6 +4,8 @@ import React from "react";
 import { Heading, RevealFx, Column, Text } from "@/once-ui/components";
 import { CustomRevealFx } from "@/components/CustomRevealFx";
 import { useProvider } from "@/app/hooks/useProvider";
+import { useProviderServices } from "@/app/hooks/useProviderServices";
+import { ProviderServices } from "@/components/service/ProviderServices";
 import { baseURL } from "@/app/resources";
 import { Meta, Schema } from "@/once-ui/modules";
 
@@ -15,9 +17,18 @@ export default function ProviderServicePage({
   params,
 }: ProviderServicePageProps) {
   const resolvedParams = React.use(params);
-  const { provider, loading, error } = useProvider(resolvedParams.slug);
+  const {
+    provider,
+    loading: providerLoading,
+    error: providerError,
+  } = useProvider(resolvedParams.slug);
+  const {
+    services,
+    loading: servicesLoading,
+    error: servicesError,
+  } = useProviderServices(resolvedParams.slug);
 
-  if (loading) {
+  if (providerLoading || servicesLoading) {
     return (
       <Column maxWidth="m" gap="xl" horizontal="center">
         <Heading>Chargement...</Heading>
@@ -25,10 +36,10 @@ export default function ProviderServicePage({
     );
   }
 
-  if (error || !provider) {
+  if (providerError || !provider) {
     return (
       <Column maxWidth="m" gap="xl" horizontal="center">
-        <Heading>Erreur: {error || "Provider non trouvé"}</Heading>
+        <Heading>Erreur: {providerError || "Provider non trouvé"}</Heading>
       </Column>
     );
   }
@@ -65,18 +76,11 @@ export default function ProviderServicePage({
         </RevealFx>
       </Column>
 
-      {/* Contenu temporaire */}
-      <RevealFx translateY={4} fillWidth delay={0.3}>
-        <Column gap="16" horizontal="center" paddingY="48">
-          <Heading as="h2" variant="display-strong-s">
-            Services en cours de développement
-          </Heading>
-          <Text variant="body-default-l" color="neutral-medium">
-            Les services de {provider.firstName} seront bientôt disponibles de
-            manière dynamique.
-          </Text>
-        </Column>
-      </RevealFx>
+      {/* Liste des services */}
+      <ProviderServices
+        services={services}
+        providerSlug={resolvedParams.slug}
+      />
     </Column>
   );
 }
