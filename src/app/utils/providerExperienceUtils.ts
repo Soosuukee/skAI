@@ -1,20 +1,19 @@
-import { ProviderExperience } from '@/app/types/providerExperience';
+import { Experience } from '@/app/types/experience';
 import experiences from '@/data/providerExperiences.json';
 
 /**
- * Transforme les données JSON vers le format ProviderExperience
+ * Transforme les données JSON vers le format Experience
  */
-function transformExperienceData(jsonExperience: any): ProviderExperience {
+function transformExperienceData(jsonExperience: any): Experience {
   return {
     experienceId: jsonExperience.experienceId,
-    providerId: jsonExperience.providerId,
     jobTitle: jsonExperience.jobTitle,
     companyName: jsonExperience.companyName,
     description: jsonExperience.description,
     task1: jsonExperience.task1,
     task2: jsonExperience.task2,
-    startDate: new Date(jsonExperience.startDate),
-    endDate: jsonExperience.endDate ? new Date(jsonExperience.endDate) : undefined,
+    startDate: jsonExperience.startDate,
+    endDate: jsonExperience.endDate,
     experienceImage: jsonExperience.experienceImage
   };
 }
@@ -22,32 +21,16 @@ function transformExperienceData(jsonExperience: any): ProviderExperience {
 /**
  * Récupère toutes les expériences
  */
-export function getAllExperiences(): ProviderExperience[] {
+export function getAllExperiences(): Experience[] {
   return experiences.map(transformExperienceData);
-}
-
-/**
- * Récupère les expériences d'un provider spécifique
- */
-export function getExperiencesByProvider(providerId: number): ProviderExperience[] {
-  const allExperiences = getAllExperiences();
-  return allExperiences.filter(experience => experience.providerId === providerId);
 }
 
 /**
  * Trouve une expérience par son ID
  */
-export function getExperienceById(experienceId: number): ProviderExperience | undefined {
+export function getExperienceById(experienceId: number): Experience | undefined {
   const allExperiences = getAllExperiences();
   return allExperiences.find(experience => experience.experienceId === experienceId);
-}
-
-/**
- * Trouve une expérience par provider et ID
- */
-export function getExperienceByProviderAndId(providerId: number, experienceId: number): ProviderExperience | undefined {
-  const providerExperiences = getExperiencesByProvider(providerId);
-  return providerExperiences.find(experience => experience.experienceId === experienceId);
 }
 
 /**

@@ -1,53 +1,34 @@
-import { ProviderEducation } from '@/app/types/providerEducation';
-import education from '@/data/providerScholarships.json';
+import { Education } from '@/app/types/education';
+import education from '@/data/providerEducation.json';
 
 /**
- * Transforme les données JSON vers le format ProviderEducation
+ * Transforme les données JSON vers le format Education
  */
-function transformEducationData(jsonEducation: any): ProviderEducation {
+function transformEducationData(jsonEducation: any): Education {
   return {
-    educationId: jsonEducation.diploma_id,
-    providerId: jsonEducation.provider_id,
+    diplomaId: jsonEducation.diploma_id,
     diplomaTitle: jsonEducation.diploma_title,
     institutionName: jsonEducation.institution_name,
     description: jsonEducation.description,
-    startDate: new Date(jsonEducation.start_date),
-    endDate: jsonEducation.end_date ? new Date(jsonEducation.end_date) : undefined,
-    educationImage: jsonEducation.diploma_image_url,
-    grade: undefined, // À ajouter plus tard si nécessaire
-    fieldOfStudy: undefined // À ajouter plus tard si nécessaire
+    startDate: jsonEducation.start_date,
+    endDate: jsonEducation.end_date,
+    diplomaImageUrl: jsonEducation.diploma_image_url
   };
 }
 
 /**
  * Récupère toutes les formations
  */
-export function getAllEducation(): ProviderEducation[] {
+export function getAllEducation(): Education[] {
   return education.map(transformEducationData);
-}
-
-/**
- * Récupère les formations d'un provider spécifique
- */
-export function getEducationByProvider(providerId: number): ProviderEducation[] {
-  const allEducation = getAllEducation();
-  return allEducation.filter(edu => edu.providerId === providerId);
 }
 
 /**
  * Trouve une formation par son ID
  */
-export function getEducationById(educationId: number): ProviderEducation | undefined {
+export function getEducationById(educationId: number): Education | undefined {
   const allEducation = getAllEducation();
-  return allEducation.find(edu => edu.educationId === educationId);
-}
-
-/**
- * Trouve une formation par provider et ID
- */
-export function getEducationByProviderAndId(providerId: number, educationId: number): ProviderEducation | undefined {
-  const providerEducation = getEducationByProvider(providerId);
-  return providerEducation.find(edu => edu.educationId === educationId);
+  return allEducation.find(edu => edu.diplomaId === educationId);
 }
 
 /**

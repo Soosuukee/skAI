@@ -8,14 +8,7 @@
     "articleCover": "/images/blog/deepep/deepep-cover.jpg",
     "tag": "Deep Learning",
     "language": "fr",
-    "isPublished": true,
-    "isFeatured": true,
-    "viewCount": 1250,
-    "likeCount": 89,
-    "commentCount": 23,
-    "shareCount": 45,
-    "seoScore": 92,
-    "updatedAt": "2024-01-15T14:30:00Z"
+    "isPublished": true
   },
   {
     "articleId": 2,
@@ -25,7 +18,8 @@
     "publishedAt": "2025-07-26",
     "articleCover": "/images/blog/health/gpu-health.jpg",
     "tag": "Santé",
-    "language": "fr"
+    "language": "fr",
+    "isPublished": true
   },
   {
     "articleId": 3,
@@ -35,7 +29,8 @@
     "publishedAt": "2025-07-25",
     "articleCover": "/images/blog/hopper/hopper-arch-transformer.jpg",
     "tag": "IA",
-    "language": "fr"
+    "language": "fr",
+    "isPublished": true
   },
   {
     "articleId": 4,
@@ -45,6 +40,7 @@
     "publishedAt": "2025-07-27",
     "articleCover": "/images/blog/infrastructure/cover.jpg",
     "tag": "Infrastructure TI",
-    "language": "fr"
+    "language": "fr",
+    "isPublished": true
   }
 ]

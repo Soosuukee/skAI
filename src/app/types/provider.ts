@@ -4,9 +4,9 @@ import { Job } from './job';
 import { SocialLink } from './socialLink';
 import { Service } from './service';
 import { Article } from './article';
-import { ProviderSkill } from './providerSkill';
-import { ProviderExperience } from './providerExperience';
-import { ProviderEducation } from './providerEducation';
+import { Experience } from './experience';
+import { Education } from './education';
+import { Language } from './language';
 
 export interface Provider {
   providerId: number;         // Identifiant unique du prestataire
@@ -18,7 +18,7 @@ export interface Provider {
   email: string;              // Email de contact
   avatar: string;             // Chemin vers l'avatar
   location: string;           // Fuseau horaire/zone géographique
-  languages: string[];        // Langues parlées
+  languages: number[];        // IDs des langues parlées
   bio?: string;               // Biographie (optionnelle)
   summary?: string;           // Résumé professionnel
   hourlyRate?: number;        // Tarif horaire (optionnel)
@@ -37,9 +37,10 @@ export interface Provider {
 
 // Interface étendue avec toutes les relations
 export interface ProviderWithDetails extends Provider {
-  skills: ProviderSkill[];    // Compétences détaillées
-  experiences: ProviderExperience[]; // Expériences professionnelles
-  education: ProviderEducation[]; // Formation/éducation
+  skills: number[];           // IDs des compétences
+  languages: number[];        // IDs des langues parlées
+  experiences: Experience[];  // Expériences professionnelles
+  education: Education[];     // Formation/éducation
   socialLinks: SocialLink[];  // Liens sociaux
   services: Service[];        // Services proposés
   articles: Article[];        // Articles publiés

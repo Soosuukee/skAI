@@ -1,6 +1,5 @@
-import { Skill, SkillLevel, ProviderSkill } from '@/app/types/skill';
+import { Skill } from '@/app/types/skill';
 import skills from '@/data/skills.json';
-import providerSkills from '@/data/providerSkills.json';
 
 /**
  * Transforme les données JSON vers le format Skill
@@ -10,23 +9,7 @@ function transformSkillData(jsonSkill: any): Skill {
     skillId: jsonSkill.skill_id,
     name: jsonSkill.name,
     category: undefined, // À ajouter plus tard si nécessaire
-    description: undefined, // À ajouter plus tard si nécessaire
-    level: undefined // À ajouter plus tard si nécessaire
-  };
-}
-
-/**
- * Transforme les données JSON vers le format ProviderSkill
- */
-function transformProviderSkillData(jsonProviderSkill: any): ProviderSkill {
-  return {
-    providerSkillId: jsonProviderSkill.providerSkillId,
-    providerId: jsonProviderSkill.providerId,
-    skillId: jsonProviderSkill.skillId,
-    level: jsonProviderSkill.level as SkillLevel,
-    yearsOfExperience: jsonProviderSkill.yearsOfExperience,
-    certified: jsonProviderSkill.certified,
-    certificationDate: jsonProviderSkill.certificationDate ? new Date(jsonProviderSkill.certificationDate) : undefined
+    description: undefined // À ajouter plus tard si nécessaire
   };
 }
 
@@ -83,68 +66,25 @@ export function getAllSkillCategories(): string[] {
 }
 
 /**
- * Récupère toutes les relations provider-skill
- */
-export function getAllProviderSkills(): ProviderSkill[] {
-  return providerSkills.map(transformProviderSkillData);
-}
-
-/**
- * Récupère les compétences d'un provider spécifique
- */
-export function getProviderSkills(providerId: number): ProviderSkill[] {
-  const allProviderSkills = getAllProviderSkills();
-  return allProviderSkills.filter(ps => ps.providerId === providerId);
-}
-
-/**
- * Récupère les compétences d'un provider avec les détails des compétences
- */
-export function getProviderSkillsWithDetails(providerId: number): (ProviderSkill & { skill: Skill })[] {
-  const providerSkills = getProviderSkills(providerId);
-  return providerSkills.map(ps => ({
-    ...ps,
-    skill: getSkillById(ps.skillId)!
-  }));
-}
-
-/**
- * Trouve une relation provider-skill spécifique
- */
-export function getProviderSkill(providerId: number, skillId: number): ProviderSkill | undefined {
-  const allProviderSkills = getAllProviderSkills();
-  return allProviderSkills.find(ps => ps.providerId === providerId && ps.skillId === skillId);
-}
-
-/**
  * Vérifie si un provider a une compétence spécifique
  */
-export function hasProviderSkill(providerId: number, skillId: number): boolean {
-  return getProviderSkill(providerId, skillId) !== undefined;
+export function hasProviderSkill(providerSkillIds: number[], skillId: number): boolean {
+  return providerSkillIds.includes(skillId);
 }
 
 /**
- * Récupère les providers qui ont une compétence spécifique
+ * Récupère les détails des compétences d'un provider
  */
-export function getProvidersWithSkill(skillId: number): number[] {
-  const allProviderSkills = getAllProviderSkills();
-  return allProviderSkills
-    .filter(ps => ps.skillId === skillId)
-    .map(ps => ps.providerId);
+export function getProviderSkillsWithDetails(providerSkillIds: number[]): Skill[] {
+  return providerSkillIds
+    .map(skillId => getSkillById(skillId))
+    .filter((skill): skill is Skill => skill !== undefined);
 }
 
 /**
- * Formate le niveau de compétence en texte
+ * Filtre les compétences d'un provider par catégorie
  */
-export function formatSkillLevel(level: SkillLevel): string {
-  return level;
-}
-
-/**
- * Calcule l'expérience totale d'un provider
- */
-export function calculateTotalExperience(providerId: number): number {
-  const providerSkills = getProviderSkills(providerId);
-  const totalYears = providerSkills.reduce((sum, ps) => sum + (ps.yearsOfExperience || 0), 0);
-  return totalYears;
+export function getProviderSkillsByCategory(providerSkillIds: number[], category: string): Skill[] {
+  const providerSkills = getProviderSkillsWithDetails(providerSkillIds);
+  return providerSkills.filter(skill => skill.category === category);
 }
