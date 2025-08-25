@@ -19,17 +19,24 @@ function transformProviderData(jsonProvider: any): Provider {
 }
 
 /**
- * GET /api/providers/[slug]
- * Récupère un provider par son slug
+ * GET /api/providers/id/[id]
+ * Récupère un provider par son ID
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { slug } = params;
+    const providerId = parseInt(params.id);
     
-    const jsonProvider = providers.find(p => p.slug === slug);
+    if (isNaN(providerId)) {
+      return NextResponse.json(
+        { error: 'ID de provider invalide' },
+        { status: 400 }
+      );
+    }
+    
+    const jsonProvider = providers.find(p => p.provider_id === providerId);
     
     if (!jsonProvider) {
       return NextResponse.json(

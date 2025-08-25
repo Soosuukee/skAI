@@ -96,7 +96,7 @@ function About({
         as="webPage"
         baseURL={baseURL}
         title={`A propos de ${provider.firstName} ${provider.lastName}`}
-        description={`Rencontrez ${provider.firstName} ${provider.lastName}, ${provider.role} de ${provider.location}`}
+        description={`Rencontrez ${provider.firstName} ${provider.lastName}, expert IA de ${provider.location}`}
         path={`/providers/${provider.slug}/about`}
         image={`${baseURL}/og?title=${encodeURIComponent(
           `${provider.firstName} ${provider.lastName}`
@@ -137,11 +137,11 @@ function About({
                 <Icon onBackground="accent-weak" name="globe" />
                 {provider.location}
               </Flex>
-              {provider.languages.length > 0 && (
+              {provider.languages && provider.languages.length > 0 && (
                 <Flex wrap gap="8">
-                  {provider.languages.map((language: string, index: number) => (
-                    <Tag key={language} size="l">
-                      {language}
+                  {provider.languages.map((language: any, index: number) => (
+                    <Tag key={language.name || language} size="l">
+                      {language.name || language}
                     </Tag>
                   ))}
                 </Flex>
@@ -199,7 +199,7 @@ function About({
                 variant="display-default-xs"
                 onBackground="neutral-weak"
               >
-                {provider.role}
+                {provider.job?.title || "Expert IA"}
               </Text>
               {social.length > 0 && (
                 <Flex

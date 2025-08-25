@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Article } from '@/app/utils/articleUtils';
+import { Provider } from '@/app/types/provider';
+import { Job } from '@/app/types/job';
+import { Language } from '@/app/types/language';
 
-export interface Provider {
+// Interface pour la compatibilité avec l'ancien code
+export interface ProviderWithLegacyData {
   id: number;
   slug: string;
   firstName: string;
@@ -11,6 +14,7 @@ export interface Provider {
   avatar: string;
   location: string;
   languages: string[];
+  job?: Job;
 }
 
 export interface SocialLink {
@@ -65,13 +69,23 @@ export interface ProviderAbout {
       }>;
     }>;
   };
+  calendar: {
+    display: boolean;
+    link: string;
+  };
+  tableOfContent: {
+    display: boolean;
+  };
+  avatar: {
+    display: boolean;
+  };
 }
 
 export function useProvider(slug: string) {
-  const [provider, setProvider] = useState<Provider | null>(null);
+  const [provider, setProvider] = useState<ProviderWithLegacyData | null>(null);
   const [social, setSocial] = useState<SocialLink[]>([]);
   const [about, setAbout] = useState<ProviderAbout | null>(null);
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -81,27 +95,98 @@ export function useProvider(slug: string) {
         setLoading(true);
         setError(null);
 
-        // Appels API séparés
-        const [providerRes, socialRes, aboutRes, articlesRes] = await Promise.all([
-          fetch(`/api/providers/${slug}`),
-          fetch(`/api/providers/${slug}/social`),
-          fetch(`/api/providers/${slug}/about`),
-          fetch(`/api/providers/${slug}/articles`)
-        ]);
-
-        if (!providerRes.ok) {
+        // Récupérer le provider avec ses détails
+        const providerResponse = await fetch(`/api/providers/${slug}`);
+        if (!providerResponse.ok) {
           throw new Error('Provider not found');
         }
+        const providerData: Provider = await providerResponse.json();
 
-        const providerData = await providerRes.json();
-        const socialData = await socialRes.json();
-        const aboutData = await aboutRes.json();
-        const articlesData = await articlesRes.json();
+        // Récupérer le job du provider
+        const jobResponse = await fetch(`/api/providers/id/${providerData.providerId}/job`);
+        const jobData: Job | undefined = jobResponse.ok ? await jobResponse.json() : undefined;
 
-        setProvider(providerData);
-        setSocial(socialData.social || []);
-        setAbout(aboutData.about || null);
-        setArticles(articlesData.articles || []);
+        // Récupérer les langues du provider
+        const languagesResponse = await fetch(`/api/providers/id/${providerData.providerId}/languages`);
+        const languagesData: Language[] = languagesResponse.ok ? await languagesResponse.json() : [];
+
+        // Adapter les données pour la compatibilité avec l'ancien code
+        setProvider({
+          id: providerData.providerId,
+          slug: providerData.slug,
+          firstName: providerData.firstName,
+          lastName: providerData.lastName,
+          role: jobData?.title || 'Expert IA',
+          email: providerData.email,
+          avatar: providerData.avatar,
+          location: providerData.location,
+          languages: languagesData.map(lang => lang.name),
+          job: jobData
+        });
+        
+        setSocial([]); // Pour l'instant, pas de social links
+        setArticles([]); // Pour l'instant, pas d'articles
+        
+        // Créer des données about par défaut
+        const aboutData: ProviderAbout = {
+          intro: {
+            display: true,
+            title: "Introduction",
+            description: `${providerData.firstName} ${providerData.lastName} est un professionnel passionné par l'innovation technologique. Spécialisé dans ${jobData?.title || 'l\'intelligence artificielle'}, il/elle combine expertise technique et vision stratégique pour créer des solutions intelligentes qui transforment les industries.`
+          },
+          work: {
+            display: true,
+            title: "Mon expérience professionnelle",
+            experiences: [{
+              company: "Entreprise Tech",
+              timeframe: "2020 - Aujourd'hui",
+              role: jobData?.title || "Expert IA",
+              achievements: ["Développé et déployé des solutions innovantes améliorant les performances de 30%."],
+              images: [{
+                src: "/images/projects/project-01/NVIDIA.jpg",
+                alt: "Entreprise Tech",
+                width: 16,
+                height: 9
+              }]
+            }]
+          },
+          studies: {
+            display: true,
+            title: "Études et Formation",
+            institutions: [{
+              degreeTitle: "Master en Informatique",
+              institutionName: "Université de Technologie",
+              yearsAttended: "2018 - 2020",
+              programDescription: "Formation approfondie en technologies modernes et développement de solutions innovantes."
+            }]
+          },
+          technical: {
+            display: true,
+            title: "Mes Technologies",
+            skills: [{
+              title: "Technologies Modernes",
+              description: "Expertise en développement de solutions technologiques avancées et optimisation de performances.",
+              images: [{
+                src: "/images/tech/cuda.jpg",
+                alt: "Technologies",
+                width: 16,
+                height: 9
+              }]
+            }]
+          },
+          calendar: {
+            display: false,
+            link: "#"
+          },
+          tableOfContent: {
+            display: false
+          },
+          avatar: {
+            display: true
+          }
+        };
+        
+        setAbout(aboutData);
 
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');

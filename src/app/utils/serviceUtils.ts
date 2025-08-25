@@ -1,97 +1,122 @@
 import { Service, ServiceWithSlug } from '@/app/types/service';
-import { slugify, findServiceBySlug } from './slugifyService';
 
-// Données des services (à remplacer par votre vraie source de données)
-const servicesData: Service[] = [
-  {
-    serviceId: 1,
-    providerId: 1,
-    title: "Programmes d'accélération startups IA",
-    createdAt: new Date('2024-01-15'),
-    minPrice: 5000,
-    maxPrice: 25000,
-    estimatedDuration: "3-6 mois"
-  },
-  {
-    serviceId: 2,
-    providerId: 1,
-    title: "Conseil stratégique IA GPU",
-    createdAt: new Date('2024-02-01'),
-    minPrice: 2000,
-    maxPrice: 15000,
-    estimatedDuration: "2-4 semaines"
-  },
-  {
-    serviceId: 3,
-    providerId: 2,
-    title: "Conférences et keynotes",
-    createdAt: new Date('2024-01-20'),
-    minPrice: 3000,
-    maxPrice: 20000,
-    estimatedDuration: "1-3 jours"
-  },
-  {
-    serviceId: 4,
-    providerId: 1,
-    title: "Audit infrastructure GPU",
-    createdAt: new Date('2024-03-01'),
-    minPrice: null,
-    maxPrice: null,
-    estimatedDuration: "1-2 semaines"
-  },
-  {
-    serviceId: 5,
-    providerId: 2,
-    title: "Formation équipes techniques",
-    createdAt: new Date('2024-02-15'),
-    minPrice: 1500,
-    maxPrice: null,
-    estimatedDuration: "2-5 jours"
+// URL de base de l'API
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+
+/**
+ * Récupère tous les services depuis l'API
+ */
+export async function getAllServices(): Promise<ServiceWithSlug[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/services`);
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    const services: Service[] = await response.json();
+    
+    return services.map(service => ({
+      ...service,
+      slug: service.slug || service.title.toLowerCase().replace(/\s+/g, '-')
+    }));
+  } catch (error) {
+    console.error('Erreur lors de la récupération des services:', error);
+    return [];
   }
-];
-
-/**
- * Récupère tous les services avec leurs slugs calculés
- */
-export function getAllServices(): ServiceWithSlug[] {
-  return servicesData.map(service => ({
-    ...service,
-    slug: slugify(service.title)
-  }));
 }
 
 /**
- * Récupère les services d'un provider spécifique
+ * Récupère les services d'un provider spécifique depuis l'API
  */
-export function getServicesByProvider(providerId: number): ServiceWithSlug[] {
-  const allServices = getAllServices();
-  return allServices.filter(service => service.providerId === providerId);
+export async function getServicesByProvider(providerId: number): Promise<ServiceWithSlug[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/providers/${providerId}/services`);
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    const services: Service[] = await response.json();
+    
+    return services.map(service => ({
+      ...service,
+      slug: service.slug || service.title.toLowerCase().replace(/\s+/g, '-')
+    }));
+  } catch (error) {
+    console.error('Erreur lors de la récupération des services du provider:', error);
+    return [];
+  }
 }
 
 /**
- * Trouve un service par son slug
+ * Trouve un service par son slug depuis l'API
  */
-export function getServiceBySlug(slug: string): ServiceWithSlug | undefined {
-  const allServices = getAllServices();
-  return allServices.find(service => service.slug === slug);
+export async function getServiceBySlug(slug: string): Promise<ServiceWithSlug | undefined> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/services/${slug}`);
+    if (!response.ok) {
+      if (response.status === 404) return undefined;
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    const service: Service = await response.json();
+    
+    return {
+      ...service,
+      slug: service.slug || service.title.toLowerCase().replace(/\s+/g, '-')
+    };
+  } catch (error) {
+    console.error('Erreur lors de la récupération du service par slug:', error);
+    return undefined;
+  }
 }
 
 /**
- * Trouve un service par son slug pour un provider spécifique
+ * Trouve un service par son slug et son provider depuis l'API
  */
-export function getServiceBySlugAndProvider(slug: string, providerId: number): ServiceWithSlug | undefined {
-  const providerServices = getServicesByProvider(providerId);
-  return providerServices.find(service => service.slug === slug);
+export async function getServiceBySlugAndProvider(serviceSlug: string, providerId: number): Promise<ServiceWithSlug | undefined> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/providers/${providerId}/services/${serviceSlug}`);
+    if (!response.ok) {
+      if (response.status === 404) return undefined;
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    const service: Service = await response.json();
+    
+    return {
+      ...service,
+      slug: service.slug || service.title.toLowerCase().replace(/\s+/g, '-')
+    };
+  } catch (error) {
+    console.error('Erreur lors de la récupération du service par slug et provider:', error);
+    return undefined;
+  }
 }
 
 /**
  * Génère les paramètres statiques pour les pages de services
  */
-export function generateServiceStaticParams() {
-  const allServices = getAllServices();
-  
-  return allServices.map(service => ({
-    serviceSlug: service.slug,
-    providerId: service.providerId.toString()
-  }));
+export async function generateServiceStaticParams() {
+  try {
+    const services = await getAllServices();
+    
+    return services.map(service => ({
+      slug: service.slug
+    }));
+  } catch (error) {
+    console.error('Erreur lors de la génération des paramètres statiques des services:', error);
+    return [];
+  }
+}
+
+/**
+ * Génère les paramètres statiques pour les pages de services par provider
+ */
+export async function generateServiceStaticParamsByProvider(providerId: number) {
+  try {
+    const services = await getServicesByProvider(providerId);
+    
+    return services.map(service => ({
+      serviceSlug: service.slug
+    }));
+  } catch (error) {
+    console.error('Erreur lors de la génération des paramètres statiques des services par provider:', error);
+    return [];
+  }
 }

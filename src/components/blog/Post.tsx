@@ -48,7 +48,7 @@ export default function Post({
         mobileDirection="column"
         fillWidth
       >
-        {article.image && thumbnail && (
+        {article.articleCover && thumbnail && (
           <SmartImage
             priority
             className={styles.image}
@@ -56,7 +56,7 @@ export default function Post({
             border="neutral-alpha-weak"
             cursor="interactive"
             radius="l"
-            src={article.image}
+            src={article.articleCover}
             alt={"Thumbnail of " + article.title}
             aspectRatio="16 / 9"
           />
@@ -72,7 +72,7 @@ export default function Post({
             {article.title}
           </Heading>
           <Text variant="label-default-s" onBackground="neutral-weak">
-            {formatDate(article.published_at, false)}
+            {formatDate(article.publishedAt, false)}
           </Text>
           {article.tag && (
             <Tag className="mt-12" label={article.tag} variant="neutral" />

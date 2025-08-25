@@ -1,103 +1,158 @@
-import { Provider, ProviderWithSlug, ProviderWithLocation } from '@/app/types/provider';
-import { slugifyProvider, findProviderBySlug, generateUniqueProviderSlug } from './providerSlugifyService';
-import { getLocationById } from './locationUtils';
-import providers from '@/data/providers.json';
+import { Provider } from '@/app/types/provider';
+import { Job } from '@/app/types/job';
+import { Language } from '@/app/types/language';
+
+// URL de base de l'API
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 /**
- * Transforme les données JSON existantes vers le nouveau format Provider
+ * Récupère tous les providers depuis l'API
  */
-function transformProviderData(jsonProvider: any): Provider {
-  return {
-    providerId: jsonProvider.provider_id,
-    firstName: jsonProvider.firstName,
-    lastName: jsonProvider.lastName,
-    email: jsonProvider.email,
-    role: jsonProvider.role,
-    locationId: 2, // Par défaut États-Unis pour l'instant
-    avatar: jsonProvider.avatar,
-    bio: jsonProvider.job, // Utilise job comme bio temporairement
-    skills: [], // À remplir plus tard
-    experience: "", // À remplir plus tard
-    languages: jsonProvider.languages || [],
-    socialLinks: {}, // À remplir plus tard
-    createdAt: new Date(), // À remplir plus tard
-    updatedAt: new Date() // À remplir plus tard
-  };
+export async function getAllProviders(): Promise<Provider[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/providers`);
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Erreur lors de la récupération des providers:', error);
+    return [];
+  }
 }
 
 /**
- * Récupère tous les providers avec leurs slugs calculés
+ * Récupère tous les providers avec leurs jobs et langues
  */
-export function getAllProviders(): ProviderWithSlug[] {
-  const providersWithSlugs: ProviderWithSlug[] = [];
-  const providersArray = providers.map(transformProviderData);
-  
-  providersArray.forEach(provider => {
-    const slug = generateUniqueProviderSlug(
-      providersArray.slice(0, providersArray.indexOf(provider)), // Providers déjà traités
-      provider.firstName,
-      provider.lastName
+export async function getAllProvidersWithDetails() {
+  try {
+    const providers = await getAllProviders();
+    
+    const providersWithDetails = await Promise.all(
+      providers.map(async (provider) => {
+        const [jobResponse, languagesResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/providers/id/${provider.providerId}/job`),
+          fetch(`${API_BASE_URL}/providers/id/${provider.providerId}/languages`)
+        ]);
+        
+        const job = jobResponse.ok ? await jobResponse.json() : undefined;
+        const languages = languagesResponse.ok ? await languagesResponse.json() : [];
+        
+        return {
+          ...provider,
+          job,
+          languages
+        };
+      })
     );
     
-    providersWithSlugs.push({
-      ...provider,
-      slug
-    });
-  });
-  
-  return providersWithSlugs;
+    return providersWithDetails;
+  } catch (error) {
+    console.error('Erreur lors de la récupération des providers avec détails:', error);
+    return [];
+  }
 }
 
 /**
  * Trouve un provider par son slug
  */
-export function getProviderBySlug(slug: string): ProviderWithSlug | undefined {
-  const allProviders = getAllProviders();
-  return allProviders.find(provider => provider.slug === slug);
+export async function getProviderBySlug(slug: string): Promise<Provider | undefined> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/providers/${slug}`);
+    if (!response.ok) {
+      if (response.status === 404) return undefined;
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Erreur lors de la récupération du provider par slug:', error);
+    return undefined;
+  }
+}
+
+/**
+ * Trouve un provider par son slug avec ses détails (job et langues)
+ */
+export async function getProviderBySlugWithDetails(slug: string) {
+  try {
+    const provider = await getProviderBySlug(slug);
+    if (!provider) return undefined;
+    
+    const [jobResponse, languagesResponse] = await Promise.all([
+      fetch(`${API_BASE_URL}/providers/id/${provider.providerId}/job`),
+      fetch(`${API_BASE_URL}/providers/id/${provider.providerId}/languages`)
+    ]);
+    
+    const job = jobResponse.ok ? await jobResponse.json() : undefined;
+    const languages = languagesResponse.ok ? await languagesResponse.json() : [];
+    
+    return {
+      ...provider,
+      job,
+      languages
+    };
+  } catch (error) {
+    console.error('Erreur lors de la récupération du provider avec détails:', error);
+    return undefined;
+  }
 }
 
 /**
  * Trouve un provider par son ID
  */
-export function getProviderById(providerId: number): ProviderWithSlug | undefined {
-  const allProviders = getAllProviders();
-  return allProviders.find(provider => provider.providerId === providerId);
+export async function getProviderById(providerId: number): Promise<Provider | undefined> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/providers/id/${providerId}`);
+    if (!response.ok) {
+      if (response.status === 404) return undefined;
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Erreur lors de la récupération du provider par ID:', error);
+    return undefined;
+  }
 }
 
 /**
- * Récupère tous les providers avec leurs locations complètes
+ * Trouve un provider par son ID avec ses détails (job et langues)
  */
-export function getAllProvidersWithLocation(): ProviderWithLocation[] {
-  const allProviders = getAllProviders();
-  
-  return allProviders.map(provider => {
-    const location = getLocationById(provider.locationId);
-    if (!location) {
-      throw new Error(`Location not found for provider ${provider.providerId}`);
-    }
+export async function getProviderByIdWithDetails(providerId: number) {
+  try {
+    const provider = await getProviderById(providerId);
+    if (!provider) return undefined;
+    
+    const [jobResponse, languagesResponse] = await Promise.all([
+      fetch(`${API_BASE_URL}/providers/id/${providerId}/job`),
+      fetch(`${API_BASE_URL}/providers/id/${providerId}/languages`)
+    ]);
+    
+    const job = jobResponse.ok ? await jobResponse.json() : undefined;
+    const languages = languagesResponse.ok ? await languagesResponse.json() : [];
     
     return {
       ...provider,
-      location
+      job,
+      languages
     };
-  });
-}
-
-/**
- * Trouve un provider par son slug avec sa location complète
- */
-export function getProviderBySlugWithLocation(slug: string): ProviderWithLocation | undefined {
-  const allProviders = getAllProvidersWithLocation();
-  return allProviders.find(provider => provider.slug === slug);
+  } catch (error) {
+    console.error('Erreur lors de la récupération du provider avec détails:', error);
+    return undefined;
+  }
 }
 
 /**
  * Génère les paramètres statiques pour les pages de providers
  */
-export function generateProviderStaticParams() {
-  const allProviders = getAllProviders();
-  
-  return allProviders.map(provider => ({
-    slug: provider.slug
-  }));
+export async function generateProviderStaticParams() {
+  try {
+    const providers = await getAllProviders();
+    
+    return providers.map(provider => ({
+      slug: provider.slug
+    }));
+  } catch (error) {
+    console.error('Erreur lors de la génération des paramètres statiques:', error);
+    return [];
+  }
 }

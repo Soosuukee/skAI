@@ -3,6 +3,7 @@ import { ArticleSection } from './articleSection';
 export interface Article {
   articleId: number;           // Identifiant unique de l'article
   providerId: number;          // Référence au prestataire (auteur)
+  slug: string;                // Slug pour l'URL
   title: string;               // Titre de l'article
   summary: string;             // Résumé de l'article
   publishedAt: string;         // Date de publication (format ISO)
@@ -10,6 +11,7 @@ export interface Article {
   tag: string;                 // Tag/catégorie de l'article
   language: string;            // Langue de l'article
   isPublished: boolean;        // Si l'article est publié
+  section: ArticleSection [];  // Sections de contenu
 }
 
 // Interface étendue pour l'affichage avec propriétés calculées

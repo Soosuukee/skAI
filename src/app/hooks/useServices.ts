@@ -9,7 +9,7 @@ export function useProviderServices(providerSlug: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadServices = () => {
+    const loadServices = async () => {
       try {
         // Trouver le provider par son slug
         const provider = providers.find(p => p.slug === providerSlug);
@@ -20,7 +20,7 @@ export function useProviderServices(providerSlug: string) {
         }
 
         // Récupérer les services du provider
-        const providerServices = getServicesByProvider(provider.provider_id);
+        const providerServices = await getServicesByProvider(provider.provider_id);
         setServices(providerServices);
         setError(null);
       } catch (err) {
@@ -45,9 +45,9 @@ export function useService(serviceSlug: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadService = () => {
+    const loadService = async () => {
       try {
-        const foundService = getServiceBySlug(serviceSlug);
+        const foundService = await getServiceBySlug(serviceSlug);
         if (!foundService) {
           setError('Service non trouvé');
         } else {

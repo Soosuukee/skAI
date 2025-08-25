@@ -13,12 +13,6 @@ export interface ServiceImageWithMetadata extends ServiceImage {
   description?: string;      // Description optionnelle de l'image
 }
 
-// Interface pour grouper les images par service
-export interface ServiceImagesGroup {
-  serviceId: number;
-  images: ServiceImage[];
-}
-
 // Interface pour les options de filtrage des images
 export interface ServiceImageFilters {
   serviceId?: number;

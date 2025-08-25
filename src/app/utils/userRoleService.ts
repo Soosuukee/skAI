@@ -4,16 +4,16 @@ import clients from '@/data/clients.json';
 import admins from '@/data/admins.json';
 
 export interface User {
-  user_id: number;
-  provider_id?: number;
-  client_id?: number;
-  admin_id?: number;
+  userId: number;
+  providerId?: number;
+  clientId?: number;
+  adminId?: number;
   email: string;
   password: string;
   role: 'provider' | 'client' | 'admin';
-  is_active: boolean;
-  created_at: string;
-  last_login: string;
+  isActive: boolean;
+  createdAt: string;
+  lastLogin: string;
 }
 
 export interface UserWithDetails extends User {
@@ -22,9 +22,8 @@ export interface UserWithDetails extends User {
     lastName: string;
     slug: string;
     avatar: string;
-    role: string;
     location: string;
-    languages: string[];
+    createdAt: string;
   };
   client?: {
     firstName: string;
@@ -53,7 +52,7 @@ export class UserRoleService {
    * Vérifie si un utilisateur est un prestataire
    */
   static isProvider(userId: number): boolean {
-    const user = users.find(u => u.user_id === userId);
+    const user = users.find(u => u.userId === userId);
     return user?.role === 'provider';
   }
 
@@ -61,7 +60,7 @@ export class UserRoleService {
    * Vérifie si un utilisateur est un client
    */
   static isClient(userId: number): boolean {
-    const user = users.find(u => u.user_id === userId);
+    const user = users.find(u => u.userId === userId);
     return user?.role === 'client';
   }
 
@@ -69,7 +68,7 @@ export class UserRoleService {
    * Vérifie si un utilisateur est un administrateur
    */
   static isAdmin(userId: number): boolean {
-    const user = users.find(u => u.user_id === userId);
+    const user = users.find(u => u.userId === userId);
     return user?.role === 'admin';
   }
 
@@ -77,7 +76,7 @@ export class UserRoleService {
    * Vérifie si un utilisateur a un rôle spécifique
    */
   static hasRole(userId: number, role: 'provider' | 'client' | 'admin'): boolean {
-    const user = users.find(u => u.user_id === userId);
+    const user = users.find(u => u.userId === userId);
     return user?.role === role;
   }
 
@@ -85,7 +84,7 @@ export class UserRoleService {
    * Récupère les détails complets d'un utilisateur avec ses informations spécifiques
    */
   static getUserWithDetails(userId: number): UserWithDetails | null {
-    const user = users.find(u => u.user_id === userId);
+    const user = users.find(u => u.userId === userId);
     
     if (!user) {
       return null;
@@ -98,25 +97,24 @@ export class UserRoleService {
 
     switch (user.role) {
       case 'provider':
-        if (user.provider_id) {
-          const provider = providers.find(p => p.provider_id === user.provider_id);
+        if (user.providerId) {
+          const provider = providers.find(p => p.provider_id === user.providerId);
           if (provider) {
             userWithDetails.provider = {
               firstName: provider.firstName,
               lastName: provider.lastName,
               slug: provider.slug,
               avatar: provider.avatar,
-              role: provider.role,
               location: provider.location,
-              languages: provider.languages,
+              createdAt: provider.createdAt,
             };
           }
         }
         break;
 
       case 'client':
-        if (user.client_id) {
-          const client = clients.find(c => c.client_id === user.client_id);
+        if (user.clientId) {
+          const client = clients.find(c => c.client_id === user.clientId);
           if (client) {
             userWithDetails.client = {
               firstName: client.firstName,
@@ -133,8 +131,8 @@ export class UserRoleService {
         break;
 
       case 'admin':
-        if (user.admin_id) {
-          const admin = admins.find(a => a.admin_id === user.admin_id);
+        if (user.adminId) {
+          const admin = admins.find(a => a.admin_id === user.adminId);
           if (admin) {
             userWithDetails.admin = {
               firstName: admin.firstName,
@@ -169,7 +167,7 @@ export class UserRoleService {
   static getAllProviders(): UserWithDetails[] {
     return users
       .filter(user => user.role === 'provider')
-      .map(user => this.getUserWithDetails(user.user_id)!)
+      .map(user => this.getUserWithDetails(user.userId)!)
       .filter(Boolean);
   }
 
@@ -179,7 +177,7 @@ export class UserRoleService {
   static getAllClients(): UserWithDetails[] {
     return users
       .filter(user => user.role === 'client')
-      .map(user => this.getUserWithDetails(user.user_id)!)
+      .map(user => this.getUserWithDetails(user.userId)!)
       .filter(Boolean);
   }
 
@@ -189,7 +187,7 @@ export class UserRoleService {
   static getAllAdmins(): UserWithDetails[] {
     return users
       .filter(user => user.role === 'admin')
-      .map(user => this.getUserWithDetails(user.user_id)!)
+      .map(user => this.getUserWithDetails(user.userId)!)
       .filter(Boolean);
   }
 
@@ -199,7 +197,7 @@ export class UserRoleService {
   static validateCredentials(email: string, password: string): User | null {
     const user = users.find(u => u.email === email);
     
-    if (!user || !user.is_active) {
+    if (!user || !user.isActive) {
       return null;
     }
 
@@ -222,7 +220,7 @@ export class UserRoleService {
    * Récupère un utilisateur par son ID
    */
   static getUserById(userId: number): User | null {
-    const user = users.find(u => u.user_id === userId);
+    const user = users.find(u => u.userId === userId);
     return user ? { ...user, role: user.role as 'provider' | 'client' | 'admin' } : null;
   }
 }

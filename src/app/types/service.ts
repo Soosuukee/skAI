@@ -1,8 +1,11 @@
+import { ServiceSection, ServiceSectionWithContentAndImages } from './serviceSection';
+
 export interface Service {
   serviceId: number;          // Identifiant unique du service
   providerId: number;         // Référence au prestataire
   title: string;              // Titre du service
   description: string;        // Description du service
+  slug: string;               // Slug du service
   isActive: boolean;          // Si le service est actif
   isFeatured: boolean;        // Si le service est mis en avant
   minPrice: number | null;    // Prix minimum (peut être null)
@@ -20,4 +23,14 @@ export interface Service {
 // Interface étendue pour l'affichage avec slug calculé
 export interface ServiceWithSlug extends Service {
   slug: string;               // Slug calculé à partir du titre
+}
+
+// Interface étendue pour l'affichage avec sections de contenu
+export interface ServiceWithSections extends Service {
+  sections: ServiceSection[]; // Sections de contenu associées au service
+}
+
+// Interface étendue pour l'affichage complet avec sections, contenus et images
+export interface ServiceWithFullContent extends Service {
+  sections: ServiceSectionWithContentAndImages[]; // Sections avec contenus et images
 }

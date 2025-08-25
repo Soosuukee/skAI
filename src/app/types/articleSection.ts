@@ -3,7 +3,9 @@ import { ArticleContent } from './articleContent';
 export interface ArticleSection {
   articleSectionId: number;    // Identifiant unique de la section d'article
   articleId: number;           // Référence à l'article
-  title: string;               // Titre de la section
+  title: string;
+  content: ArticleContent [];
+  // Titre de la section
 }
 
 // Interface étendue pour l'affichage avec des propriétés calculées

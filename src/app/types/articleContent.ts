@@ -3,7 +3,8 @@ import { ArticleImage } from './articleImage';
 export interface ArticleContent {
   articleContentId: number;    // Identifiant unique du contenu d'article
   articleSectionId: number;    // Référence à la section d'article
-  content: string;         // Type de contenu (paragraph, code, image, etc.)
+  content: string;
+  image: ArticleImage;        // Type de contenu (paragraph, code, image, etc.)
 }
 
 // Interface étendue pour l'affichage avec des propriétés calculées

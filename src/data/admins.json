@@ -2,7 +2,7 @@
   {
     "id": 1,
     "admin_id": 1,
-    "slug": "admin-super",
+    "slug": "admin-super-k8901234567",
     "firstName": "Super",
     "lastName": "Admin",
     "email": "admin@skai.com",
@@ -17,7 +17,7 @@
   {
     "id": 2,
     "admin_id": 2,
-    "slug": "admin-support",
+    "slug": "admin-support-l9012345678",
     "firstName": "Support",
     "lastName": "Team",
     "email": "support@skai.com",

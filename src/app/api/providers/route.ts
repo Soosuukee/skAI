@@ -19,28 +19,14 @@ function transformProviderData(jsonProvider: any): Provider {
 }
 
 /**
- * GET /api/providers/[slug]
- * Récupère un provider par son slug
+ * GET /api/providers
+ * Récupère tous les providers
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { slug: string } }
-) {
+export async function GET(request: NextRequest) {
   try {
-    const { slug } = params;
+    const transformedProviders = providers.map(transformProviderData);
     
-    const jsonProvider = providers.find(p => p.slug === slug);
-    
-    if (!jsonProvider) {
-      return NextResponse.json(
-        { error: 'Provider non trouvé' },
-        { status: 404 }
-      );
-    }
-    
-    const provider = transformProviderData(jsonProvider);
-    
-    return NextResponse.json(provider, {
+    return NextResponse.json(transformedProviders, {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
@@ -48,7 +34,7 @@ export async function GET(
       }
     });
   } catch (error) {
-    console.error('Erreur lors de la récupération du provider:', error);
+    console.error('Erreur lors de la récupération des providers:', error);
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }

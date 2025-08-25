@@ -28,95 +28,109 @@ GET /api/providers/{slug}
 }
 ```
 
-### 2. **Liens sociaux**
+### 2. **Données complètes du provider (ProviderWithDetails)**
 
 ```
-GET /api/providers/{slug}/social
+GET /api/providers/{slug}
 ```
 
 **Réponse :**
 
 ```json
 {
-  "provider_id": 1,
-  "social": [
+  "providerId": 1,
+  "slug": "jensen-huang",
+  "firstName": "Jensen",
+  "lastName": "Huang",
+  "role": "Architecte de Solution IA",
+  "email": "example@gmail.com",
+  "avatar": "/images/avatar-jh.jpg",
+  "location": "Taïwan",
+  "languages": ["Anglais", "Hokkien taïwanais", "Chinois Mandarin"],
+  "bio": "Entrepreneur taïwano‑américain...",
+  "summary": "Spécialiste en IA et GPU...",
+  "hourlyRate": 150,
+  "availability": "Disponible",
+  "timezone": "Asia/Taipei",
+  "website": "https://example.com",
+  "isActive": true,
+  "isVerified": true,
+  "rating": 4.8,
+  "reviewCount": 25,
+  "completedProjects": 15,
+  "responseTime": "2h",
+  "createdAt": "2024-01-01T00:00:00Z",
+  "updatedAt": "2024-12-01T00:00:00Z",
+  "skills": [1, 9, 19, 20, 21],
+  "experiences": [
     {
+      "id": 1,
+      "providerId": 1,
+      "title": "CEO & Founder",
+      "company": "NVIDIA",
+      "startDate": "1993-01-01",
+      "endDate": null,
+      "description": "Fondation et direction de NVIDIA...",
+      "achievements": ["Création de CUDA", "Développement des GPU..."]
+    }
+  ],
+  "education": [
+    {
+      "id": 1,
+      "providerId": 1,
+      "degree": "Master en Ingénierie Électrique",
+      "institution": "Stanford University",
+      "startDate": "1988-09-01",
+      "endDate": "1990-06-01",
+      "description": "Spécialisation en microélectronique..."
+    }
+  ],
+  "socialLinks": [
+    {
+      "id": 1,
+      "providerId": 1,
       "name": "GitHub",
       "icon": "github",
-      "link": "https://github.com/once-ui-system/nextjs-starter"
+      "link": "https://github.com/jensen-huang"
     },
     {
+      "id": 2,
+      "providerId": 1,
       "name": "LinkedIn",
       "icon": "linkedin",
-      "link": "https://www.linkedin.com/company/once-ui/"
+      "link": "https://linkedin.com/in/jensen-huang"
     }
-  ]
-}
-```
-
-### 3. **Informations "About"**
-
-```
-GET /api/providers/{slug}/about
-```
-
-**Réponse :**
-
-```json
-{
-  "provider_id": 1,
-  "about": {
-    "intro": {
-      "display": true,
-      "title": "Introduction",
-      "description": "Jensen Huang est un entrepreneur taïwano‑américain..."
-    },
-    "work": {
-      "display": true,
-      "title": "Mon experience professionel",
-      "experiences": [...]
-    },
-    "studies": {
-      "display": true,
-      "title": "Etude et Formation",
-      "institutions": [...]
-    },
-    "technical": {
-      "display": true,
-      "title": "Mes Technologies",
-      "skills": [...]
+  ],
+  "services": [
+    {
+      "id": 1,
+      "providerId": 1,
+      "slug": "conseil-strategique-ia-gpu",
+      "title": "Conseil Stratégique IA & GPU",
+      "description": "Optimisation des solutions GPU...",
+      "price": 150,
+      "duration": "2h"
     }
-  }
-}
-```
-
-### 4. **Articles du provider**
-
-```
-GET /api/providers/{slug}/articles
-```
-
-**Réponse :**
-
-```json
-{
-  "provider_id": 1,
+  ],
   "articles": [
     {
-      "article_id": 1,
-      "provider_id": 1,
+      "id": 1,
+      "providerId": 1,
       "slug": "prise-en-main-rapide-avec-deepep",
       "title": "DeepEP : la bibliothèque de communication ultime...",
       "summary": "Découvrez comment DeepEP révolutionne...",
-      "published_at": "2025-07-24",
+      "publishedAt": "2025-07-24",
       "image": "/images/blog/deepep/deepep-cover.jpg",
       "tag": "Deep Learning",
-      "language": "fr",
-      "content": {
-        "sections": [...]
-      }
+      "language": "fr"
     }
-  ]
+  ],
+  "jobDetails": {
+    "id": 1,
+    "title": "Architecte de Solution IA",
+    "description": "Conception et implémentation de solutions IA...",
+    "requirements": ["Expertise en GPU", "Machine Learning..."]
+  }
 }
 ```
 
@@ -172,31 +186,32 @@ function MyComponent({ slug }: { slug: string }) {
 ### Appels directs
 
 ```typescript
-// Récupérer seulement les données de base
-const provider = await fetch(`/api/providers/${slug}`).then((r) => r.json());
-
-// Récupérer seulement les liens sociaux
-const social = await fetch(`/api/providers/${slug}/social`).then((r) =>
+// Récupérer toutes les données du provider en une seule requête
+const providerWithDetails = await fetch(`/api/providers/${slug}`).then((r) =>
   r.json()
 );
 
-// Récupérer seulement les infos "about"
-const about = await fetch(`/api/providers/${slug}/about`).then((r) => r.json());
-
-// Récupérer seulement les articles
-const articles = await fetch(`/api/providers/${slug}/articles`).then((r) =>
-  r.json()
-);
+// Accéder aux différentes sections
+const {
+  firstName,
+  lastName,
+  role,
+  socialLinks,
+  experiences,
+  education,
+  services,
+  articles,
+} = providerWithDetails;
 ```
 
 ## ✅ **Avantages de cette architecture**
 
-1. **Séparation des responsabilités** : Chaque endpoint a une responsabilité unique
-2. **Performance** : On ne récupère que les données nécessaires
-3. **Cacheabilité** : Chaque endpoint peut être mis en cache indépendamment
-4. **Évolutivité** : Facile d'ajouter de nouveaux endpoints
-5. **Maintenabilité** : Code plus clair et modulaire
-6. **Standards REST** : Respect des conventions REST
+1. **Performance optimisée** : Un seul appel API au lieu de 4
+2. **Cohérence des données** : Toutes les données arrivent ensemble
+3. **Type safety** : Interface TypeScript complète avec `ProviderWithDetails`
+4. **Simplicité** : Moins de code côté client
+5. **Maintenabilité** : Architecture plus simple et centralisée
+6. **Évolutivité** : Facile d'ajouter de nouvelles relations
 
 ## 🚀 **Prochaines étapes**
 

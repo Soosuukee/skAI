@@ -2,79 +2,67 @@
   {
     "id": 1,
     "provider_id": 1,
-    "slug": "jensen-huang",
+    "slug": "jensen-huang-e2345678901",
     "firstName": "Jensen",
     "lastName": "Huang",
-    "role": "Architecte de Solution IA",
-    "job": "Architecte de Solution IA",
     "email": "example@gmail.com",
     "avatar": "/images/avatar-jh.jpg",
-    "location": "Asia/Taipei",
-    "languages": ["Anglais", "Hokkien taïwanais", "Chinois Mandarin"]
+    "location": "Taïwan",
+    "createdAt": "2024-01-01T00:00:00Z"
   },
   {
     "id": 2,
     "provider_id": 2,
-    "slug": "marie-dubois",
+    "slug": "marie-dubois-f3456789012",
     "firstName": "Marie",
     "lastName": "Dubois",
-    "role": "Ingénieure Machine Learning",
-    "job": "Ingénieure Machine Learning",
     "email": "marie.dubois@example.com",
     "avatar": "/images/avatar-md.webp",
-    "location": "Europe/Paris",
-    "languages": ["Français", "Anglais"]
+    "location": "France",
+    "createdAt": "2024-01-15T00:00:00Z"
   },
   {
     "id": 3,
     "provider_id": 3,
-    "slug": "carlos-garcia",
+    "slug": "carlos-garcia-g4567890123",
     "firstName": "Carlos",
     "lastName": "Garcia",
-    "role": "Data Scientist",
-    "job": "Data Scientist",
     "email": "carlos.garcia@example.com",
     "avatar": "/images/avatar-gc.jpg",
-    "location": "America/Mexico_City",
-    "languages": ["Espagnol", "Anglais"]
+    "location": "Mexique",
+    "createdAt": "2024-02-01T00:00:00Z"
   },
   {
     "id": 4,
     "provider_id": 4,
-    "slug": "akira-tanaka",
+    "slug": "akira-tanaka-h5678901234",
     "firstName": "Akira",
     "lastName": "Tanaka",
-    "role": "Chercheur en IA",
-    "job": "Chercheur en IA",
     "email": "akira.tanaka@example.com",
     "avatar": "/images/avatar-at.jpg",
-    "location": "Asia/Tokyo",
-    "languages": ["Japonais", "Anglais"]
+    "location": "Japon",
+    "createdAt": "2024-02-15T00:00:00Z"
   },
   {
     "id": 5,
     "provider_id": 5,
-    "slug": "elena-rossi",
+    "slug": "elena-rossi-i6789012345",
     "firstName": "Elena",
     "lastName": "Rossi",
-    "role": "Ingénieure Vision par Ordinateur",
-    "job": "Ingénieure Vision par Ordinateur",
     "email": "elena.rossi@example.com",
     "avatar": "/images/avatar-er.webp",
-    "location": "Europe/Rome",
-    "languages": ["Italien", "Anglais"]
+    "location": "Italie",
+    "createdAt": "2024-03-01T00:00:00Z"
   },
   {
     "id": 6,
     "provider_id": 6,
-    "slug": "raj-patel",
+    "slug": "raj-patel-j7890123456",
     "firstName": "Raj",
     "lastName": "Patel",
-    "role": "Spécialiste Deep Learning",
-    "job": "Spécialiste Deep Learning",
     "email": "raj.patel@example.com",
     "avatar": "/images/avatar-rp.webp",
-    "location": "Asia/Mumbai",
-    "languages": ["Hindi", "Anglais"]
+    "location": "Inde",
+    "createdAt": "2024-03-15T00:00:00Z"
   }
 ]
