@@ -11,7 +11,7 @@ import {
 } from "@/once-ui/components";
 import styles from "./Posts.module.scss";
 import { formatDate } from "@/app/utils/formatDate";
-import { Article } from "@/app/utils/articleUtils";
+import { Article } from "@/app/types/article";
 
 interface PostProps {
   article: Article;

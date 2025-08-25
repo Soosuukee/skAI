@@ -31,8 +31,8 @@ export async function getAllProvidersWithDetails() {
     const providersWithDetails = await Promise.all(
       providers.map(async (provider) => {
         const [jobResponse, languagesResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/providers/id/${provider.providerId}/job`),
-          fetch(`${API_BASE_URL}/providers/id/${provider.providerId}/languages`)
+          fetch(`/api/providers/id/${provider.providerId}/job`),
+          fetch(`/api/providers/id/${provider.providerId}/languages`)
         ]);
         
         const job = jobResponse.ok ? await jobResponse.json() : undefined;
@@ -58,7 +58,7 @@ export async function getAllProvidersWithDetails() {
  */
 export async function getProviderBySlug(slug: string): Promise<Provider | undefined> {
   try {
-    const response = await fetch(`${API_BASE_URL}/providers/${slug}`);
+    const response = await fetch(`/api/providers/${slug}`);
     if (!response.ok) {
       if (response.status === 404) return undefined;
       throw new Error(`Erreur HTTP: ${response.status}`);
@@ -79,8 +79,8 @@ export async function getProviderBySlugWithDetails(slug: string) {
     if (!provider) return undefined;
     
     const [jobResponse, languagesResponse] = await Promise.all([
-      fetch(`${API_BASE_URL}/providers/id/${provider.providerId}/job`),
-      fetch(`${API_BASE_URL}/providers/id/${provider.providerId}/languages`)
+      fetch(`/api/providers/id/${provider.providerId}/job`),
+      fetch(`/api/providers/id/${provider.providerId}/languages`)
     ]);
     
     const job = jobResponse.ok ? await jobResponse.json() : undefined;
@@ -102,7 +102,7 @@ export async function getProviderBySlugWithDetails(slug: string) {
  */
 export async function getProviderById(providerId: number): Promise<Provider | undefined> {
   try {
-    const response = await fetch(`${API_BASE_URL}/providers/id/${providerId}`);
+    const response = await fetch(`/api/providers/id/${providerId}`);
     if (!response.ok) {
       if (response.status === 404) return undefined;
       throw new Error(`Erreur HTTP: ${response.status}`);
@@ -123,8 +123,8 @@ export async function getProviderByIdWithDetails(providerId: number) {
     if (!provider) return undefined;
     
     const [jobResponse, languagesResponse] = await Promise.all([
-      fetch(`${API_BASE_URL}/providers/id/${providerId}/job`),
-      fetch(`${API_BASE_URL}/providers/id/${providerId}/languages`)
+      fetch(`/api/providers/id/${providerId}/job`),
+      fetch(`/api/providers/id/${providerId}/languages`)
     ]);
     
     const job = jobResponse.ok ? await jobResponse.json() : undefined;

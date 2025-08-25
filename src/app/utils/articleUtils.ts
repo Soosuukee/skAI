@@ -8,7 +8,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/a
  */
 export async function getAllArticles(): Promise<Article[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/articles`);
+    const response = await fetch('/api/articles');
     if (!response.ok) {
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
@@ -24,7 +24,7 @@ export async function getAllArticles(): Promise<Article[]> {
  */
 export async function getArticlesByProvider(providerId: number): Promise<Article[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/providers/${providerId}/articles`);
+    const response = await fetch(`/api/providers/${providerId}/articles`);
     if (!response.ok) {
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
@@ -36,11 +36,13 @@ export async function getArticlesByProvider(providerId: number): Promise<Article
 }
 
 /**
- * Trouve un article par son slug depuis l'API
+ * Récupère un article par son slug depuis l'API
  */
 export async function getArticleBySlug(slug: string): Promise<Article | undefined> {
   try {
-    const response = await fetch(`${API_BASE_URL}/articles/${slug}`);
+    // Utiliser une URL absolue côté serveur
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/articles/${slug}`);
     if (!response.ok) {
       if (response.status === 404) return undefined;
       throw new Error(`Erreur HTTP: ${response.status}`);
@@ -53,11 +55,11 @@ export async function getArticleBySlug(slug: string): Promise<Article | undefine
 }
 
 /**
- * Trouve un article par son slug et son provider depuis l'API
+ * Récupère un article par son slug et son provider depuis l'API
  */
 export async function getArticleBySlugAndProvider(articleSlug: string, providerId: number): Promise<Article | undefined> {
   try {
-    const response = await fetch(`${API_BASE_URL}/providers/${providerId}/articles/${articleSlug}`);
+    const response = await fetch(`/api/providers/${providerId}/articles/${articleSlug}`);
     if (!response.ok) {
       if (response.status === 404) return undefined;
       throw new Error(`Erreur HTTP: ${response.status}`);

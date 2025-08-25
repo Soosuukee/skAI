@@ -110,6 +110,10 @@ export function useProvider(slug: string) {
         const languagesResponse = await fetch(`/api/providers/id/${providerData.providerId}/languages`);
         const languagesData: Language[] = languagesResponse.ok ? await languagesResponse.json() : [];
 
+        // Récupérer les articles du provider
+        const articlesResponse = await fetch(`/api/providers/${slug}/articles`);
+        const articlesData = articlesResponse.ok ? await articlesResponse.json() : [];
+
         // Adapter les données pour la compatibilité avec l'ancien code
         setProvider({
           id: providerData.providerId,
@@ -125,7 +129,7 @@ export function useProvider(slug: string) {
         });
         
         setSocial([]); // Pour l'instant, pas de social links
-        setArticles([]); // Pour l'instant, pas d'articles
+        setArticles(articlesData); // Articles du provider
         
         // Créer des données about par défaut
         const aboutData: ProviderAbout = {

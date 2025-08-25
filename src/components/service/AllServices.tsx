@@ -1,11 +1,55 @@
 "use client";
 
-import { Column, Flex, Heading, SmartLink, Avatar } from "@/once-ui/components";
+import React, { useState, useEffect } from "react";
+import {
+  Column,
+  Flex,
+  Heading,
+  SmartLink,
+  Avatar,
+  Text,
+} from "@/once-ui/components";
 import { getAllServicesWithProviders } from "@/app/utils/serviceUtils";
 import styles from "./Services.module.scss";
 
 export function AllServices() {
-  const servicesWithProviders = getAllServicesWithProviders();
+  const [servicesWithProviders, setServicesWithProviders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchServices() {
+      try {
+        setLoading(true);
+        const services = await getAllServicesWithProviders();
+        setServicesWithProviders(services);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Une erreur est survenue"
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchServices();
+  }, []);
+
+  if (loading) {
+    return (
+      <Column fillWidth gap="xl" marginBottom="40" paddingX="l">
+        <Text>Chargement des services...</Text>
+      </Column>
+    );
+  }
+
+  if (error) {
+    return (
+      <Column fillWidth gap="xl" marginBottom="40" paddingX="l">
+        <Text color="error">Erreur: {error}</Text>
+      </Column>
+    );
+  }
 
   return (
     <Column fillWidth gap="xl" marginBottom="40" paddingX="l">
@@ -14,7 +58,7 @@ export function AllServices() {
       </Heading>
 
       {servicesWithProviders.map((service) => (
-        <div key={service.service_id} className={styles.service}>
+        <div key={service.serviceId} className={styles.service}>
           <Flex
             background="surface"
             border="neutral-alpha-medium"
@@ -64,9 +108,8 @@ export function AllServices() {
                   marginBottom: "8",
                 }}
               >
-                Description courte du service - Lorem ipsum dolor sit amet,
-                consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
-                labore et dolore magna aliqua.
+                {service.summary ||
+                  "Description courte du service - Lorem ipsum dolor sit amet, consectetur adipiscing elit."}
               </p>
 
               {/* Informations du prestataire */}

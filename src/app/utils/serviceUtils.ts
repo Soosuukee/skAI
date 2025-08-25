@@ -6,18 +6,13 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/a
 /**
  * Récupère tous les services depuis l'API
  */
-export async function getAllServices(): Promise<ServiceWithSlug[]> {
+export async function getAllServices(): Promise<Service[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/services`);
+    const response = await fetch('/api/services');
     if (!response.ok) {
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
-    const services: Service[] = await response.json();
-    
-    return services.map(service => ({
-      ...service,
-      slug: service.slug || service.title.toLowerCase().replace(/\s+/g, '-')
-    }));
+    return await response.json();
   } catch (error) {
     console.error('Erreur lors de la récupération des services:', error);
     return [];
@@ -29,7 +24,7 @@ export async function getAllServices(): Promise<ServiceWithSlug[]> {
  */
 export async function getServicesByProvider(providerId: number): Promise<ServiceWithSlug[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/providers/${providerId}/services`);
+    const response = await fetch(`/api/providers/${providerId}/services`);
     if (!response.ok) {
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
@@ -46,11 +41,11 @@ export async function getServicesByProvider(providerId: number): Promise<Service
 }
 
 /**
- * Trouve un service par son slug depuis l'API
+ * Récupère un service par son slug depuis l'API
  */
 export async function getServiceBySlug(slug: string): Promise<ServiceWithSlug | undefined> {
   try {
-    const response = await fetch(`${API_BASE_URL}/services/${slug}`);
+    const response = await fetch(`/api/services/${slug}`);
     if (!response.ok) {
       if (response.status === 404) return undefined;
       throw new Error(`Erreur HTTP: ${response.status}`);
@@ -68,11 +63,11 @@ export async function getServiceBySlug(slug: string): Promise<ServiceWithSlug | 
 }
 
 /**
- * Trouve un service par son slug et son provider depuis l'API
+ * Récupère un service par son slug et son provider depuis l'API
  */
 export async function getServiceBySlugAndProvider(serviceSlug: string, providerId: number): Promise<ServiceWithSlug | undefined> {
   try {
-    const response = await fetch(`${API_BASE_URL}/providers/${providerId}/services/${serviceSlug}`);
+    const response = await fetch(`/api/providers/${providerId}/services/${serviceSlug}`);
     if (!response.ok) {
       if (response.status === 404) return undefined;
       throw new Error(`Erreur HTTP: ${response.status}`);
@@ -117,6 +112,42 @@ export async function generateServiceStaticParamsByProvider(providerId: number) 
     }));
   } catch (error) {
     console.error('Erreur lors de la génération des paramètres statiques des services par provider:', error);
+    return [];
+  }
+}
+
+/**
+ * Récupère tous les services avec les informations des providers
+ */
+export async function getAllServicesWithProviders() {
+  try {
+    // Récupérer tous les services
+    const services = await getAllServices();
+    
+    // Récupérer tous les providers
+    const providersResponse = await fetch('/api/providers');
+    if (!providersResponse.ok) {
+      throw new Error(`Erreur HTTP: ${providersResponse.status}`);
+    }
+    const providers = await providersResponse.json();
+    
+    // Associer chaque service avec son provider
+    const servicesWithProviders = services.map(service => {
+      const provider = providers.find((p: any) => p.providerId === service.providerId);
+      return {
+        ...service,
+        provider: provider || {
+          firstName: 'Unknown',
+          lastName: 'Provider',
+          avatar: '/images/avatar.jpg',
+          slug: 'unknown'
+        }
+      };
+    });
+    
+    return servicesWithProviders;
+  } catch (error) {
+    console.error('Erreur lors de la récupération des services avec providers:', error);
     return [];
   }
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Heading,
@@ -13,9 +15,27 @@ import {
 import { CustomRevealFx } from "@/components/CustomRevealFx";
 import { baseURL } from "@/app/resources";
 import { Meta, Schema } from "@/once-ui/modules";
-import providersData from "@/data/providers.json";
+import { useProviders } from "@/app/hooks/useProviders";
 
 export default function ProvidersPage() {
+  const { providers: providersData, loading, error } = useProviders();
+
+  if (loading) {
+    return (
+      <Column maxWidth="m" gap="xl" horizontal="center" paddingY="24">
+        <Text>Chargement des experts...</Text>
+      </Column>
+    );
+  }
+
+  if (error) {
+    return (
+      <Column maxWidth="m" gap="xl" horizontal="center" paddingY="24">
+        <Text color="error">Erreur: {error}</Text>
+      </Column>
+    );
+  }
+
   return (
     <Column maxWidth="m" gap="xl" horizontal="center">
       <Schema
@@ -85,39 +105,16 @@ export default function ProvidersPage() {
                       <Heading as="h3" variant="heading-strong-l">
                         {provider.firstName} {provider.lastName}
                       </Heading>
-                      <Text variant="body-default-s" color="neutral-medium">
-                        {provider.role}
-                      </Text>
+                      {provider.job && (
+                        <Text variant="body-default-s" color="neutral-medium">
+                          {provider.job.title}
+                        </Text>
+                      )}
                       <Text variant="body-default-s" color="neutral-medium">
                         📍 {provider.location}
                       </Text>
                     </Column>
                   </Flex>
-
-                  {/* Langues parlées */}
-                  {provider.languages && provider.languages.length > 0 && (
-                    <Column gap="8">
-                      <Text variant="body-default-s" color="neutral-medium">
-                        Langues parlées :
-                      </Text>
-                      <Flex gap="8" wrap>
-                        {provider.languages.map((language, langIdx) => (
-                          <Text
-                            key={langIdx}
-                            variant="body-default-s"
-                            style={{
-                              background: "var(--neutral-alpha-weak)",
-                              padding: "0.25rem 0.5rem",
-                              borderRadius: "0.25rem",
-                              fontSize: "0.75rem",
-                            }}
-                          >
-                            {language}
-                          </Text>
-                        ))}
-                      </Flex>
-                    </Column>
-                  )}
 
                   {/* Lien vers le profil */}
                   <Text

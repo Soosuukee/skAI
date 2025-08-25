@@ -13,7 +13,6 @@ import {
 } from "@/once-ui/components";
 import { CustomRevealFx } from "@/components/CustomRevealFx";
 import Post from "@/components/blog/Post";
-import { getSortedArticles } from "@/app/utils/articleUtils";
 import { useProvider } from "@/app/hooks/useProvider";
 import { baseURL } from "@/app/resources";
 import { Meta, Schema } from "@/once-ui/modules";
@@ -29,7 +28,7 @@ export default function ProviderPage({ params }: ProviderPageProps) {
   );
 
   // Récupère les 2 derniers articles de blog
-  const blogList = getSortedArticles().slice(0, 2);
+  const blogList = articles.slice(0, 2);
 
   if (loading) {
     return (
