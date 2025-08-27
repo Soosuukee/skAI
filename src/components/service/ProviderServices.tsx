@@ -11,7 +11,7 @@ import {
   Badge,
   RevealFx,
 } from "@/once-ui/components";
-import { Service } from "@/app/hooks/useProviderServices";
+import type { Service } from "@/app/types/service";
 import { CustomRevealFx } from "@/components/CustomRevealFx";
 
 interface ProviderServicesProps {
@@ -59,7 +59,7 @@ export const ProviderServices: React.FC<ProviderServicesProps> = ({
       <Flex gap="l" wrap horizontal="center">
         {services.map((service, index) => (
           <RevealFx
-            key={service.service_id}
+            key={service.serviceId}
             translateY={4}
             delay={0.4 + index * 0.1}
           >
@@ -77,18 +77,18 @@ export const ProviderServices: React.FC<ProviderServicesProps> = ({
                     {service.title}
                   </Heading>
                   <Badge>
-                    {formatPrice(service.min_price, service.max_price)}
+                    {formatPrice(service.minPrice, service.maxPrice)}
                   </Badge>
                 </Flex>
 
                 <Text variant="body-default-s" color="neutral-medium">
                   Service créé le{" "}
-                  {new Date(service.created_at).toLocaleDateString("fr-FR")}
+                  {new Date(service.createdAt).toLocaleDateString("fr-FR")}
                 </Text>
 
                 <Flex gap="s" horizontal="end">
                   <Button
-                    href={`/providers/${providerSlug}/service/${service.slug}`}
+                    href={`/providers/${providerSlug}/service/${service.serviceId}`}
                     variant="primary"
                     size="s"
                   >

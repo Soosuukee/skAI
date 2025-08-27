@@ -96,7 +96,9 @@ function About({
         as="webPage"
         baseURL={baseURL}
         title={`A propos de ${provider.firstName} ${provider.lastName}`}
-        description={`Rencontrez ${provider.firstName} ${provider.lastName}, expert IA de ${provider.location}`}
+        description={`Rencontrez ${provider.firstName} ${
+          provider.lastName
+        }, expert IA de ${provider.location?.name ?? ""}`}
         path={`/providers/${provider.slug}/about`}
         image={`${baseURL}/og?title=${encodeURIComponent(
           `${provider.firstName} ${provider.lastName}`
@@ -135,7 +137,7 @@ function About({
               <Avatar src={provider.avatar} size="xl" />
               <Flex gap="8" vertical="center">
                 <Icon onBackground="accent-weak" name="globe" />
-                {provider.location}
+                {provider.location?.name}
               </Flex>
               {provider.languages && provider.languages.length > 0 && (
                 <Flex wrap gap="8">

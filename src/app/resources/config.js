@@ -8,6 +8,11 @@ const routes = {
   "/blog": true,
   "/service": true,
   "/providers": true,
+  "/join": true,
+  "/servicecreation": true,
+  "/experiencecreation": true,
+  "/educationcreation": true,
+  "/test-datepicker": true,
   // Add these routes when you create the corresponding pages
   // "/settings": true,
   // "/profile": true,

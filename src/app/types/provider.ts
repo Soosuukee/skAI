@@ -15,27 +15,24 @@ export interface Provider {
   lastName: string;           // Nom de famille
   email: string;              // Email de contact
   avatar: string;             // Chemin vers l'avatar
-  location: string;           // Localisation géographique
+  location: Location;           // Localisation géographique
   createdAt: string;          // Date de création (format ISO)
 }
 
 // Interface étendue avec toutes les relations
 export interface ProviderWithDetails extends Provider {
-  skills: number[];           // IDs des compétences
+  skills: Skill[];           // IDs des compétences
   experiences: Experience[];  // Expériences professionnelles
   education: Education[];     // Formation/éducation
   socialLinks: SocialLink[];  // Liens sociaux
   services: Service[];        // Services proposés
   articles: Article[];        // Articles publiés
-  jobDetails: Job;            // Détails du métier
+  job: Job;            // Détails du métier
   languages: Language[];        // Langues parlées
 }
 
 // Interface pour l'affichage complet du profil
-export interface ProviderProfile extends ProviderWithDetails {
-  locationDetails: Location;  // Détails de la localisation
-  skillDetails: Skill[];      // Détails des compétences
-}
+// (Supprimé) ProviderProfile: non utilisé et non souhaité
 
 // Interface pour les options de filtrage des prestataires
 export interface ProviderFilters {

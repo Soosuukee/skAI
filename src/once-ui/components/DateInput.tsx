@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useCallback, useEffect } from "react";
-import { Input, DropdownWrapper, Flex, DatePicker } from ".";
+import { Input, DropdownWrapper, Flex } from ".";
+import { DatePicker } from "./DatePicker";
+import type { Placement } from "@floating-ui/react-dom";
 
-interface DateInputProps extends Omit<React.ComponentProps<typeof Input>, "onChange" | "value"> {
+interface DateInputProps
+  extends Omit<React.ComponentProps<typeof Input>, "onChange" | "value"> {
   id: string;
   label: string;
   value?: Date;
@@ -12,6 +15,7 @@ interface DateInputProps extends Omit<React.ComponentProps<typeof Input>, "onCha
   className?: string;
   style?: React.CSSProperties;
   timePicker?: boolean;
+  floatingPlacement?: Placement;
 }
 
 const formatDate = (date: Date, timePicker: boolean) => {
@@ -39,10 +43,13 @@ export const DateInput: React.FC<DateInputProps> = ({
   className,
   style,
   timePicker = false,
+  floatingPlacement = "right-start",
   ...rest
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [inputValue, setInputValue] = useState(value ? formatDate(value, timePicker) : "");
+  const [inputValue, setInputValue] = useState(
+    value ? formatDate(value, timePicker) : ""
+  );
 
   useEffect(() => {
     if (value) {
@@ -54,11 +61,19 @@ export const DateInput: React.FC<DateInputProps> = ({
     (date: Date) => {
       setInputValue(formatDate(date, timePicker));
       onChange?.(date);
+    },
+    [onChange, timePicker]
+  );
+
+  const handleDateSelect = useCallback(
+    (date: Date) => {
+      setInputValue(formatDate(date, timePicker));
+      onChange?.(date);
       if (!timePicker) {
         setIsOpen(false);
       }
     },
-    [onChange, timePicker],
+    [onChange, timePicker]
   );
 
   const handleInputClick = useCallback(() => {
@@ -82,14 +97,26 @@ export const DateInput: React.FC<DateInputProps> = ({
   );
 
   const dropdown = (
-    <Flex padding="20">
-      <DatePicker value={value} onChange={handleDateChange} timePicker={timePicker} />
+    <Flex
+      padding="20"
+      onClick={(e) => {
+        // Empêcher la fermeture du dropdown quand on clique sur le DatePicker
+        e.stopPropagation();
+      }}
+    >
+      <DatePicker
+        value={value}
+        onChange={handleDateChange}
+        onDateSelect={handleDateSelect}
+        timePicker={timePicker}
+      />
     </Flex>
   );
 
   return (
     <DropdownWrapper
       fillWidth
+      floatingPlacement={floatingPlacement}
       trigger={trigger}
       minHeight={minHeight}
       dropdown={dropdown}

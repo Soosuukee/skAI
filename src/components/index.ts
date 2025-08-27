@@ -8,6 +8,9 @@ export { ProjectCard } from "@/components/ProjectCard";
 export { HeadingLink } from "@/components/HeadingLink";
 export { RouteGuard } from "@/components/RouteGuard";
 export { JoinButton } from "@/components/auth/JoinButton";
+export { default as ExperienceForm } from "@/components/forms/ExperienceForm";
+export { default as EducationForm } from "@/components/forms/EducationForm";
+export { default as ServiceForm } from "@/components/forms/ServiceForm";
 
 // Service Image Components
 export { ServiceImage } from "@/components/service/ServiceImage";

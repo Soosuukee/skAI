@@ -2,285 +2,630 @@
 
 import React, { useState, forwardRef, useEffect } from "react";
 import classNames from "classnames";
-import { Flex, Text, Button, Grid, SegmentedControl, IconButton, RevealFx, NumberInput } from ".";
+import { Flex } from "./Flex";
+import { Text } from "./Text";
+import { Button } from "./Button";
+import { Grid } from "./Grid";
+import { SegmentedControl } from "./SegmentedControl";
+import { IconButton } from "./IconButton";
+import { RevealFx } from "./RevealFx";
+import { NumberInput } from "./NumberInput";
 import styles from "./DatePicker.module.scss";
 
-export interface DatePickerProps extends Omit<React.ComponentProps<typeof Flex>, "onChange"> {
+export interface DatePickerProps
+  extends Omit<React.ComponentProps<typeof Flex>, "onChange"> {
   value?: Date;
   onChange?: (date: Date) => void;
+  onDateSelect?: (date: Date) => void; // Callback appelé seulement quand une date est vraiment sélectionnée
   minDate?: Date;
   maxDate?: Date;
-  previousMonth?: boolean;
-  nextMonth?: boolean;
-  timePicker?: boolean;
-  defaultDate?: Date;
-  defaultTime?: {
-    hours: number;
-    minutes: number;
-  };
-  size?: "s" | "m" | "l";
-  className?: string;
-  style?: React.CSSProperties;
-  currentMonth?: number;
-  currentYear?: number;
-  onMonthChange?: (increment: number) => void;
   range?: {
     startDate?: Date;
     endDate?: Date;
   };
-  onHover?: (date: Date | null) => void;
+  timePicker?: boolean;
+  size?: "s" | "m" | "l";
+  className?: string;
+  style?: React.CSSProperties;
 }
 
-const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
+type ViewMode = "days" | "months" | "years";
+
+const monthNames = [
+  "Janvier",
+  "Février",
+  "Mars",
+  "Avril",
+  "Mai",
+  "Juin",
+  "Juillet",
+  "Août",
+  "Septembre",
+  "Octobre",
+  "Novembre",
+  "Décembre",
+];
+
+const dayNames = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+
+export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
   (
     {
       value,
       onChange,
-      timePicker = false,
-      previousMonth = true,
-      nextMonth = true,
+      onDateSelect,
       minDate,
       maxDate,
-      defaultDate,
-      defaultTime,
+      range,
+      timePicker = false,
       size = "m",
       className,
       style,
-      currentMonth: propCurrentMonth,
-      currentYear: propCurrentYear,
-      onMonthChange,
-      range,
-      onHover,
       ...rest
     },
-    ref,
+    ref
   ) => {
     const today = new Date();
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(value);
+    const defaultTime = value
+      ? { hours: value.getHours(), minutes: value.getMinutes() }
+      : undefined;
+    const [selectedDate, setSelectedDate] = useState<Date | null>(
+      value || null
+    );
     const [selectedTime, setSelectedTime] = useState<
-      | {
-          hours: number;
-          minutes: number;
-        }
-      | undefined
+      { hours: number; minutes: number } | undefined
     >(defaultTime);
-    const [isPM, setIsPM] = useState(defaultTime?.hours ? defaultTime.hours >= 12 : false);
+    const [isPM, setIsPM] = useState(
+      defaultTime?.hours ? defaultTime.hours >= 12 : false
+    );
     const [isTimeSelector, setIsTimeSelector] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(true);
+    const [viewMode, setViewMode] = useState<ViewMode>("days");
 
     const [currentMonth, setCurrentMonth] = useState<number>(
-      value ? value.getMonth() : today.getMonth(),
+      value ? value.getMonth() : today.getMonth()
     );
     const [currentYear, setCurrentYear] = useState<number>(
-      value ? value.getFullYear() : today.getFullYear(),
+      value ? value.getFullYear() : today.getFullYear()
+    );
+
+    // For years view - show range of 12 years
+    const [yearRangeStart, setYearRangeStart] = useState<number>(
+      Math.floor(currentYear / 12) * 12
     );
 
     useEffect(() => {
-      if (typeof propCurrentMonth === "number") {
-        setCurrentMonth(propCurrentMonth);
-      }
-      if (typeof propCurrentYear === "number") {
-        setCurrentYear(propCurrentYear);
-      }
-    }, [propCurrentMonth, propCurrentYear]);
-
-    useEffect(() => {
-      setSelectedDate(value);
       if (value) {
-        setSelectedTime({
-          hours: value.getHours(),
-          minutes: value.getMinutes(),
-        });
-        setIsPM(value.getHours() >= 12);
+        setSelectedDate(value);
+        setCurrentMonth(value.getMonth());
+        setCurrentYear(value.getFullYear());
+        setYearRangeStart(Math.floor(value.getFullYear() / 12) * 12);
       }
     }, [value]);
 
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        setIsTransitioning(true);
-      }, 100);
+    const handleDateSelect = (date: Date) => {
+      setSelectedDate(date);
+      if (onChange) {
+        onChange(date);
+      }
+      // onDateSelect est appelé seulement quand on clique sur un jour spécifique
+      if (onDateSelect) {
+        onDateSelect(date);
+      }
+    };
 
-      return () => clearTimeout(timer);
-    }, []);
+    const handleMonthChange = (direction: number) => {
+      const newMonth = currentMonth + direction;
+      if (newMonth < 0) {
+        setCurrentMonth(11);
+        setCurrentYear(currentYear - 1);
+      } else if (newMonth > 11) {
+        setCurrentMonth(0);
+        setCurrentYear(currentYear + 1);
+      } else {
+        setCurrentMonth(newMonth);
+      }
+    };
 
-    const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    const dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+    const handleYearChange = (direction: number) => {
+      setCurrentYear(currentYear + direction);
+    };
+
+    const handleYearRangeChange = (direction: number) => {
+      setYearRangeStart(yearRangeStart + direction * 12);
+    };
+
+    const handleMonthSelect = (month: number) => {
+      console.log("handleMonthSelect called with month:", month);
+      setCurrentMonth(month);
+      setViewMode("days");
+      setIsTransitioning(true);
+    };
+
+    const handleYearSelect = (year: number) => {
+      console.log("handleYearSelect called with year:", year);
+      setCurrentYear(year);
+      setViewMode("months");
+      setIsTransitioning(true);
+    };
 
     const handleTimeToggle = (show: boolean) => {
-      setIsTransitioning(false);
-      setTimeout(() => {
-        setIsTimeSelector(show);
-        setIsTransitioning(true);
-      }, 400);
+      setIsTimeSelector(show);
+      setIsTransitioning(true);
     };
 
-    const handleDateSelect = (date: Date) => {
-      const newDate = new Date(date);
-      if (timePicker && selectedDate && selectedTime) {
-        newDate.setHours(selectedTime.hours);
-        newDate.setMinutes(selectedTime.minutes);
-      }
-      setSelectedDate(newDate);
-      if (timePicker) {
-        handleTimeToggle(true);
-      } else {
-        onChange?.(newDate);
-      }
+    const handleViewModeToggle = (mode: ViewMode) => {
+      setViewMode(mode);
+      setIsTransitioning(true);
     };
 
-    const handleMonthChange = (increment: number) => {
-      if (onMonthChange) {
-        // Delegate to external handler
-        onMonthChange(increment);
-      } else {
-        // Fallback to internal state management
-        const newMonth = currentMonth + increment;
-        if (newMonth < 0) {
-          setCurrentMonth(11); // December
-          setCurrentYear(currentYear - 1);
-        } else if (newMonth > 11) {
-          setCurrentMonth(0); // January
-          setCurrentYear(currentYear + 1);
-        } else {
-          setCurrentMonth(newMonth);
-        }
-      }
-    };
-
-    const convert24to12 = (hour24: number) => {
-      if (hour24 === 0) return 12;
-      if (hour24 > 12) return hour24 - 12;
-      return hour24;
-    };
-
-    const handleTimeChange = (hours: number, minutes: number, pm: boolean = isPM) => {
+    const handleTimeChange = (
+      hours: number,
+      minutes: number,
+      pm: boolean = isPM
+    ) => {
       if (!selectedDate) return;
 
-      const newTime = {
-        hours: pm ? (hours === 12 ? 12 : hours + 12) : hours === 12 ? 0 : hours,
-        minutes,
-      };
+      const newHours = pm ? (hours % 12) + 12 : hours % 12;
+      const newTime = { hours: newHours, minutes };
       setSelectedTime(newTime);
       setIsPM(pm);
 
       const newDate = new Date(selectedDate);
-      newDate.setHours(newTime.hours);
-      newDate.setMinutes(minutes);
-      onChange?.(newDate);
+      newDate.setHours(newHours, minutes);
+      setSelectedDate(newDate);
+      if (onChange) {
+        onChange(newDate);
+      }
+    };
+
+    const convert24to12 = (hour: number) => {
+      return hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
     };
 
     const isInRange = (date: Date) => {
-      if (!range?.startDate) return false;
-      if (!range?.endDate) return false;
+      if (!range?.startDate || !range?.endDate) return false;
       return date >= range.startDate && date <= range.endDate;
     };
 
-    const renderCalendarGrid = () => {
-      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-      const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+    const getDaysInMonth = (month: number, year: number) => {
+      return new Date(year, month + 1, 0).getDate();
+    };
 
-      // Calculate total number of weeks needed
-      const totalDaysShown = firstDay + daysInMonth;
-      const numberOfWeeks = Math.ceil(totalDaysShown / 7);
-      const totalGridSpots = numberOfWeeks * 7;
+    const getFirstDayOfMonth = (month: number, year: number) => {
+      const firstDay = new Date(year, month, 1).getDay();
+      // Convert Sunday (0) to 6, Monday (1) to 0, etc.
+      return firstDay === 0 ? 6 : firstDay - 1;
+    };
 
+    const renderDaysView = () => {
+      const daysInMonth = getDaysInMonth(currentMonth, currentYear);
+      const firstDayOfMonth = getFirstDayOfMonth(currentMonth, currentYear);
       const days = [];
 
-      // Previous month's days
-      for (let i = 0; i < firstDay; i++) {
-        const prevMonthDay = daysInPrevMonth - firstDay + i + 1;
+      // Previous month days
+      const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+      const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+      const daysInPrevMonth = getDaysInMonth(prevMonth, prevYear);
+
+      for (let i = 0; i < firstDayOfMonth; i++) {
+        const prevMonthDay = daysInPrevMonth - firstDayOfMonth + i + 1;
         days.push(
           <Flex
-            paddingY="2"
-            width="40"
-            height="40"
             key={`prev-${currentYear}-${currentMonth}-${i}`}
+            fillWidth
+            horizontal="center"
           >
-            <Button fillWidth weight="default" variant="tertiary" size="m" type="button" disabled>
+            <Button
+              fillWidth
+              weight="default"
+              variant="tertiary"
+              size="m"
+              type="button"
+              disabled
+            >
               {prevMonthDay}
             </Button>
-          </Flex>,
+          </Flex>
         );
       }
 
-      // Current month's days
-      for (let day = 1; day <= daysInMonth; day++) {
-        const currentDate = new Date(currentYear, currentMonth, day);
+      // Current month days
+      for (let i = 1; i <= daysInMonth; i++) {
+        const currentDate = new Date(currentYear, currentMonth, i);
         const isSelected =
-          (selectedDate?.getDate() === day &&
-            selectedDate?.getMonth() === currentMonth &&
-            selectedDate?.getFullYear() === currentYear) ||
-          (value instanceof Date && value.getTime() === currentDate.getTime()) ||
+          (selectedDate &&
+            selectedDate.getDate() === i &&
+            selectedDate.getMonth() === currentMonth &&
+            selectedDate.getFullYear() === currentYear) ||
+          (value instanceof Date &&
+            value.getTime() === currentDate.getTime()) ||
           range?.startDate?.getTime() === currentDate.getTime() ||
           range?.endDate?.getTime() === currentDate.getTime();
 
         const isFirstInRange =
-          range?.startDate && currentDate.getTime() === range.startDate.getTime();
-        const isLastInRange = range?.endDate && currentDate.getTime() === range.endDate.getTime();
+          range?.startDate &&
+          currentDate.getTime() === range.startDate.getTime();
+        const isLastInRange =
+          range?.endDate && currentDate.getTime() === range.endDate.getTime();
 
         // Check if the current date is out of the minDate and maxDate range
-        const isDisabled = (minDate && currentDate < minDate) || (maxDate && currentDate > maxDate);
+        const isDisabled =
+          (minDate && currentDate < minDate) ||
+          (maxDate && currentDate > maxDate);
 
         days.push(
-          <Flex paddingY="2" key={`day-${currentYear}-${currentMonth}-${day}`}>
-            <Flex
-              width="40"
-              height="40"
-              background={isInRange(currentDate) ? "neutral-alpha-weak" : undefined}
-              borderTop={isInRange(currentDate) ? "neutral-alpha-weak" : "transparent"}
-              borderBottom={isInRange(currentDate) ? "neutral-alpha-weak" : "transparent"}
-              leftRadius={isFirstInRange ? "m" : undefined}
-              rightRadius={isLastInRange ? "m" : undefined}
+          <Flex
+            key={`current-${currentYear}-${currentMonth}-${i}`}
+            fillWidth
+            horizontal="center"
+          >
+            <Button
+              fillWidth
+              weight="default"
+              variant={isSelected ? "primary" : "tertiary"}
+              size="m"
+              type="button"
+              disabled={isDisabled}
+              onClick={() => handleDateSelect(currentDate)}
+              style={{ width: "40px", height: "40px" }}
             >
-              <Button
-                fillWidth
-                weight={isSelected ? "strong" : "default"}
-                variant={isSelected ? "primary" : "tertiary"}
-                size="m"
-                onClick={() => !isDisabled && handleDateSelect(currentDate)}
-                onMouseEnter={() => onHover?.(currentDate)}
-                onMouseLeave={() => onHover?.(null)}
-                disabled={isDisabled}
-              >
-                {day}
-              </Button>
-            </Flex>
-          </Flex>,
+              {i}
+            </Button>
+          </Flex>
         );
       }
 
-      const remainingDays = totalGridSpots - days.length;
-
+      // Next month days
+      const remainingDays = 42 - days.length; // 6 rows * 7 days
       for (let i = 1; i <= remainingDays; i++) {
         days.push(
           <Flex
-            marginTop="2"
-            width="40"
-            height="40"
             key={`next-${currentYear}-${currentMonth}-${i}`}
+            fillWidth
+            horizontal="center"
           >
-            <Button fillWidth weight="default" variant="tertiary" size="m" type="button" disabled>
+            <Button
+              fillWidth
+              weight="default"
+              variant="tertiary"
+              size="m"
+              type="button"
+              disabled
+            >
               {i}
             </Button>
-          </Flex>,
+          </Flex>
         );
       }
 
       return days;
+    };
+
+    const renderMonthsView = () => {
+      return monthNames.map((monthName, index) => {
+        const isSelected = currentMonth === index;
+        const isDisabled =
+          (minDate && currentYear < minDate.getFullYear()) ||
+          (maxDate && currentYear > maxDate.getFullYear()) ||
+          (minDate &&
+            currentYear === minDate.getFullYear() &&
+            index < minDate.getMonth()) ||
+          (maxDate &&
+            currentYear === maxDate.getFullYear() &&
+            index > maxDate.getMonth());
+
+        return (
+          <Flex key={`month-${index}`} fillWidth horizontal="center">
+            <Button
+              fillWidth
+              weight="default"
+              variant={isSelected ? "primary" : "tertiary"}
+              size="m"
+              type="button"
+              disabled={isDisabled}
+              onClick={() => handleMonthSelect(index)}
+            >
+              {monthName}
+            </Button>
+          </Flex>
+        );
+      });
+    };
+
+    const renderYearsView = () => {
+      const years = [];
+      for (let i = 0; i < 12; i++) {
+        const year = yearRangeStart + i;
+        const isSelected = currentYear === year;
+        const isDisabled =
+          (minDate && year < minDate.getFullYear()) ||
+          (maxDate && year > maxDate.getFullYear());
+
+        years.push(
+          <Flex key={`year-${year}`} fillWidth horizontal="center">
+            <Button
+              fillWidth
+              weight="default"
+              variant={isSelected ? "primary" : "tertiary"}
+              size="m"
+              type="button"
+              disabled={isDisabled}
+              onClick={() => handleYearSelect(year)}
+            >
+              {year}
+            </Button>
+          </Flex>
+        );
+      }
+      return years;
+    };
+
+    const renderHeader = () => {
+      if (isTimeSelector) {
+        return (
+          <Flex horizontal="center" fillWidth direction="column" gap="8">
+            <Text
+              variant={`label-default-${size}`}
+              onBackground="neutral-strong"
+            >
+              {monthNames[currentMonth]} {currentYear}
+            </Text>
+            <Text
+              className="cursor-interactive"
+              variant="label-default-s"
+              onBackground="brand-weak"
+              onClick={() => handleTimeToggle(false)}
+            >
+              Back to calendar
+            </Text>
+          </Flex>
+        );
+      }
+
+      if (viewMode === "days") {
+        return (
+          <>
+            <IconButton
+              variant="tertiary"
+              size={size === "l" ? "l" : "m"}
+              icon="chevronLeft"
+              onClick={(event: any) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleMonthChange(-1);
+              }}
+            />
+            <Flex fillWidth direction="column" horizontal="center" gap="8">
+              <Flex vertical="center" gap="8">
+                <Text
+                  variant={`body-default-${size}`}
+                  onBackground="neutral-strong"
+                  className="cursor-interactive"
+                  onClick={(event: any) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    handleViewModeToggle("months");
+                  }}
+                >
+                  {monthNames[currentMonth]}
+                </Text>
+                <Text
+                  variant={`body-default-${size}`}
+                  onBackground="neutral-strong"
+                  className="cursor-interactive"
+                  onClick={(event: any) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    handleViewModeToggle("years");
+                  }}
+                >
+                  {currentYear}
+                </Text>
+              </Flex>
+              {timePicker && selectedTime && (
+                <Text variant="label-default-s" onBackground="neutral-weak">
+                  {`${selectedTime.hours
+                    .toString()
+                    .padStart(2, "0")}:${selectedTime.minutes
+                    .toString()
+                    .padStart(2, "0")} ${isPM ? "PM" : "AM"}`}
+                </Text>
+              )}
+            </Flex>
+            <IconButton
+              variant="tertiary"
+              size={size === "l" ? "l" : "m"}
+              icon="chevronRight"
+              onClick={(event: any) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleMonthChange(1);
+              }}
+            />
+          </>
+        );
+      }
+
+      if (viewMode === "months") {
+        return (
+          <>
+            <IconButton
+              variant="tertiary"
+              size={size === "l" ? "l" : "m"}
+              icon="chevronLeft"
+              onClick={(event: any) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleYearChange(-1);
+              }}
+            />
+            <Flex fillWidth direction="column" horizontal="center" gap="8">
+              <Text
+                variant={`body-default-${size}`}
+                onBackground="neutral-strong"
+                className="cursor-interactive"
+                onClick={(event: any) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  handleViewModeToggle("years");
+                }}
+              >
+                {currentYear}
+              </Text>
+            </Flex>
+            <IconButton
+              variant="tertiary"
+              size={size === "l" ? "l" : "m"}
+              icon="chevronRight"
+              onClick={(event: any) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleYearChange(1);
+              }}
+            />
+          </>
+        );
+      }
+
+      if (viewMode === "years") {
+        return (
+          <>
+            <IconButton
+              variant="tertiary"
+              size={size === "l" ? "l" : "m"}
+              icon="chevronLeft"
+              onClick={(event: any) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleYearRangeChange(-1);
+              }}
+            />
+            <Flex fillWidth direction="column" horizontal="center" gap="8">
+              <Text
+                variant={`body-default-${size}`}
+                onBackground="neutral-strong"
+              >
+                {yearRangeStart} - {yearRangeStart + 11}
+              </Text>
+            </Flex>
+            <IconButton
+              variant="tertiary"
+              size={size === "l" ? "l" : "m"}
+              icon="chevronRight"
+              onClick={(event: any) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleYearRangeChange(1);
+              }}
+            />
+          </>
+        );
+      }
+    };
+
+    const renderContent = () => {
+      if (isTimeSelector) {
+        return (
+          <Flex fillWidth direction="column" gap="16">
+            <Flex fillWidth direction="column" horizontal="center" gap="8">
+              <SegmentedControl
+                buttons={[
+                  { value: "AM", label: "AM" },
+                  { value: "PM", label: "PM" },
+                ]}
+                selected={isPM ? "PM" : "AM"}
+                onToggle={(value) => {
+                  handleTimeChange(
+                    selectedTime?.hours ?? 0,
+                    selectedTime?.minutes ?? 0,
+                    value === "PM"
+                  );
+                }}
+              />
+            </Flex>
+            <Flex fillWidth direction="column" horizontal="center" gap="8">
+              <NumberInput
+                id="hours"
+                label="Hours"
+                min={1}
+                max={12}
+                value={
+                  selectedTime?.hours ? convert24to12(selectedTime.hours) : 12
+                }
+                onChange={(value) => {
+                  if (value >= 1 && value <= 12) {
+                    handleTimeChange(value, selectedTime?.minutes ?? 0, isPM);
+                  }
+                }}
+              />
+              <NumberInput
+                id="minutes"
+                label="Minutes"
+                min={0}
+                max={59}
+                value={selectedTime?.minutes ?? 0}
+                onChange={(value) => {
+                  if (value >= 0 && value <= 59) {
+                    handleTimeChange(selectedTime?.hours ?? 0, value, isPM);
+                  }
+                }}
+              />
+            </Flex>
+          </Flex>
+        );
+      }
+
+      if (viewMode === "days") {
+        return (
+          <Flex fillWidth direction="column" gap="8">
+            <Grid columns={7} gap="4" fillWidth>
+              {dayNames.map((day) => (
+                <Flex key={day} fillWidth horizontal="center">
+                  <Text
+                    variant="label-default-s"
+                    onBackground="neutral-weak"
+                    weight="strong"
+                  >
+                    {day}
+                  </Text>
+                </Flex>
+              ))}
+            </Grid>
+            <Grid columns={7} gap="4" fillWidth>
+              {renderDaysView()}
+            </Grid>
+            {timePicker && (
+              <Flex fillWidth horizontal="center">
+                <Text
+                  className="cursor-interactive"
+                  variant="label-default-s"
+                  onBackground="brand-weak"
+                  onClick={() => handleTimeToggle(true)}
+                >
+                  Set time
+                </Text>
+              </Flex>
+            )}
+          </Flex>
+        );
+      }
+
+      if (viewMode === "months") {
+        return (
+          <Grid columns={3} gap="8" fillWidth>
+            {renderMonthsView()}
+          </Grid>
+        );
+      }
+
+      if (viewMode === "years") {
+        return (
+          <Grid columns={3} gap="8" fillWidth>
+            {renderYearsView()}
+          </Grid>
+        );
+      }
     };
 
     return (
@@ -295,151 +640,20 @@ const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
         {...rest}
       >
         <Flex fillWidth center>
-          {isTimeSelector ? (
-            <Flex horizontal="center" fillWidth direction="column" gap="8">
-              <Text variant={`label-default-${size}`} onBackground="neutral-strong">
-                {monthNames[currentMonth]} {currentYear}
-              </Text>
-              <Text
-                className="cursor-interactive"
-                variant="label-default-s"
-                onBackground="brand-weak"
-                onClick={() => handleTimeToggle(false)}
-              >
-                Back to calendar
-              </Text>
-            </Flex>
-          ) : (
-            <>
-              {previousMonth && (
-                <IconButton
-                  variant="tertiary"
-                  size={size === "l" ? "l" : "m"}
-                  icon="chevronLeft"
-                  onClick={(event: any) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    handleMonthChange(-1);
-                  }}
-                />
-              )}
-              <Flex fillWidth direction="column" horizontal="center" gap="8">
-                <Text variant={`body-default-${size}`} onBackground="neutral-strong">
-                  {monthNames[currentMonth]} {currentYear}
-                </Text>
-                {timePicker && selectedTime && (
-                  <Text variant="label-default-s" onBackground="neutral-weak">
-                    {`${selectedTime.hours.toString().padStart(2, "0")}:${selectedTime.minutes.toString().padStart(2, "0")} ${isPM ? "PM" : "AM"}`}
-                  </Text>
-                )}
-              </Flex>
-              {nextMonth && (
-                <IconButton
-                  variant="tertiary"
-                  size={size === "l" ? "l" : "m"}
-                  icon="chevronRight"
-                  onClick={(event: any) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    handleMonthChange(1);
-                  }}
-                />
-              )}
-            </>
-          )}
+          {renderHeader()}
         </Flex>
 
-        <RevealFx
+        <Flex
           fillWidth
           horizontal="center"
           vertical="center"
-          key={isTimeSelector ? "time" : "date"}
-          trigger={isTransitioning}
-          speed="fast"
+          key={`${viewMode}-${isTimeSelector ? "time" : "date"}`}
         >
-          {isTimeSelector ? (
-            <Flex
-              maxWidth={24}
-              horizontal="center"
-              vertical="center"
-              direction="column"
-              padding="32"
-              gap="32"
-            >
-              <SegmentedControl
-                buttons={[
-                  {
-                    value: "AM",
-                    label: "AM",
-                  },
-                  {
-                    value: "PM",
-                    label: "PM",
-                  },
-                ]}
-                selected={isPM ? "PM" : "AM"}
-                onToggle={(value) =>
-                  handleTimeChange(
-                    selectedTime?.hours ?? 0,
-                    selectedTime?.minutes ?? 0,
-                    value === "PM",
-                  )
-                }
-              />
-              <Flex fillWidth gap="16" vertical="center" data-scaling="110">
-                <NumberInput
-                  id="hours"
-                  label="Hours"
-                  labelAsPlaceholder
-                  min={1}
-                  max={12}
-                  value={selectedTime?.hours ? convert24to12(selectedTime.hours) : 12}
-                  onChange={(value) => {
-                    if (value >= 1 && value <= 12) {
-                      handleTimeChange(value, selectedTime?.minutes ?? 0);
-                    }
-                  }}
-                  aria-label="Hours"
-                />
-                :
-                <NumberInput
-                  id="minutes"
-                  label="Minutes"
-                  labelAsPlaceholder
-                  min={0}
-                  max={59}
-                  padStart={2}
-                  value={selectedTime?.minutes ?? 0}
-                  onChange={(value) => {
-                    if (value >= 0 && value <= 59) {
-                      handleTimeChange(selectedTime?.hours ?? 0, value);
-                    }
-                  }}
-                  aria-label="Minutes"
-                />
-              </Flex>
-            </Flex>
-          ) : (
-            <Grid fitWidth columns="7">
-              {dayNames.map((day) => (
-                <Text
-                  marginBottom="16"
-                  key={day}
-                  variant="label-default-m"
-                  onBackground="neutral-medium"
-                  align="center"
-                >
-                  {day}
-                </Text>
-              ))}
-              {renderCalendarGrid()}
-            </Grid>
-          )}
-        </RevealFx>
+          {renderContent()}
+        </Flex>
       </Flex>
     );
-  },
+  }
 );
 
 DatePicker.displayName = "DatePicker";
-export { DatePicker };

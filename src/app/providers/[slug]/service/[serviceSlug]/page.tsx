@@ -12,10 +12,11 @@ import {
 import { CustomRevealFx } from "@/components/CustomRevealFx";
 import { ServiceContent } from "@/components/service/ServiceContent";
 import { useProvider } from "@/app/hooks/useProvider";
-import { useProviderServices } from "@/app/hooks/useServices";
+import { useProviderServices } from "@/app/hooks/useProviderServices";
 import { formatPrice } from "@/app/utils/priceUtils";
 import { baseURL } from "@/app/resources";
 import { Meta, Schema } from "@/once-ui/modules";
+import { ServiceDetailRenderer } from "@/components/service/ServiceDetailRenderer";
 
 interface ProviderServiceDetailPageProps {
   params: Promise<{ slug: string; serviceSlug: string }>;
@@ -54,7 +55,9 @@ export default function ProviderServiceDetailPage({
     );
   }
 
-  const service = services.find((s) => s.slug === resolvedParams.serviceSlug);
+  const service = services.find(
+    (s) => s.serviceId.toString() === resolvedParams.serviceSlug
+  );
 
   if (!service) {
     return (
@@ -78,7 +81,7 @@ export default function ProviderServiceDetailPage({
       <Schema
         as="webPage"
         baseURL={baseURL}
-        path={`/providers/${provider.slug}/service/${service.slug}`}
+        path={`/providers/${provider.slug}/service/${service.serviceId}`}
         title={`${service.title} - ${provider.firstName} ${provider.lastName}`}
         description={`Service ${service.title} proposé par ${provider.firstName} ${provider.lastName}`}
         image={`${baseURL}/og?title=${encodeURIComponent(
@@ -92,41 +95,27 @@ export default function ProviderServiceDetailPage({
       />
 
       {/* Contenu du service */}
-      {service ? (
-        <RevealFx translateY={4} fillWidth delay={0.3}>
-          <Column gap="l" fillWidth>
-            <Heading as="h2" variant="display-strong-m">
-              {service.title}
-            </Heading>
-            <Text variant="body-default-l" color="neutral-medium">
-              Durée estimée : {service.estimatedDuration}
-            </Text>
-            <Text variant="body-default-l">
-              Prix : {formatPrice(service.minPrice, service.maxPrice)}
-            </Text>
-          </Column>
-        </RevealFx>
-      ) : (
-        <RevealFx translateY={4} fillWidth delay={0.3}>
-          <Column gap="l" fillWidth>
-            <Heading as="h2" variant="display-strong-m">
-              Description du service
-            </Heading>
-            <Text variant="body-default-l" color="neutral-medium">
-              Le contenu détaillé de ce service sera bientôt disponible. Ce
-              service est proposé par {provider.firstName} {provider.lastName},
-              {provider.role} basé à {provider.location}.
-            </Text>
+      <RevealFx translateY={4} fillWidth delay={0.3}>
+        <Column gap="l" fillWidth>
+          <Heading as="h2" variant="display-strong-m">
+            {service.title}
+          </Heading>
+          <Text variant="body-default-l" color="neutral-medium">
+            Tag : {service.tag}
+          </Text>
+          <Text variant="body-default-l">
+            Prix : {formatPrice(service.minPrice, service.maxPrice)}
+          </Text>
+          <Text variant="body-default-l" color="neutral-medium">
+            {service.summary}
+          </Text>
 
-            <Text variant="body-default-l">
-              Pour plus d'informations sur ce service, veuillez contacter{" "}
-              {provider.firstName}
-              directement via son profil ou utiliser les informations de contact
-              disponibles.
-            </Text>
-          </Column>
-        </RevealFx>
-      )}
+          {/* Contenu détaillé du service */}
+          <div className="mt-8">
+            <ServiceDetailRenderer service={service} provider={provider} />
+          </div>
+        </Column>
+      </RevealFx>
 
       {/* Actions */}
       <RevealFx translateY={4} fillWidth delay={0.4}>

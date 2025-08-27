@@ -23,6 +23,11 @@ const publicRoutes = [
   "/gallery",
   "/providers",
   "/service",
+  "/join",
+  "/servicecreation",
+  "/experiencecreation",
+  "/educationcreation",
+  "/test-datepicker",
   "/work",
   "/api",
 ];
