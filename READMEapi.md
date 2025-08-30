@@ -3,7 +3,7 @@
 Base URL: `http://localhost:8080/api/v1`
 
 - CORS: origine reflétée automatiquement (pas limité à une URL). Cookies autorisés.
-- Placeholders: `{id}` entier (`{id:\d+}`), `{slug}` alphanum.
+- Placeholders: `{id}` (`{id:\d+}`), `{providerSlug}`, `{clientSlug}`, `{serviceSlug}`, `{articleSlug}`, `{tagSlug}`.
 
 ### Auth
 
@@ -17,8 +17,7 @@ Base URL: `http://localhost:8080/api/v1`
 
 - (Public) GET `/providers`: liste des providers (paginations/filters côté front si besoin).
 - (Public) GET `/providers/{id}`: provider par ID.
-- (Public) GET `/providers/slug/{slug}`: provider par slug (forme 1).
-- (Public) GET `/providers/{slug}`: provider par slug (forme 2, SEO-friendly).
+- (Public) GET `/providers/{providerSlug}`: provider par slug.
 - (Public) GET `/providers/country/{countryId}`: filtrer par pays (ID).
 - (Public) GET `/providers/job/{jobId}`: filtrer par métier (ID).
 - (Public) GET `/providers/hard-skill/{skillName}`: providers possédant la hard skill.
@@ -27,6 +26,8 @@ Base URL: `http://localhost:8080/api/v1`
 - (Public) GET `/providers/search/{query}`: recherche plein texte (nom, compétences...).
 - (Public) GET `/providers/{providerSlug}/reviews`: avis du provider.
 - (Public) GET `/providers/{providerSlug}/availability`: créneaux de dispo du provider.
+- (Public) GET `/providers/{providerSlug}/experiences`: expériences du provider.
+- (Public) GET `/providers/{providerSlug}/educations`: éducations du provider.
 - (Privé) POST `/providers`: créer un provider.
 - (Privé) PUT/PATCH `/providers/{id}`: maj provider.
 - (Privé) DELETE `/providers/{id}`: supprimer provider.
@@ -37,7 +38,7 @@ Base URL: `http://localhost:8080/api/v1`
 - (Public) GET `/clients`: liste des clients.
 - (Public) GET `/clients/{id}`: client par ID.
 - (Public) GET `/clients/email/{email}`: client par email.
-- (Public) GET `/clients/slug/{slug}`: client par slug.
+- (Public) GET `/clients/{clientSlug}`: client par slug.
 - (Privé) POST `/clients`: créer un client.
 - (Privé) PUT/PATCH `/clients/{id}`: maj client.
 - (Privé) DELETE `/clients/{id}`: supprimer client.
@@ -47,14 +48,11 @@ Base URL: `http://localhost:8080/api/v1`
 - (Public) GET `/services`: liste globale.
 - (Public) GET `/services/{id}`: service par ID.
 - (Public) GET `/providers/{providerSlug}/services`: services d’un provider (slug, SEO-friendly recommandé).
-- (Public) GET `/providers/slug/{providerSlug}/services`: services d’un provider (forme alternative).
 - (Public) GET `/providers/{providerId}/services`: services d’un provider (ID).
 - (Public) GET `/providers/{providerSlug}/services/{serviceSlug}`: détail par duo slug provider/service.
-- (Public) GET `/providers/slug/{providerSlug}/services/{serviceSlug}`: détail (forme alternative).
 - (Public) GET `/services/active`: services actifs.
 - (Public) GET `/services/featured`: mis en avant.
-- (Public) GET `/services/tag/{tagId}`: filtrer par tag (ID).
-- (Public) GET `/services/tag/slug/{tagSlug}`: filtrer par tag (slug).
+- (Public) GET `/services/tag/{tagSlug}`: filtrer par tag (slug).
 - (Public) GET `/services/search/{query}`: recherche services.
 - (Privé) POST `/services`: créer un service.
 - (Privé) PUT/PATCH `/services/{id}`: maj service.
@@ -69,24 +67,21 @@ Provider-scoped (médias):
 - (Privé) POST `/providers/{providerId}/services/{serviceId}/sections/{sectionId}/contents/{contentId}/images`: uploader image de contenu.
 - (Privé) POST `/providers/{providerId}/{entityType:articles|experiences|education}/{entityId}/images`: uploader image d’entité.
 - (Privé) POST `/services/{serviceId}/content/{contentId}/images`: uploader image (legacy service).
-- (Privé) PUT/PATCH/DELETE `/services/slug/{slug}`: maintenance par slug.
+- (Privé) PUT/PATCH/DELETE `/services/{serviceSlug}`: maintenance par slug.
 
 ### Articles
 
 - (Public) GET `/articles`: liste globale.
 - (Public) GET `/providers/{providerSlug}/articles`: articles d’un provider (slug, SEO-friendly recommandé).
-- (Public) GET `/providers/slug/{providerSlug}/articles`: articles d’un provider (forme alternative).
 - (Public) GET `/providers/{providerSlug}/articles/{articleSlug}`: détail article par duo de slugs.
-- (Public) GET `/providers/slug/{providerSlug}/articles/{articleSlug}`: détail (forme alternative).
 - (Public) GET `/articles/published`: publiés.
 - (Public) GET `/articles/featured`: mis en avant.
-- (Public) GET `/articles/tag/{tagId}`: par tag ID.
-- (Public) GET `/articles/tag/slug/{tagSlug}`: par tag slug.
+- (Public) GET `/articles/tag/{tagSlug}`: par tag slug.
 - (Public) GET `/articles/search/{query}`: recherche articles.
 - (Privé) POST `/articles`: créer un article.
 - (Privé) PUT/PATCH `/articles/{id}`: maj.
-- (Privé) PUT/PATCH `/articles/slug/{slug}`: maj par slug.
-- (Privé) DELETE `/articles/{id}` ou `/articles/slug/{slug}`: supprimer.
+- (Privé) PUT/PATCH `/articles/{articleSlug}`: maj par slug.
+- (Privé) DELETE `/articles/{id}` ou `/articles/{articleSlug}`: supprimer.
 - (Privé) POST `/articles/with-content`: créer article + sections/contents.
 - (Privé) PATCH `/articles/{id}/with-content`: maj partielle + contenu.
 - (Privé) POST `/articles/{id}/cover`: uploader cover.

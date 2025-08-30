@@ -6,16 +6,21 @@ import {
   Input,
   Textarea,
   Button,
+  CustomButton,
   Text,
   Card,
   Flex,
   DateInput,
 } from "@/once-ui/components";
 import { Education } from "@/app/types/education";
+import {
+  formatLocalDateYYYYMMDD,
+  parseYYYYMMDDToLocalDate,
+} from "@/app/utils/date";
 
 export type EducationFormValues = Omit<
   Education,
-  "diplomaId" | "diplomaImageUrl"
+  "id" | "providerId" | "institutionImage"
 > & {
   diplomaImageFile?: File | null;
 };
@@ -28,11 +33,11 @@ interface EducationFormProps {
 }
 
 const defaultValues: EducationFormValues = {
-  diplomaTitle: "",
+  title: "",
   institutionName: "",
   description: "",
-  startDate: "",
-  endDate: "",
+  startedAt: "",
+  endedAt: "",
   diplomaImageFile: null,
 };
 
@@ -42,6 +47,7 @@ export default function EducationForm({
   submittingLabel = "Enregistrement...",
   submitLabel = "Enregistrer",
 }: EducationFormProps) {
+  const formRef = useRef<HTMLFormElement | null>(null);
   const [values, setValues] = useState<EducationFormValues>({
     ...defaultValues,
     ...initialValues,
@@ -60,20 +66,30 @@ export default function EducationForm({
     setError(undefined);
     try {
       if (
-        !values.diplomaTitle ||
+        !values.title ||
         !values.institutionName ||
         !values.description ||
-        !values.startDate
+        !values.startedAt
       ) {
         setError("Veuillez compléter les champs requis");
         return;
       }
+      // Validate date order
+      if (
+        values.endedAt &&
+        new Date(values.endedAt) < new Date(values.startedAt)
+      ) {
+        setError(
+          "La date de fin ne peut pas être antérieure à la date de début"
+        );
+        return;
+      }
       await onSubmit({
-        diplomaTitle: values.diplomaTitle,
+        title: values.title,
         institutionName: values.institutionName,
         description: values.description,
-        startDate: values.startDate,
-        endDate: values.endDate || undefined,
+        startedAt: values.startedAt,
+        endedAt: values.endedAt || undefined,
         diplomaImageFile: values.diplomaImageFile || null,
       });
     } catch (err: any) {
@@ -85,15 +101,15 @@ export default function EducationForm({
 
   return (
     <Card style={{ width: "100%" }}>
-      <form onSubmit={handleSubmit}>
+      <form ref={formRef} onSubmit={handleSubmit}>
         <Column gap="16" padding="24">
           <Column gap="8">
             <Input
-              id="diplomaTitle"
+              id="title"
               label="Intitulé du diplôme"
-              value={values.diplomaTitle}
+              value={values.title}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange("diplomaTitle", e.target.value)
+                handleChange("title", e.target.value)
               }
               required
             />
@@ -122,24 +138,25 @@ export default function EducationForm({
           </Column>
           <Flex gap="8" wrap>
             <DateInput
-              id="startDate"
+              id="startedAt"
               label="Date de début"
-              value={values.startDate ? new Date(values.startDate) : undefined}
+              value={parseYYYYMMDDToLocalDate(values.startedAt)}
               onChange={(d: Date) =>
-                handleChange("startDate", d.toISOString().split("T")[0])
+                handleChange("startedAt", formatLocalDateYYYYMMDD(d))
               }
               floatingPlacement="right-start"
               monthYearSelector
             />
             <DateInput
-              id="endDate"
+              id="endedAt"
               label="Date de fin (optionnel)"
-              value={values.endDate ? new Date(values.endDate) : undefined}
+              value={parseYYYYMMDDToLocalDate(values.endedAt)}
               onChange={(d: Date) =>
-                handleChange("endDate", d.toISOString().split("T")[0])
+                handleChange("endedAt", formatLocalDateYYYYMMDD(d))
               }
               floatingPlacement="right-start"
               monthYearSelector
+              minDate={parseYYYYMMDDToLocalDate(values.startedAt)}
             />
           </Flex>
           <Column gap="8">
@@ -156,7 +173,7 @@ export default function EducationForm({
                 )
               }
             />
-            <Button
+            <CustomButton
               variant="secondary"
               onClick={(e: any) => {
                 e.preventDefault();
@@ -164,7 +181,7 @@ export default function EducationForm({
               }}
             >
               Choisir un logo de diplôme (optionnel)
-            </Button>
+            </CustomButton>
             {values.diplomaImageFile && (
               <Text variant="body-default-s" color="neutral-medium">
                 {values.diplomaImageFile.name}
@@ -178,9 +195,16 @@ export default function EducationForm({
             </Text>
           )}
 
-          <Button type="submit" disabled={loading}>
+          <CustomButton
+            role="button"
+            onClick={(e: any) => {
+              e.preventDefault();
+              formRef.current?.requestSubmit();
+            }}
+            aria-disabled={loading}
+          >
             {loading ? submittingLabel : submitLabel}
-          </Button>
+          </CustomButton>
         </Column>
       </form>
     </Card>

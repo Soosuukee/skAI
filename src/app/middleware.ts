@@ -27,6 +27,7 @@ const publicRoutes = [
   "/servicecreation",
   "/experiencecreation",
   "/educationcreation",
+  "/articlecreation",
   "/test-datepicker",
   "/work",
   "/api",

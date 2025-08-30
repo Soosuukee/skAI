@@ -56,14 +56,26 @@
   gap: 8px;
 
   select {
-    background: transparent;
+    background: var(--neutral-background-strong);
     color: var(--neutral-on-background-strong);
-    border: 1px solid var(--neutral-background-medium);
+    border: 1px solid var(--neutral-border-medium);
     padding: 6px 8px;
     border-radius: var(--radius-s);
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
+    outline: none;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+    &:focus {
+      border-color: var(--brand-border-medium);
+      box-shadow: 0 0 0 2px var(--brand-alpha-weak);
+    }
+
+    option {
+      background: var(--neutral-background-strong);
+      color: var(--neutral-on-background-strong);
+    }
   }
 }
   

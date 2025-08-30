@@ -14,20 +14,51 @@ export function UserMenu() {
 
   if (!user) return null;
 
-  // Récupérer les informations complètes de l'utilisateur
+  // Récupérer les informations complètes de l'utilisateur (fallback local JSON)
   const userWithDetails = UserRoleService.getUserWithDetails(user.user_id);
 
-  let displayName = user.email.split("@")[0];
-  let avatarSrc = "/images/avatar.jpg";
+  const makeAbsolute = (url?: string) => {
+    if (!url) return undefined;
+    if (/^https?:\/\//i.test(url)) return url;
+    try {
+      const apiBase =
+        process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api/v1";
+      const origin = new URL(apiBase).origin;
+      return url.startsWith("/")
+        ? `${origin}${url}`
+        : `${apiBase.replace(/\/$/, "")}/${url}`;
+    } catch {
+      return url;
+    }
+  };
 
+  let displayName = user.email?.split("@")[0] || "";
+  let avatarSrc: string | undefined = "/images/avatar.jpg";
+
+  // 1) Préférer les champs directement renvoyés par l'API externe si présents
+  const role = (user as any)?.role;
+  const directFirst = (user as any)?.firstName || (user as any)?.firstname;
+  const directLast = (user as any)?.lastName || (user as any)?.lastname;
+  const directAvatar = (user as any)?.profilePicture || (user as any)?.avatar;
+
+  if (
+    (role === "client" || role === "provider" || role === "admin") &&
+    (directFirst || directLast || directAvatar)
+  ) {
+    displayName =
+      `${directFirst ?? ""} ${directLast ?? ""}`.trim() || displayName;
+    avatarSrc = makeAbsolute(directAvatar) || avatarSrc;
+  }
+
+  // 2) Sinon, fallback sur les détails enrichis locaux (providers/clients.json)
   if (userWithDetails) {
-    if (userWithDetails.provider) {
+    if (!directFirst && userWithDetails.provider) {
       displayName = `${userWithDetails.provider.firstName} ${userWithDetails.provider.lastName}`;
       avatarSrc = userWithDetails.provider.avatar;
-    } else if (userWithDetails.client) {
+    } else if (!directFirst && userWithDetails.client) {
       displayName = `${userWithDetails.client.firstName} ${userWithDetails.client.lastName}`;
       avatarSrc = userWithDetails.client.avatar;
-    } else if (userWithDetails.admin) {
+    } else if (!directFirst && userWithDetails.admin) {
       displayName = `${userWithDetails.admin.firstName} ${userWithDetails.admin.lastName}`;
       avatarSrc = userWithDetails.admin.avatar;
     }

@@ -32,6 +32,14 @@ export interface DatePickerProps
   size?: "s" | "m" | "l";
   className?: string;
   style?: React.CSSProperties;
+  /** Show or hide next/previous month navigation */
+  nextMonth?: boolean;
+  previousMonth?: boolean;
+  /** Controlled month/year and external month change handler */
+  currentMonth?: number;
+  currentYear?: number;
+  onMonthChange?: (direction: number) => void;
+  onHover?: (date: Date | null) => void;
 }
 
 type ViewMode = "days" | "months" | "years";
@@ -67,6 +75,12 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       size = "m",
       className,
       style,
+      nextMonth = true,
+      previousMonth = true,
+      currentMonth: currentMonthProp,
+      currentYear: currentYearProp,
+      onMonthChange,
+      onHover,
       ...rest
     },
     ref
@@ -89,10 +103,18 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
     const [viewMode, setViewMode] = useState<ViewMode>("days");
 
     const [currentMonth, setCurrentMonth] = useState<number>(
-      value ? value.getMonth() : today.getMonth()
+      typeof currentMonthProp === "number"
+        ? currentMonthProp
+        : value
+        ? value.getMonth()
+        : today.getMonth()
     );
     const [currentYear, setCurrentYear] = useState<number>(
-      value ? value.getFullYear() : today.getFullYear()
+      typeof currentYearProp === "number"
+        ? currentYearProp
+        : value
+        ? value.getFullYear()
+        : today.getFullYear()
     );
 
     // For years view - show range of 12 years
@@ -103,11 +125,24 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
     useEffect(() => {
       if (value) {
         setSelectedDate(value);
-        setCurrentMonth(value.getMonth());
-        setCurrentYear(value.getFullYear());
+        // only update internal month/year if external props not provided
+        if (typeof currentMonthProp !== "number")
+          setCurrentMonth(value.getMonth());
+        if (typeof currentYearProp !== "number")
+          setCurrentYear(value.getFullYear());
         setYearRangeStart(Math.floor(value.getFullYear() / 12) * 12);
       }
     }, [value]);
+
+    // sync controlled month/year props
+    useEffect(() => {
+      if (typeof currentMonthProp === "number")
+        setCurrentMonth(currentMonthProp);
+    }, [currentMonthProp]);
+
+    useEffect(() => {
+      if (typeof currentYearProp === "number") setCurrentYear(currentYearProp);
+    }, [currentYearProp]);
 
     const handleDateSelect = (date: Date) => {
       setSelectedDate(date);
@@ -121,6 +156,12 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
     };
 
     const handleMonthChange = (direction: number) => {
+      // If parent provided handler, call it instead of updating internal state
+      if (onMonthChange) {
+        onMonthChange(direction);
+        return;
+      }
+
       const newMonth = currentMonth + direction;
       if (newMonth < 0) {
         setCurrentMonth(11);
@@ -414,7 +455,11 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
               }}
             />
             <Flex fillWidth direction="column" horizontal="center" gap="8">
-              <Flex vertical="center" gap="8">
+              <Flex
+                vertical="center"
+                gap="8"
+                className={styles.calendar + " " + styles.monthYearSelect}
+              >
                 {monthYearSelector ? (
                   <>
                     <select
@@ -424,13 +469,6 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
                         handleMonthChangeDirect(Number(e.target.value));
                       }}
                       aria-label="Select month"
-                      style={{
-                        background: "transparent",
-                        color: "var(--color-text)",
-                        border: "1px solid transparent",
-                        padding: "4px 8px",
-                        borderRadius: "6px",
-                      }}
                     >
                       {monthNames.map((m, i) => (
                         <option key={m} value={i}>
@@ -445,13 +483,6 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
                         handleYearChangeDirect(Number(e.target.value));
                       }}
                       aria-label="Select year"
-                      style={{
-                        background: "transparent",
-                        color: "var(--color-text)",
-                        border: "1px solid transparent",
-                        padding: "4px 8px",
-                        borderRadius: "6px",
-                      }}
                     >
                       {Array.from({ length: 40 }).map((_, i) => {
                         const year = new Date().getFullYear() - 20 + i;

@@ -15,7 +15,8 @@ interface AuthContextType {
   isLoading: boolean;
   login: (
     email: string,
-    password: string
+    password: string,
+    userType?: "provider" | "client" | "admin"
   ) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   checkAuth: () => Promise<void>;
@@ -56,9 +57,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (
+    email: string,
+    password: string,
+    userType?: "provider" | "client" | "admin"
+  ) => {
     try {
-      const data = await authService.login(email, password);
+      const data = await authService.login(email, password, userType);
       if (data.success) {
         if (data.token) localStorage.setItem("authToken", data.token);
         if (data.user) setUser(data.user as User);

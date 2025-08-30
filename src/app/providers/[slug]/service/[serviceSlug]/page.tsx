@@ -14,7 +14,6 @@ import { ServiceContent } from "@/components/service/ServiceContent";
 import { useProvider } from "@/app/hooks/useProvider";
 import { useProviderServices } from "@/app/hooks/useProviderServices";
 import { formatPrice } from "@/app/utils/priceUtils";
-import { baseURL } from "@/app/resources";
 import { Meta, Schema } from "@/once-ui/modules";
 import { ServiceDetailRenderer } from "@/components/service/ServiceDetailRenderer";
 
@@ -26,6 +25,10 @@ export default function ProviderServiceDetailPage({
   params,
 }: ProviderServiceDetailPageProps) {
   const resolvedParams = React.use(params);
+  const baseURL =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const {
     provider,
     loading: providerLoading,
@@ -55,9 +58,27 @@ export default function ProviderServiceDetailPage({
     );
   }
 
-  const service = services.find(
-    (s) => s.serviceId.toString() === resolvedParams.serviceSlug
-  );
+  const slugParamRaw = resolvedParams.serviceSlug || "";
+  const slugParam = decodeURIComponent(slugParamRaw);
+
+  const toSlug = (value?: string) => {
+    if (!value) return "";
+    return value
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  };
+
+  const service = services.find((s: any) => {
+    const idMatch =
+      (s.id != null && String(s.id) === slugParamRaw) ||
+      (s.serviceId != null && String(s.serviceId) === slugParamRaw);
+    if (idMatch) return true;
+    const serviceSlug = (s.slug as string) || toSlug(s.title as string);
+    return toSlug(slugParam) === serviceSlug;
+  });
 
   if (!service) {
     return (
@@ -81,7 +102,9 @@ export default function ProviderServiceDetailPage({
       <Schema
         as="webPage"
         baseURL={baseURL}
-        path={`/providers/${provider.slug}/service/${service.serviceId}`}
+        path={`/providers/${provider.slug}/service/${
+          service.slug || service.id
+        }`}
         title={`${service.title} - ${provider.firstName} ${provider.lastName}`}
         description={`Service ${service.title} proposé par ${provider.firstName} ${provider.lastName}`}
         image={`${baseURL}/og?title=${encodeURIComponent(
@@ -100,11 +123,15 @@ export default function ProviderServiceDetailPage({
           <Heading as="h2" variant="display-strong-m">
             {service.title}
           </Heading>
-          <Text variant="body-default-l" color="neutral-medium">
-            Tag : {service.tag}
-          </Text>
+          {Array.isArray((service as any).tags) && (
+            <Text variant="body-default-l" color="neutral-medium">
+              Tags :{" "}
+              {(service as any).tags.map((t: any) => t.title || t).join(", ")}
+            </Text>
+          )}
           <Text variant="body-default-l">
-            Prix : {formatPrice(service.minPrice, service.maxPrice)}
+            Prix :{" "}
+            {formatPrice(service.minPrice ?? null, service.maxPrice ?? null)}
           </Text>
           <Text variant="body-default-l" color="neutral-medium">
             {service.summary}

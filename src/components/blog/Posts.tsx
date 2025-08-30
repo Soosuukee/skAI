@@ -19,6 +19,7 @@ interface ArticleWithProvider extends Article {
     slug: string;
     firstName: string;
     lastName: string;
+    avatar?: string;
   };
 }
 
@@ -55,6 +56,7 @@ export function Posts({
                     slug: provider.slug,
                     firstName: provider.firstName,
                     lastName: provider.lastName,
+                    avatar: provider.avatar,
                   },
                 };
               }
@@ -122,6 +124,12 @@ export function Posts({
               thumbnail={thumbnail}
               direction={direction}
               providerSlug={article.provider?.slug}
+              authorName={
+                article.provider
+                  ? `${article.provider.firstName} ${article.provider.lastName}`
+                  : undefined
+              }
+              providerAvatar={article.provider?.avatar}
             />
           ))}
         </Grid>

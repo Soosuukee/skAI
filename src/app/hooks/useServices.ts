@@ -1,26 +1,16 @@
 import { useState, useEffect } from 'react';
-import { ServiceWithSlug } from '@/app/types/service';
-import { getServicesByProvider, getServiceBySlug } from '@/app/utils/serviceUtils';
-import providers from '@/data/providers.json';
+import { Service } from '@/app/types/service';
+import { getServicesByProviderSlug, getServiceBySlug } from '@/app/utils/serviceUtils';
 
 export function useProviderServices(providerSlug: string) {
-  const [services, setServices] = useState<ServiceWithSlug[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadServices = async () => {
       try {
-        // Trouver le provider par son slug
-        const provider = providers.find(p => p.slug === providerSlug);
-        if (!provider) {
-          setError('Provider non trouvé');
-          setLoading(false);
-          return;
-        }
-
-        // Récupérer les services du provider
-        const providerServices = await getServicesByProvider(provider.provider_id);
+        const providerServices = await getServicesByProviderSlug(providerSlug);
         setServices(providerServices);
         setError(null);
       } catch (err) {
@@ -40,7 +30,7 @@ export function useProviderServices(providerSlug: string) {
 }
 
 export function useService(serviceSlug: string) {
-  const [service, setService] = useState<ServiceWithSlug | null>(null);
+  const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

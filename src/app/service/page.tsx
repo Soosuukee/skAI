@@ -1,13 +1,13 @@
 import { Column } from "@/once-ui/components";
 
-import { baseURL } from "@/app/resources";
-import { about, person, service } from "@/app/resources/content";
+import { service } from "@/app/resources/content";
 import { Meta, Schema } from "@/once-ui/modules";
 import { AllServices } from "@/components/service/AllServices";
 import { RevealFx } from "@/once-ui/components";
 import { Heading } from "@/once-ui/components";
 
 export async function generateMetadata() {
+  const baseURL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   return Meta.generate({
     title: service.title,
     description: service.description,
@@ -18,6 +18,10 @@ export async function generateMetadata() {
 }
 
 function ServiceContent() {
+  const baseURL =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   return (
     <Column maxWidth="m">
       <Schema
@@ -27,11 +31,7 @@ function ServiceContent() {
         title={service.title}
         description={service.description}
         image={`${baseURL}/og?title=${encodeURIComponent(service.title)}`}
-        author={{
-          name: person.name,
-          url: `${baseURL}${about.path}`,
-          image: `${baseURL}${person.avatar}`,
-        }}
+        author={{ name: "", url: baseURL, image: "/images/avatar.jpg" }}
       />
       <RevealFx
         fillWidth

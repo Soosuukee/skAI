@@ -14,19 +14,20 @@ interface CardProps extends React.ComponentProps<typeof Flex> {
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ children, href, onClick, style, className, ...rest }, ref) => {
+    const interactive = Boolean(onClick || href);
     return (
       <ElementType
-        tabIndex={0}
+        tabIndex={interactive ? 0 : undefined}
         className={classNames(
           "reset-button-styles",
           "display-flex",
           "fill-width",
-          (onClick || href) && "focus-ring",
-          (onClick || href) && "radius-l",
+          interactive && "focus-ring",
+          interactive && "radius-l"
         )}
         href={href}
-        onClick={onClick ? onClick : () => {}}
-        role="button"
+        {...(onClick ? { onClick } : {})}
+        {...(interactive ? { role: "button" } : {})}
         ref={ref}
       >
         <Flex
@@ -44,7 +45,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
         </Flex>
       </ElementType>
     );
-  },
+  }
 );
 
 Card.displayName = "Card";

@@ -6,16 +6,22 @@ import {
   Input,
   Textarea,
   Button,
+  CustomButton,
   Text,
   Card,
   Flex,
   DateInput,
 } from "@/once-ui/components";
 import { Experience } from "@/app/types/experience";
+import {
+  formatLocalDateYYYYMMDD,
+  parseYYYYMMDDToLocalDate,
+} from "@/app/utils/date";
 
+// Reuse backend Experience type for form values (omit backend-only fields)
 export type ExperienceFormValues = Omit<
   Experience,
-  "experienceId" | "experienceImage"
+  "id" | "providerId" | "companyLogo"
 > & {
   experienceImageFile?: File | null;
 };
@@ -28,13 +34,13 @@ interface ExperienceFormProps {
 }
 
 const defaultValues: ExperienceFormValues = {
-  jobTitle: "",
+  title: "",
   companyName: "",
-  description: "",
-  task1: "",
-  task2: "",
-  startDate: "",
-  endDate: "",
+  firstTask: "",
+  secondTask: undefined,
+  thirdTask: undefined,
+  startedAt: "",
+  endedAt: undefined,
   experienceImageFile: null,
 };
 
@@ -62,22 +68,35 @@ export default function ExperienceForm({
     setError(undefined);
     try {
       if (
-        !values.jobTitle ||
+        !values.title ||
         !values.companyName ||
-        !values.description ||
-        !values.startDate
+        !values.firstTask ||
+        !values.startedAt
       ) {
         setError("Veuillez compléter les champs requis");
         return;
       }
+
+      // Ensure endedAt is not before startedAt
+      if (values.startedAt && values.endedAt) {
+        const s = new Date(values.startedAt);
+        const e = new Date(values.endedAt);
+        if (e < s) {
+          setError(
+            "La date de fin ne peut pas être antérieure à la date de début"
+          );
+          return;
+        }
+      }
+
       await onSubmit({
-        jobTitle: values.jobTitle,
+        title: values.title,
         companyName: values.companyName,
-        description: values.description,
-        task1: values.task1 || undefined,
-        task2: values.task2 || undefined,
-        startDate: values.startDate,
-        endDate: values.endDate || undefined,
+        firstTask: values.firstTask,
+        secondTask: values.secondTask || undefined,
+        thirdTask: values.thirdTask || undefined,
+        startedAt: values.startedAt,
+        endedAt: values.endedAt || undefined,
         experienceImageFile: values.experienceImageFile || null,
       });
     } catch (err: any) {
@@ -93,10 +112,10 @@ export default function ExperienceForm({
         <Column gap="16" padding="24">
           <Column gap="8">
             <Input
-              id="jobTitle"
+              id="title"
               label="Titre du poste"
-              value={values.jobTitle}
-              onChange={(e) => handleChange("jobTitle", e.target.value)}
+              value={values.title}
+              onChange={(e) => handleChange("title", e.target.value)}
               required
             />
           </Column>
@@ -111,51 +130,54 @@ export default function ExperienceForm({
           </Column>
           <Column gap="8">
             <Textarea
-              id="description"
-              label="Description"
-              value={values.description}
+              id="firstTask"
+              label="Tâche principale"
+              value={values.firstTask}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                handleChange("description", e.target.value)
+                handleChange("firstTask", e.target.value)
               }
               required
             />
           </Column>
           <Flex gap="8" wrap>
             <Input
-              id="task1"
-              label="Tâche principale 1 (optionnel)"
-              value={values.task1}
+              id="secondTask"
+              label="Tâche secondaire (optionnel)"
+              value={values.secondTask}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange("task1", e.target.value)
+                handleChange("secondTask", e.target.value)
               }
             />
             <Input
-              id="task2"
-              label="Tâche principale 2 (optionnel)"
-              value={values.task2}
+              id="thirdTask"
+              label="Autre tâche (optionnel)"
+              value={values.thirdTask}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange("task2", e.target.value)
+                handleChange("thirdTask", e.target.value)
               }
             />
           </Flex>
           <Flex gap="8" wrap>
             <DateInput
-              id="startDate"
+              id="startedAt"
               label="Date de début"
-              value={values.startDate ? new Date(values.startDate) : undefined}
+              value={parseYYYYMMDDToLocalDate(values.startedAt)}
               onChange={(d: Date) =>
-                handleChange("startDate", d.toISOString().split("T")[0])
+                handleChange("startedAt", formatLocalDateYYYYMMDD(d))
               }
               floatingPlacement="right-start"
+              monthYearSelector
             />
             <DateInput
-              id="endDate"
+              id="endedAt"
               label="Date de fin (optionnel)"
-              value={values.endDate ? new Date(values.endDate) : undefined}
+              value={parseYYYYMMDDToLocalDate(values.endedAt)}
               onChange={(d: Date) =>
-                handleChange("endDate", d.toISOString().split("T")[0])
+                handleChange("endedAt", formatLocalDateYYYYMMDD(d))
               }
               floatingPlacement="right-start"
+              monthYearSelector
+              minDate={parseYYYYMMDDToLocalDate(values.startedAt)}
             />
           </Flex>
           <Column gap="8">
@@ -172,7 +194,7 @@ export default function ExperienceForm({
                 )
               }
             />
-            <Button
+            <CustomButton
               variant="secondary"
               onClick={(e: any) => {
                 e.preventDefault();
@@ -180,7 +202,7 @@ export default function ExperienceForm({
               }}
             >
               Ajouter le logo d'entreprise (optionnel)
-            </Button>
+            </CustomButton>
             {values.experienceImageFile && (
               <Text variant="body-default-s" color="neutral-medium">
                 {values.experienceImageFile.name}

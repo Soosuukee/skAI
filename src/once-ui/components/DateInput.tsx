@@ -11,6 +11,7 @@ interface DateInputProps
   label: string;
   value?: Date;
   onChange?: (date: Date) => void;
+  minDate?: Date;
   minHeight?: number;
   className?: string;
   style?: React.CSSProperties;
@@ -45,6 +46,8 @@ export const DateInput: React.FC<DateInputProps> = ({
   style,
   timePicker = false,
   floatingPlacement = "right-start",
+  monthYearSelector,
+  minDate,
   ...rest
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -110,7 +113,8 @@ export const DateInput: React.FC<DateInputProps> = ({
         onChange={handleDateChange}
         onDateSelect={handleDateSelect}
         timePicker={timePicker}
-        monthYearSelector={(rest as any).monthYearSelector}
+        monthYearSelector={monthYearSelector}
+        minDate={minDate}
       />
     </Flex>
   );

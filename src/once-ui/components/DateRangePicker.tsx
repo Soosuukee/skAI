@@ -8,7 +8,8 @@ export interface DateRange {
   endDate: Date | undefined;
 }
 
-export interface DateRangePickerProps extends Omit<React.ComponentProps<typeof Flex>, "onChange"> {
+export interface DateRangePickerProps
+  extends Omit<React.ComponentProps<typeof Flex>, "onChange"> {
   value?: DateRange;
   onChange?: (range: DateRange) => void;
   minDate?: Date;
@@ -42,29 +43,47 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     }
   }, [value]);
 
-  const handleDateChange = (date: Date) => {
-    if (!internalValue.startDate || (internalValue.startDate && internalValue.endDate)) {
-      // Start new selection
+  // Explicit handlers to avoid end < start and make behavior deterministic
+  const handleStartDateChange = (date: Date) => {
+    // If there's an endDate and it's before the new start, clear endDate
+    let newRange = {
+      startDate: date,
+      endDate:
+        internalValue.endDate && internalValue.endDate < date
+          ? undefined
+          : internalValue.endDate,
+    } as DateRange;
+
+    setInternalValue(newRange);
+    onChange?.(newRange);
+  };
+
+  const handleEndDateChange = (date: Date) => {
+    if (!internalValue.startDate) {
+      // No start selected yet: set start to the picked date and clear end
+      const newRange = { startDate: date, endDate: undefined } as DateRange;
+      setInternalValue(newRange);
+      onChange?.(newRange);
+      return;
+    }
+
+    if (date < internalValue.startDate) {
+      // If end picked before start, swap them
       const newRange = {
         startDate: date,
-        endDate: undefined,
-      };
+        endDate: internalValue.startDate,
+      } as DateRange;
       setInternalValue(newRange);
       onChange?.(newRange);
-    } else {
-      const newRange = {
-        startDate: internalValue.startDate,
-        endDate: date,
-      };
-
-      if (newRange.startDate > date) {
-        newRange.startDate = date;
-        newRange.endDate = internalValue.startDate;
-      }
-
-      setInternalValue(newRange);
-      onChange?.(newRange);
+      return;
     }
+
+    const newRange = {
+      startDate: internalValue.startDate,
+      endDate: date,
+    } as DateRange;
+    setInternalValue(newRange);
+    onChange?.(newRange);
   };
 
   const handleMonthChange = (increment: number) => {
@@ -85,10 +104,14 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   };
 
   const getPreviewRange = () => {
-    if (!internalValue.startDate || internalValue.endDate || !hoveredDate) return null;
+    if (!internalValue.startDate || internalValue.endDate || !hoveredDate)
+      return null;
     return {
       startDate: internalValue.startDate,
-      endDate: hoveredDate > internalValue.startDate ? hoveredDate : internalValue.startDate,
+      endDate:
+        hoveredDate > internalValue.startDate
+          ? hoveredDate
+          : internalValue.startDate,
       isPreview: true,
     };
   };
@@ -97,7 +120,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     <Flex gap="24" {...rest}>
       <DatePicker
         value={internalValue.startDate}
-        onChange={handleDateChange}
+        onChange={handleStartDateChange}
         range={getPreviewRange() || internalValue}
         minDate={minDate}
         maxDate={maxDate}
@@ -110,9 +133,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       />
       <DatePicker
         value={internalValue.endDate}
-        onChange={handleDateChange}
+        onChange={handleEndDateChange}
         range={getPreviewRange() || internalValue}
-        minDate={minDate}
+        minDate={internalValue.startDate ?? minDate}
         maxDate={maxDate}
         previousMonth={false}
         size={size}

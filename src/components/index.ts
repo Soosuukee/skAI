@@ -11,6 +11,7 @@ export { JoinButton } from "@/components/auth/JoinButton";
 export { default as ExperienceForm } from "@/components/forms/ExperienceForm";
 export { default as EducationForm } from "@/components/forms/EducationForm";
 export { default as ServiceForm } from "@/components/forms/ServiceForm";
+export { default as ArticleForm } from "@/components/forms/ArticleForm";
 
 // Service Image Components
 export { ServiceImage } from "@/components/service/ServiceImage";

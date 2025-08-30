@@ -18,6 +18,8 @@ interface PostProps {
   thumbnail: boolean;
   direction?: "row" | "column";
   providerSlug?: string; // Nouveau prop pour l'URL dynamique
+  authorName?: string; // Nom complet de l'auteur
+  providerAvatar?: string; // Avatar du provider
 }
 
 export default function Post({
@@ -25,6 +27,8 @@ export default function Post({
   thumbnail,
   direction,
   providerSlug,
+  authorName,
+  providerAvatar,
 }: PostProps) {
   // URL dynamique basée sur le provider ou URL globale
   const articleUrl = providerSlug
@@ -50,6 +54,7 @@ export default function Post({
       >
         {article.articleCover && thumbnail && (
           <SmartImage
+            fillWidth
             priority
             className={styles.image}
             sizes="(max-width: 768px) 100vw, 640px"
@@ -74,8 +79,32 @@ export default function Post({
           <Text variant="label-default-s" onBackground="neutral-weak">
             {formatDate(article.publishedAt, false)}
           </Text>
-          {article.tag && (
-            <Tag className="mt-12" label={article.tag} variant="neutral" />
+          {(authorName || (article as any).language) && (
+            <Flex gap="8" vertical="center">
+              {providerAvatar && (
+                <SmartImage
+                  src={providerAvatar}
+                  alt={authorName || "Auteur"}
+                  height={2}
+                  aspectRatio="1 / 1"
+                  radius="full"
+                />
+              )}
+              <Text variant="label-default-s" onBackground="neutral-weak">
+                {authorName ? `par ${authorName}` : ""}
+                {authorName && (article as any).language ? " — " : ""}
+                {(article as any).language
+                  ? `${(article as any).language}`
+                  : ""}
+              </Text>
+            </Flex>
+          )}
+          {(article as any).tag && (
+            <Tag
+              className="mt-12"
+              label={(article as any).tag}
+              variant="neutral"
+            />
           )}
         </Column>
       </Flex>

@@ -12,6 +12,7 @@ const routes = {
   "/servicecreation": true,
   "/experiencecreation": true,
   "/educationcreation": true,
+  "/articlecreation": true,
   "/test-datepicker": true,
   // Add these routes when you create the corresponding pages
   // "/settings": true,

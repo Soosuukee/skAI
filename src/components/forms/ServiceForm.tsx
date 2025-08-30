@@ -6,6 +6,7 @@ import {
   Input,
   Textarea,
   Button,
+  CustomButton,
   Text,
   Card,
   Flex,
@@ -15,7 +16,7 @@ import { Service } from "@/app/types/service";
 
 export type ServiceFormValues = Omit<
   Service,
-  "serviceId" | "providerId" | "createdAt" | "updatedAt"
+  "id" | "providerId" | "createdAt"
 > & {
   providerId?: number;
   subtitle?: string;
@@ -39,18 +40,14 @@ interface ServiceFormProps {
 
 const defaultValues: ServiceFormValues = {
   title: "",
-  description: "",
+  summary: "",
   slug: "",
   isActive: true,
   isFeatured: false,
   minPrice: 0,
   maxPrice: 0,
-  estimatedDuration: "",
-  availability: "",
-  responseTime: "",
-  rating: undefined,
-  reviewCount: undefined,
-  completedProjects: undefined,
+  sections: [],
+  tags: [],
   subtitle: "",
   coverImageFile: null,
   onQuote: false,
@@ -153,6 +150,9 @@ export default function ServiceForm({
           values.maxPrice === null || values.maxPrice === undefined
             ? null
             : Number(values.maxPrice),
+        summary: values.summary || "",
+        // sections est un draft local; on laisse vide ici pour respecter le type
+        sections: [],
       };
       await onSubmit(payload);
     } catch (err: any) {
@@ -201,7 +201,7 @@ export default function ServiceForm({
                 )
               }
             />
-            <Button
+            <CustomButton
               variant="secondary"
               onClick={(e: any) => {
                 e.preventDefault();
@@ -209,7 +209,7 @@ export default function ServiceForm({
               }}
             >
               Choisir une image de couverture
-            </Button>
+            </CustomButton>
             {values.coverImageFile && (
               <Text variant="body-default-s" color="neutral-medium">
                 {values.coverImageFile.name}
@@ -256,16 +256,7 @@ export default function ServiceForm({
               Renseignez un prix min/max ou laissez vide.
             </Text>
           )}
-          <Flex gap="16" wrap>
-            <Input
-              id="estimatedDuration"
-              label="Durée estimée"
-              value={values.estimatedDuration}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange("estimatedDuration", e.target.value)
-              }
-            />
-          </Flex>
+          {/* Champ durée estimée retiré (non dans l'interface Service) */}
           <Flex gap="16" wrap>
             <Checkbox
               id="isActive"
@@ -334,7 +325,7 @@ export default function ServiceForm({
                             vertical="center"
                           >
                             <Text>{img.title || img.url}</Text>
-                            <Button
+                            <CustomButton
                               variant="secondary"
                               onClick={(e: any) => {
                                 e.preventDefault();
@@ -342,7 +333,7 @@ export default function ServiceForm({
                               }}
                             >
                               Supprimer
-                            </Button>
+                            </CustomButton>
                           </Flex>
                         ))}
                       </Column>
@@ -351,14 +342,14 @@ export default function ServiceForm({
                 </Column>
               </Card>
             ))}
-            <Button
+            <CustomButton
               onClick={(e: any) => {
                 e.preventDefault();
                 addSection();
               }}
             >
               Ajouter une section
-            </Button>
+            </CustomButton>
           </Column>
 
           {error && (
@@ -367,9 +358,13 @@ export default function ServiceForm({
             </Text>
           )}
 
-          <Button type="submit" disabled={loading}>
+          <CustomButton
+            role="button"
+            onClick={() => {}}
+            aria-disabled={loading}
+          >
             {loading ? submittingLabel : submitLabel}
-          </Button>
+          </CustomButton>
         </Column>
       </form>
     </Card>
