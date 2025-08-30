@@ -16,6 +16,7 @@ interface DateInputProps
   style?: React.CSSProperties;
   timePicker?: boolean;
   floatingPlacement?: Placement;
+  monthYearSelector?: boolean;
 }
 
 const formatDate = (date: Date, timePicker: boolean) => {
@@ -109,6 +110,7 @@ export const DateInput: React.FC<DateInputProps> = ({
         onChange={handleDateChange}
         onDateSelect={handleDateSelect}
         timePicker={timePicker}
+        monthYearSelector={(rest as any).monthYearSelector}
       />
     </Flex>
   );

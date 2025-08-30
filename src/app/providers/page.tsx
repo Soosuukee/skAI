@@ -11,6 +11,7 @@ import {
   SmartLink,
   Avatar,
   Flex,
+  Tag,
 } from "@/once-ui/components";
 import { CustomRevealFx } from "@/components/CustomRevealFx";
 import { baseURL } from "@/app/resources";
@@ -37,7 +38,13 @@ export default function ProvidersPage() {
   }
 
   return (
-    <Column maxWidth="m" gap="xl" horizontal="center">
+    <Column
+      fillWidth
+      gap="xl"
+      horizontal="center"
+      paddingX="32"
+      style={{ maxWidth: "80vw" }}
+    >
       <Schema
         as="webPage"
         baseURL={baseURL}
@@ -70,68 +77,113 @@ export default function ProvidersPage() {
           </Heading>
         </RevealFx>
 
-        <Grid columns="2" mobileColumns="1" fillWidth gap="16">
-          {providersData.map((provider, idx) => (
-            <CustomRevealFx
-              key={provider.slug}
-              translateY={4}
-              delay={0.1 * (idx + 1)}
-              fillWidth
-            >
-              <SmartLink
-                href={`/providers/${provider.slug}`}
-                style={{ textDecoration: "none", color: "inherit" }}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+            gap: "24px",
+            width: "100%",
+            alignItems: "stretch",
+          }}
+        >
+          {providersData.map((provider, idx) => {
+            return (
+              <CustomRevealFx
+                key={provider.slug}
+                translateY={4}
+                delay={0.1 * (idx + 1)}
+                fillWidth
+                style={{ width: "100%" }}
               >
-                <Column
-                  gap="16"
-                  padding="24"
+                <SmartLink
+                  href={`/providers/${provider.slug}`}
                   style={{
-                    border: "1px solid var(--neutral-alpha-medium)",
-                    borderRadius: "0.5rem",
-                    background: "var(--surface)",
-                    transition: "all 0.2s ease",
-                    cursor: "pointer",
+                    textDecoration: "none",
+                    color: "inherit",
+                    display: "block",
+                    width: "100%",
                   }}
-                  className="hover:shadow-lg hover:border-neutral-alpha-strong"
                 >
-                  {/* Avatar et infos de base */}
-                  <Flex gap="16" vertical="center">
-                    <Avatar
-                      src={provider.avatar}
-                      size="xl"
-                      style={{ flexShrink: 0 }}
-                    />
-                    <Column gap="4">
-                      <Heading as="h3" variant="heading-strong-l">
-                        {provider.firstName} {provider.lastName}
-                      </Heading>
-                      {provider.job && (
-                        <Text variant="body-default-s" color="neutral-medium">
-                          {provider.job.title}
-                        </Text>
-                      )}
-                      <Text variant="body-default-s" color="neutral-medium">
-                        📍 {provider.location}
-                      </Text>
-                    </Column>
-                  </Flex>
-
-                  {/* Lien vers le profil */}
-                  <Text
-                    variant="body-default-s"
+                  <Column
+                    gap="20"
+                    padding="32"
                     style={{
-                      color: "var(--brand)",
-                      fontWeight: "500",
-                      marginTop: "auto",
+                      border: "1px solid var(--neutral-alpha-medium)",
+                      borderRadius: "0.75rem",
+                      background: "var(--surface)",
+                      transition: "all 0.2s ease",
+                      cursor: "pointer",
+                      height: "320px",
+                      display: "flex",
+                      flexDirection: "column",
+                      width: "100%",
+                      boxSizing: "border-box",
                     }}
+                    className="hover:shadow-lg hover:border-neutral-alpha-strong"
                   >
-                    Voir le profil complet →
-                  </Text>
-                </Column>
-              </SmartLink>
-            </CustomRevealFx>
-          ))}
-        </Grid>
+                    {/* Avatar et infos de base */}
+                    <Flex gap="16" vertical="center">
+                      <Avatar
+                        src={
+                          provider.avatar ||
+                          (provider.profilePicture
+                            ? provider.profilePicture.startsWith("http")
+                              ? provider.profilePicture
+                              : `${
+                                  process.env.NEXT_PUBLIC_API_BASE_URL ||
+                                  "http://localhost:8080/api/v1"
+                                }${provider.profilePicture}`
+                            : undefined)
+                        }
+                        size="xl"
+                        style={{ flexShrink: 0 }}
+                      />
+                      <Column gap="4">
+                        <Heading as="h3" variant="heading-strong-l">
+                          {provider.firstName} {provider.lastName}
+                        </Heading>
+                        {provider.job && (
+                          <Text variant="body-default-s" color="neutral-medium">
+                            {provider.job.title}
+                          </Text>
+                        )}
+                        <Text variant="body-default-s" color="neutral-medium">
+                          📍 {String(provider.country?.name)}
+                        </Text>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: 8,
+                            flexWrap: "wrap",
+                            marginTop: 8,
+                          }}
+                        >
+                          {provider.languages?.map((language) => (
+                            <Tag key={language.id} variant="brand" size="s">
+                              {language.name}
+                            </Tag>
+                          ))}
+                        </div>
+                      </Column>
+                    </Flex>
+
+                    {/* Lien vers le profil */}
+                    <Text
+                      variant="body-default-s"
+                      style={{
+                        color: "var(--brand)",
+                        fontWeight: "500",
+                        marginTop: "auto",
+                      }}
+                    >
+                      Voir le profil complet →
+                    </Text>
+                  </Column>
+                </SmartLink>
+              </CustomRevealFx>
+            );
+          })}
+        </div>
       </Column>
 
       {/* Footer */}

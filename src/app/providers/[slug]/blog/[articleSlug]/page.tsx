@@ -7,7 +7,7 @@ import {
   SmartImage,
 } from "@/once-ui/components";
 import { CustomRevealFx } from "@/components/CustomRevealFx";
-import ArticleContent from "@/components/blog/ArticleContent";
+
 import { Meta, Schema } from "@/once-ui/modules";
 import { formatDate } from "@/app/utils/formatDate";
 import { getArticleBySlug } from "@/app/utils/articleUtils";
@@ -113,7 +113,72 @@ export default async function ProviderArticlePage({
 
       {/* Contenu de l'article */}
       <Column as="article" fillWidth>
-        <ArticleContent sections={article.section || []} />
+        {article.section?.map((section: any, index: number) => {
+          const delay = (index + 1) * 0.1;
+
+          switch (section.type) {
+            case "heading":
+              return (
+                <RevealFx key={index} translateY={4} delay={delay}>
+                  <Heading
+                    variant={
+                      section.level === 1
+                        ? "display-strong-s"
+                        : "heading-strong-l"
+                    }
+                    marginBottom="m"
+                    marginTop={section.level === 1 ? "0" : "xl"}
+                  >
+                    {section.content}
+                  </Heading>
+                </RevealFx>
+              );
+
+            case "paragraph":
+              return (
+                <RevealFx key={index} translateY={4} delay={delay}>
+                  <Text variant="body-default-l" marginBottom="m">
+                    {section.content}
+                  </Text>
+                </RevealFx>
+              );
+
+            case "list":
+              return (
+                <RevealFx key={index} translateY={4} delay={delay}>
+                  <ul style={{ marginBottom: "1rem", paddingLeft: "1.5rem" }}>
+                    {section.items?.map((item: string, itemIndex: number) => (
+                      <li key={itemIndex} style={{ marginBottom: "0.5rem" }}>
+                        <Text variant="body-default-l">{item}</Text>
+                      </li>
+                    ))}
+                  </ul>
+                </RevealFx>
+              );
+
+            case "image":
+              return (
+                <RevealFx key={index} translateY={4} delay={delay}>
+                  <SmartImage
+                    src={section.src || ""}
+                    alt={section.alt || ""}
+                    aspectRatio={section.aspectRatio || "16/9"}
+                    radius="l"
+                    marginBottom="16"
+                  />
+                </RevealFx>
+              );
+
+            default:
+              return (
+                <RevealFx key={index} translateY={4} delay={delay}>
+                  <Text variant="body-default-l" marginBottom="m">
+                    {section.content}
+                  </Text>
+                </RevealFx>
+              );
+          }
+        })}
       </Column>
 
       {/* Footer avec lien retour */}

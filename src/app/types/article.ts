@@ -1,41 +1,20 @@
 import { ArticleSection } from './articleSection';
+import { Tag } from './tag';
 
 export interface Article {
   articleId: number;           // Identifiant unique de l'article
   providerId: number;          // Référence au prestataire (auteur)
-  slug: string;                // Slug pour l'URL
+  languageId: number;            // Langue de l'article
   title: string;               // Titre de l'article
-  summary: string;             // Résumé de l'article
+  slug: string;                // Slug pour l'URL
   publishedAt: string;         // Date de publication (format ISO)
-  articleCover: string;        // URL de l'image de couverture
-  tag: string;                 // Tag/catégorie de l'article
-  language: string;            // Langue de l'article
+  summary: string;             // Résumé de l'article
   isPublished: boolean;        // Si l'article est publié
-  section: ArticleSection [];  // Sections de contenu
+  isFeatured: boolean;         // Si l'article est mis en avant
+  articleCover: string;        // URL de l'image de couverture
+  tags: Tag[];                 // Tag/catégorie de l'article
+  sections: ArticleSection [];  // Sections de contenu
 }
 
-// Interface étendue pour l'affichage avec propriétés calculées
-export interface ArticleWithMetadata extends Article {
-  readingTime?: number;        // Temps de lecture estimé en minutes
-  wordCount?: number;          // Nombre de mots
-  excerpt?: string;            // Extrait pour les aperçus
-  formattedDate?: string;      // Date formatée pour l'affichage
-}
-
-// Interface pour les options de filtrage des articles
-export interface ArticleFilters {
-  providerId?: number;
-  tag?: string;
-  language?: string;
-  publishedAfter?: string;
-  publishedBefore?: string;
-  search?: string;
-}
-
-// Interface pour le tri des articles
-export interface ArticleSortOptions {
-  field: 'publishedAt' | 'title' | 'tag';
-  direction: 'asc' | 'desc';
-}
 
 

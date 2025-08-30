@@ -1,5 +1,5 @@
-import { Location } from './location';
-import { Skill } from './skill';
+import { HardSkill } from './hardskill';
+import { SoftSkill } from './softskill';
 import { Job } from './job';
 import { SocialLink } from './socialLink';
 import { Service } from './service';
@@ -7,28 +7,38 @@ import { Article } from './article';
 import { Experience } from './experience';
 import { Education } from './education';
 import { Language } from './language';
+import { Country } from './country';
 
 export interface Provider {
-  providerId: number;         // Identifiant unique du prestataire
-  slug: string;               // Slug pour l'URL
-  firstName: string;          // Prénom
-  lastName: string;           // Nom de famille
-  email: string;              // Email de contact
-  avatar: string;             // Chemin vers l'avatar
-  location: Location;           // Localisation géographique
-  createdAt: string;          // Date de création (format ISO)
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  profilePicture: string | null;
+  joinedAt: string;
+  slug: string;
+  jobId: number;
+  countryId: number;
+  city: string;
+  state?: string | null;
+  postalCode?: string | null;
+  address?: string | null;
+  role: 'provider';
 }
 
-// Interface étendue avec toutes les relations
-export interface ProviderWithDetails extends Provider {
-  skills: Skill[];           // IDs des compétences
-  experiences: Experience[];  // Expériences professionnelles
-  education: Education[];     // Formation/éducation
-  socialLinks: SocialLink[];  // Liens sociaux
-  services: Service[];        // Services proposés
-  articles: Article[];        // Articles publiés
-  job: Job;            // Détails du métier
-  languages: Language[];        // Langues parlées
+// Variante avec relations optionnelles (si l'API agrège ces données)
+export interface ProviderWithRelations extends Provider {
+  hardSkills?: HardSkill[];
+  softSkills?: SoftSkill[];
+  experiences?: Experience[];
+  education?: Education[];
+  socialLinks?: SocialLink[];
+  services?: Service[];
+  articles?: Article[];
+  languages?: Language[];
+  job?: Job;
+  country?: Country;
+  avatar?: string; // URL calculée à partir de profilePicture
 }
 
 // Interface pour l'affichage complet du profil

@@ -24,6 +24,11 @@ export interface DatePickerProps
     endDate?: Date;
   };
   timePicker?: boolean;
+  /**
+   * When true, show month and year dropdowns together in the header
+   * so the user can change both without toggling the month/year views.
+   */
+  monthYearSelector?: boolean;
   size?: "s" | "m" | "l";
   className?: string;
   style?: React.CSSProperties;
@@ -58,6 +63,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
       maxDate,
       range,
       timePicker = false,
+      monthYearSelector = false,
       size = "m",
       className,
       style,
@@ -156,6 +162,17 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
 
     const handleViewModeToggle = (mode: ViewMode) => {
       setViewMode(mode);
+      setIsTransitioning(true);
+    };
+
+    // New handlers for month/year dropdowns
+    const handleMonthChangeDirect = (month: number) => {
+      setCurrentMonth(month);
+      setIsTransitioning(true);
+    };
+
+    const handleYearChangeDirect = (year: number) => {
+      setCurrentYear(year);
       setIsTransitioning(true);
     };
 
@@ -398,30 +415,82 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
             />
             <Flex fillWidth direction="column" horizontal="center" gap="8">
               <Flex vertical="center" gap="8">
-                <Text
-                  variant={`body-default-${size}`}
-                  onBackground="neutral-strong"
-                  className="cursor-interactive"
-                  onClick={(event: any) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    handleViewModeToggle("months");
-                  }}
-                >
-                  {monthNames[currentMonth]}
-                </Text>
-                <Text
-                  variant={`body-default-${size}`}
-                  onBackground="neutral-strong"
-                  className="cursor-interactive"
-                  onClick={(event: any) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    handleViewModeToggle("years");
-                  }}
-                >
-                  {currentYear}
-                </Text>
+                {monthYearSelector ? (
+                  <>
+                    <select
+                      value={currentMonth}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handleMonthChangeDirect(Number(e.target.value));
+                      }}
+                      aria-label="Select month"
+                      style={{
+                        background: "transparent",
+                        color: "var(--color-text)",
+                        border: "1px solid transparent",
+                        padding: "4px 8px",
+                        borderRadius: "6px",
+                      }}
+                    >
+                      {monthNames.map((m, i) => (
+                        <option key={m} value={i}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={currentYear}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handleYearChangeDirect(Number(e.target.value));
+                      }}
+                      aria-label="Select year"
+                      style={{
+                        background: "transparent",
+                        color: "var(--color-text)",
+                        border: "1px solid transparent",
+                        padding: "4px 8px",
+                        borderRadius: "6px",
+                      }}
+                    >
+                      {Array.from({ length: 40 }).map((_, i) => {
+                        const year = new Date().getFullYear() - 20 + i;
+                        return (
+                          <option key={year} value={year}>
+                            {year}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </>
+                ) : (
+                  <>
+                    <Text
+                      variant={`body-default-${size}`}
+                      onBackground="neutral-strong"
+                      className="cursor-interactive"
+                      onClick={(event: any) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        handleViewModeToggle("months");
+                      }}
+                    >
+                      {monthNames[currentMonth]}
+                    </Text>
+                    <Text
+                      variant={`body-default-${size}`}
+                      onBackground="neutral-strong"
+                      className="cursor-interactive"
+                      onClick={(event: any) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        handleViewModeToggle("years");
+                      }}
+                    >
+                      {currentYear}
+                    </Text>
+                  </>
+                )}
               </Flex>
               {timePicker && selectedTime && (
                 <Text variant="label-default-s" onBackground="neutral-weak">

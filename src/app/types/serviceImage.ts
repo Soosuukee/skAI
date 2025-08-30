@@ -1,7 +1,6 @@
 export interface ServiceImage {
-  imageId: number;           // Identifiant unique de l'image
-  serviceId: number;         // Référence au service
-  title: string;             // Titre de l'image
+  id: number;                       // Identifiant unique de l'image
+  serviceContentId: number;         // Référence au service
   url: string;               // URL de l'image
 }
 
@@ -15,6 +14,5 @@ export interface ServiceImageWithMetadata extends ServiceImage {
 
 // Interface pour les options de filtrage des images
 export interface ServiceImageFilters {
-  serviceId?: number;
-  title?: string;
+  serviceContentId?: number;
 }

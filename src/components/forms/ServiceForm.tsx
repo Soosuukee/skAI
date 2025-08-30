@@ -310,9 +310,6 @@ export default function ServiceForm({
                       onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                         updateSectionContent(index, e.target.value)
                       }
-                      placeholder={
-                        "Saisissez du texte. Les sauts de ligne seront conservés."
-                      }
                       required={index === 0}
                     />
                   </Column>

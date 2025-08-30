@@ -22,6 +22,7 @@ export default function TestDatePickerPage() {
           value={selectedDate || undefined}
           onChange={(date) => setSelectedDate(date)}
           size="m"
+          monthYearSelector
         />
       </Flex>
     </div>

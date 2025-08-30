@@ -102,7 +102,7 @@ const SmartImage: React.FC<SmartImageProps> = ({
 
   const getYouTubeEmbedUrl = (url: string) => {
     const match = url.match(
-      /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
     );
     return match
       ? `https://www.youtube.com/embed/${match[1]}?controls=0&rel=0&modestbranding=1`
@@ -111,6 +111,9 @@ const SmartImage: React.FC<SmartImageProps> = ({
 
   const isVideo = src?.endsWith(".mp4");
   const isYouTube = isYouTubeVideo(src);
+
+  // If the src is an absolute URL (external API), disable Next image optimization
+  const finalUnoptimized = unoptimized || /^https?:\/\//.test(src);
 
   return (
     <>
@@ -165,7 +168,7 @@ const SmartImage: React.FC<SmartImageProps> = ({
             alt={alt}
             priority={priority}
             sizes={sizes}
-            unoptimized={unoptimized}
+            unoptimized={finalUnoptimized}
             fill
             style={{
               objectFit: objectFit,
@@ -199,7 +202,9 @@ const SmartImage: React.FC<SmartImageProps> = ({
               height: "100vh",
               transform: "translate(-50%, -50%)",
             }}
-            onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+            onClick={(e: React.MouseEvent<HTMLDivElement>) =>
+              e.stopPropagation()
+            }
           >
             {isVideo ? (
               <video

@@ -50,6 +50,22 @@
           transform: none;
       }
   }
+
+.monthYearSelect {
+  display: inline-flex;
+  gap: 8px;
+
+  select {
+    background: transparent;
+    color: var(--neutral-on-background-strong);
+    border: 1px solid var(--neutral-background-medium);
+    padding: 6px 8px;
+    border-radius: var(--radius-s);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+}
   
   .dayButton {
     aspect-ratio: 1;

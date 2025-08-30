@@ -8,6 +8,7 @@ import React, {
   ReactNode,
 } from "react";
 import { User } from "@/app/utils/userUtils";
+import * as authService from "@/app/utils/authService";
 
 interface AuthContextType {
   user: User | null;
@@ -37,41 +38,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const checkAuth = async () => {
     try {
-      // Vérifier d'abord localStorage, puis cookies
-      let token = localStorage.getItem("authToken");
-
-      if (!token) {
-        // Essayer de récupérer depuis les cookies
-        const cookies = document.cookie.split(";");
-        const authCookie = cookies.find((cookie) =>
-          cookie.trim().startsWith("authToken=")
-        );
-        if (authCookie) {
-          token = authCookie.split("=")[1];
-          // Synchroniser avec localStorage
-          localStorage.setItem("authToken", token);
-        }
-      }
-
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await fetch("/api/check-auth", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
+      const token = localStorage.getItem("authToken") || undefined;
+      const result = await authService.checkAuth(token);
+      if (result.authenticated && result.user) {
+        setUser(result.user as User);
       } else {
-        // Token invalide, le supprimer partout
-        localStorage.removeItem("authToken");
-        document.cookie =
-          "authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         setUser(null);
       }
     } catch (error) {
@@ -79,9 +50,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         "Erreur lors de la vérification de l'authentification:",
         error
       );
-      localStorage.removeItem("authToken");
-      document.cookie =
-        "authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -90,50 +58,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch("/api/authenticate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Stocker le token dans localStorage et cookies
-        localStorage.setItem("authToken", data.token);
-
-        // Créer un cookie pour le middleware
-        document.cookie = `authToken=${data.token}; path=/; max-age=${
-          60 * 60 * 24 * 7
-        }; SameSite=Strict`;
-
-        setUser(data.user);
+      const data = await authService.login(email, password);
+      if (data.success) {
+        if (data.token) localStorage.setItem("authToken", data.token);
+        if (data.user) setUser(data.user as User);
         return { success: true };
-      } else {
-        return {
-          success: false,
-          message: data.message || "Erreur de connexion",
-        };
       }
+      return { success: false, message: data.message };
     } catch (error) {
       console.error("Erreur lors de la connexion:", error);
       return { success: false, message: "Erreur de connexion au serveur" };
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("authToken");
-
-    // Supprimer le cookie
-    document.cookie =
-      "authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-
+  const logout = async () => {
+    await authService.logout();
     setUser(null);
-
-    // Appeler l'API de déconnexion si nécessaire
-    fetch("/api/logout", { method: "POST" }).catch(console.error);
   };
 
   const value: AuthContextType = {

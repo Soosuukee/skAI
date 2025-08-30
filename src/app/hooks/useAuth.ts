@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getUserWithProvider } from "@/app/utils/userUtils";
+import * as authService from "@/app/utils/authService";
 
 interface User {
   id: number;
@@ -30,64 +31,35 @@ export function useAuth() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch("/api/check-auth");
-      const data = await response.json();
-
-      if (response.ok && data.authenticated) {
-        // Récupérer les informations complètes de l'utilisateur
-        const userWithProvider = getUserWithProvider(data.user.id);
+      const token = localStorage.getItem("authToken") || undefined;
+      const result = await authService.checkAuth(token);
+      if (result.authenticated && result.user) {
         setAuthState({
-          user: data.user,
+          user: result.user,
           loading: false,
           error: null,
         });
       } else {
-        setAuthState({
-          user: null,
-          loading: false,
-          error: null,
-        });
+        setAuthState({ user: null, loading: false, error: null });
       }
     } catch (error) {
-      setAuthState({
-        user: null,
-        loading: false,
-        error: "Erreur de vérification d'authentification",
-      });
+      setAuthState({ user: null, loading: false, error: "Erreur de vérification d'authentification" });
     }
   };
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch("/api/authenticate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const data = await authService.login(email, password);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setAuthState({
-          user: data.user,
-          loading: false,
-          error: null,
-        });
+      if (data.success) {
+        setAuthState({ user: data.user, loading: false, error: null });
         return { success: true };
-      } else {
-        setAuthState(prev => ({
-          ...prev,
-          error: data.message || "Erreur de connexion",
-        }));
-        return { success: false, error: data.message };
       }
+
+      setAuthState(prev => ({ ...prev, error: data.message || "Erreur de connexion" }));
+      return { success: false, error: data.message };
     } catch (error) {
-      setAuthState(prev => ({
-        ...prev,
-        error: "Erreur de connexion au serveur",
-      }));
+      setAuthState(prev => ({ ...prev, error: "Erreur de connexion au serveur" }));
       return { success: false, error: "Erreur de connexion au serveur" };
     }
   };

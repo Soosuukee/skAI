@@ -129,6 +129,7 @@ export default function EducationForm({
                 handleChange("startDate", d.toISOString().split("T")[0])
               }
               floatingPlacement="right-start"
+              monthYearSelector
             />
             <DateInput
               id="endDate"
@@ -138,6 +139,7 @@ export default function EducationForm({
                 handleChange("endDate", d.toISOString().split("T")[0])
               }
               floatingPlacement="right-start"
+              monthYearSelector
             />
           </Flex>
           <Column gap="8">

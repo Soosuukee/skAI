@@ -1,9 +1,10 @@
 export interface Education {
-  diplomaId: number;          // Identifiant unique du diplôme
-  diplomaTitle: string;       // Titre du diplôme
+  id: number;                  // Identifiant unique
+  providerId: number;
+  title: string;               // Titre du diplôme
   institutionName: string;    // Nom de l'institution
   description: string;        // Description de la formation
-  startDate: string;          // Date de début (format ISO)
-  endDate?: string;           // Date de fin (format ISO, null si en cours)
-  diplomaImageUrl?: string;   // Logo de l'institution
+  startedAt: string;          // Date de début (ISO)
+  endedAt?: string;           // Date de fin (ISO)
+  institutionImage?: string;  // URL de l'image/Logo
 }
