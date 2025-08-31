@@ -29,6 +29,7 @@ const SmartImage: React.FC<SmartImageProps> = ({
   unoptimized = false,
   priority,
   sizes = "100vw",
+  style: externalStyle,
   ...rest
 }) => {
   const [isEnlarged, setIsEnlarged] = useState(false);
@@ -126,10 +127,15 @@ const SmartImage: React.FC<SmartImageProps> = ({
         style={{
           outline: "none",
           isolation: "isolate",
-          height: aspectRatio ? "" : height ? `${height}rem` : "100%",
+          height: aspectRatio
+            ? undefined
+            : height
+            ? `${height}rem`
+            : (externalStyle as any)?.height || "100%",
           aspectRatio,
           borderRadius: isEnlarged ? "0" : undefined,
           ...calculateTransform(),
+          ...(externalStyle || {}),
         }}
         onClick={handleClick}
         {...rest}

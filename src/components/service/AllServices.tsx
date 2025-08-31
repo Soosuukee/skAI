@@ -8,6 +8,7 @@ import {
   SmartLink,
   Avatar,
   Text,
+  SmartImage,
 } from "@/once-ui/components";
 import { getAllServicesWithProviders } from "@/app/utils/serviceUtils";
 import styles from "./Services.module.scss";
@@ -58,7 +59,10 @@ export function AllServices() {
       </Heading>
 
       {servicesWithProviders.map((service) => (
-        <div key={service.serviceId} className={styles.service}>
+        <div
+          key={`${service.id ?? service.serviceId ?? service.slug}`}
+          className={styles.service}
+        >
           <Flex
             background="surface"
             border="neutral-alpha-medium"
@@ -78,21 +82,31 @@ export function AllServices() {
               e.currentTarget.style.transform = "translateY(0)";
             }}
           >
-            {/* Image du service (placeholder pour l'instant) */}
-            <div
-              style={{
-                width: "120px",
-                height: "80px",
-                background: "var(--neutral-alpha-low)",
-                borderRadius: "8px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "var(--neutral-alpha-medium)",
-              }}
-            >
-              📋
-            </div>
+            {/* Image de couverture du service */}
+            {service.cover ? (
+              <SmartImage
+                src={service.cover}
+                alt={service.title}
+                height={6.625}
+                radius="m"
+                style={{ width: "160px", minWidth: "160px" }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: "160px",
+                  height: "106px",
+                  background: "var(--neutral-alpha-low)",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "var(--neutral-alpha-medium)",
+                }}
+              >
+                📋
+              </div>
+            )}
 
             {/* Contenu du service */}
             <Flex vertical="start" flex={1} gap="8">

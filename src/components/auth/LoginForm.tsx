@@ -11,6 +11,9 @@ interface LoginFormProps {
 export function LoginForm({ onClose }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userType, setUserType] = useState<"provider" | "client" | "admin">(
+    "client"
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
@@ -37,7 +40,7 @@ export function LoginForm({ onClose }: LoginFormProps) {
     setLoading(true);
     setError("");
 
-    const result = await login(email, password);
+    const result = await login(email, password, userType);
 
     if (result.success) {
       onClose();
@@ -56,6 +59,16 @@ export function LoginForm({ onClose }: LoginFormProps) {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log("Password change:", e.target.value);
     setPassword(e.target.value);
+  };
+
+  const cycleUserType = (e?: React.MouseEvent<HTMLButtonElement>) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setUserType((prev) =>
+      prev === "client" ? "provider" : prev === "provider" ? "admin" : "client"
+    );
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -122,6 +135,22 @@ export function LoginForm({ onClose }: LoginFormProps) {
                 required
               />
             </Column>
+
+            <Flex gap="8" vertical="center">
+              <Text variant="body-default-s" color="neutral-medium">
+                Type d'utilisateur:
+              </Text>
+              <Button
+                type="button"
+                variant="secondary"
+                size="s"
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                  cycleUserType(e)
+                }
+              >
+                {userType}
+              </Button>
+            </Flex>
 
             {error && (
               <Text variant="body-default-s" color="error">

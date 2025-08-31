@@ -11,7 +11,7 @@ export default function ServiceCreationPage() {
   };
 
   return (
-    <Column maxWidth="m" gap="24">
+    <Column gap="24" style={{ maxWidth: "1200px", width: "100%" }}>
       <Heading variant="display-strong-m">Créer un service</Heading>
       <Text color="neutral-medium">
         Prévisualisation du formulaire de création de service.

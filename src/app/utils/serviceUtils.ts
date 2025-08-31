@@ -2,6 +2,19 @@ import { Service } from '@/app/types/service';
 import { getApiBaseUrl } from '@/app/utils/api';
 const API_BASE_URL = getApiBaseUrl();
 
+function buildAbsoluteImageUrl(url?: string): string | undefined {
+  if (!url) return undefined;
+  if (/^https?:\/\//i.test(url)) return url;
+  try {
+    const origin = new URL(API_BASE_URL).origin; // e.g. http://localhost:8080
+    return url.startsWith('/')
+      ? `${origin}${url}`
+      : `${API_BASE_URL.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
+  } catch {
+    return url;
+  }
+}
+
 async function parseJsonSafe<T>(response: Response): Promise<T> {
   const contentType = response.headers.get('content-type') || '';
   if (!contentType.toLowerCase().includes('application/json')) {
@@ -149,33 +162,40 @@ export async function generateServiceStaticParamsByProvider(providerId: number) 
  */
 export async function getAllServicesWithProviders() {
   try {
-    // Utiliser les routes internes Next pour éviter les erreurs backend externes
-    const servicesResponse = await fetch(`${API_BASE_URL}/services`);
+    const servicesResponse = await fetch(`${API_BASE_URL}/services`, { credentials: 'include' });
     if (!servicesResponse.ok) {
       throw new Error(`Erreur HTTP: ${servicesResponse.status}`);
     }
     const services = await parseJsonSafe<any[]>(servicesResponse);
 
-    const providersResponse = await fetch(`${API_BASE_URL}/providers`);
+    const providersResponse = await fetch(`${API_BASE_URL}/providers`, { credentials: 'include' });
     if (!providersResponse.ok) {
       throw new Error(`Erreur HTTP: ${providersResponse.status}`);
     }
     const providers = await parseJsonSafe<any[]>(providersResponse);
-    
-    // Associer chaque service avec son provider
-    const servicesWithProviders = services.map(service => {
-      const provider = providers.find((p: any) => p.providerId === service.providerId);
+
+    // Associer chaque service avec son provider (API renvoie id et profilePicture)
+    const servicesWithProviders = services.map((service) => {
+      const provider = providers.find((p: any) => (p.id ?? p.providerId) === service.providerId);
       return {
         ...service,
-        provider: provider || {
-          firstName: 'Unknown',
-          lastName: 'Provider',
-          avatar: '/images/avatar.jpg',
-          slug: 'unknown'
-        }
+        cover: buildAbsoluteImageUrl((service as any).cover) || (service as any).cover,
+        provider: provider
+          ? {
+              firstName: provider.firstName,
+              lastName: provider.lastName,
+              avatar: buildAbsoluteImageUrl(provider.profilePicture || provider.avatar) || '/images/avatar.jpg',
+              slug: provider.slug,
+            }
+          : {
+              firstName: 'Unknown',
+              lastName: 'Provider',
+              avatar: '/images/avatar.jpg',
+              slug: 'unknown',
+            },
       };
     });
-    
+
     return servicesWithProviders;
   } catch (error) {
     console.error('Erreur lors de la récupération des services avec providers:', error);

@@ -14,8 +14,14 @@ export function UserMenu() {
 
   if (!user) return null;
 
+  // Normaliser id/role si l'API renvoie id & type
+  const normalizedUserId = (user as any)?.user_id ?? (user as any)?.id;
+  const normalizedRole = (user as any)?.role ?? (user as any)?.type;
+
   // Récupérer les informations complètes de l'utilisateur (fallback local JSON)
-  const userWithDetails = UserRoleService.getUserWithDetails(user.user_id);
+  const userWithDetails = normalizedUserId
+    ? UserRoleService.getUserWithDetails(normalizedUserId)
+    : null;
 
   const makeAbsolute = (url?: string) => {
     if (!url) return undefined;
@@ -36,7 +42,7 @@ export function UserMenu() {
   let avatarSrc: string | undefined = "/images/avatar.jpg";
 
   // 1) Préférer les champs directement renvoyés par l'API externe si présents
-  const role = (user as any)?.role;
+  const role = normalizedRole;
   const directFirst = (user as any)?.firstName || (user as any)?.firstname;
   const directLast = (user as any)?.lastName || (user as any)?.lastname;
   const directAvatar = (user as any)?.profilePicture || (user as any)?.avatar;
