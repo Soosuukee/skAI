@@ -1,16 +1,57 @@
 "use client";
 
 import React from "react";
-import { Heading, RevealFx, Column, Text } from "@/once-ui/components";
-import { CustomRevealFx } from "@/components/CustomRevealFx";
-import { useProvider } from "@/app/hooks/useProvider";
-import { useProviderServices } from "@/app/hooks/useProviderServices";
-import { ProviderServices } from "@/components/service/ProviderServices";
+import { Column } from "@/once-ui/components";
 import { baseURL } from "@/app/resources";
 import { Meta, Schema } from "@/once-ui/modules";
+import { useProviderBasic, useProviderServices } from "@/app/hooks/providers";
+import { ProviderServices } from "@/components/service/ProviderServices";
+import { RevealFx, Heading } from "@/once-ui/components";
 
 interface ProviderServicePageProps {
   params: Promise<{ slug: string }>;
+}
+
+function ProviderServiceContent({
+  provider,
+  services,
+  providerSlug,
+}: {
+  provider: any;
+  services: any[];
+  providerSlug: string;
+}) {
+  return (
+    <Column maxWidth="m">
+      <Schema
+        as="webPage"
+        baseURL={baseURL}
+        path={`/providers/${provider.slug}/service`}
+        title={`Services de ${provider.firstName} ${provider.lastName}`}
+        description={`Découvrez les services professionnels de ${provider.firstName} ${provider.lastName}`}
+        image={`${baseURL}/og?title=${encodeURIComponent(
+          `${provider.firstName} ${provider.lastName} - Services`
+        )}`}
+        author={{
+          name: `${provider.firstName} ${provider.lastName}`,
+          url: `${baseURL}/providers/${provider.slug}/about`,
+          image: `${baseURL}${provider.avatar}`,
+        }}
+      />
+      <RevealFx
+        fillWidth
+        horizontal="start"
+        paddingTop="16"
+        paddingBottom="32"
+        paddingLeft="12"
+      >
+        <Heading as="h1" marginBottom="16" variant="display-strong-s">
+          Services de {provider.firstName} {provider.lastName}
+        </Heading>
+        <ProviderServices services={services} providerSlug={providerSlug} />
+      </RevealFx>
+    </Column>
+  );
 }
 
 export default function ProviderServicePage({
@@ -21,7 +62,7 @@ export default function ProviderServicePage({
     provider,
     loading: providerLoading,
     error: providerError,
-  } = useProvider(resolvedParams.slug);
+  } = useProviderBasic(resolvedParams.slug);
   const {
     services,
     loading: servicesLoading,
@@ -44,43 +85,19 @@ export default function ProviderServicePage({
     );
   }
 
-  return (
-    <Column maxWidth="m" gap="xl" horizontal="center">
-      <Schema
-        as="webPage"
-        baseURL={baseURL}
-        path={`/providers/${provider.slug}/service`}
-        title="Mes Services"
-        description="Nous aidons les entreprises à passer de l'idée au produit"
-        image={`${baseURL}/og?title=${encodeURIComponent(
-          `${provider.firstName} ${provider.lastName} - Services`
-        )}`}
-        author={{
-          name: `${provider.firstName} ${provider.lastName}`,
-          url: `${baseURL}/providers/${provider.slug}/about`,
-          image: `${baseURL}${provider.avatar}`,
-        }}
-      />
-
-      {/* Header */}
-      <Column fillWidth paddingY="24" gap="m">
-        <CustomRevealFx translateY={4} delay={0.1} fillWidth>
-          <Heading wrap="balance" variant="display-strong-l">
-            Mes Services
-          </Heading>
-        </CustomRevealFx>
-        <RevealFx translateY={4} fillWidth delay={0.2}>
-          <Text variant="body-default-l" color="neutral-medium">
-            Nous aidons les entreprises à passer de l'idée au produit
-          </Text>
-        </RevealFx>
+  if (servicesError) {
+    return (
+      <Column maxWidth="m" gap="xl" horizontal="center">
+        <Heading>Erreur lors du chargement des services</Heading>
       </Column>
+    );
+  }
 
-      {/* Liste des services */}
-      <ProviderServices
-        services={services}
-        providerSlug={resolvedParams.slug}
-      />
-    </Column>
+  return (
+    <ProviderServiceContent
+      provider={provider}
+      services={services}
+      providerSlug={resolvedParams.slug}
+    />
   );
 }

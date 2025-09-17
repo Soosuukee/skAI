@@ -56,7 +56,7 @@ const DropdownWrapper = forwardRef<HTMLDivElement, DropdownWrapperProps>(
       className,
       style,
     },
-    ref,
+    ref
   ) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -73,7 +73,7 @@ const DropdownWrapper = forwardRef<HTMLDivElement, DropdownWrapperProps>(
         }
         onOpenChange?.(newIsOpen);
       },
-      [onOpenChange, isControlled],
+      [onOpenChange, isControlled]
     );
 
     const { x, y, strategy, refs, update } = useFloating({
@@ -125,20 +125,26 @@ const DropdownWrapper = forwardRef<HTMLDivElement, DropdownWrapperProps>(
 
     const handleClickOutside = useCallback(
       (event: MouseEvent) => {
-        if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        if (
+          wrapperRef.current &&
+          !wrapperRef.current.contains(event.target as Node)
+        ) {
           handleOpenChange(false);
         }
       },
-      [handleOpenChange, wrapperRef],
+      [handleOpenChange, wrapperRef]
     );
 
     const handleFocusOut = useCallback(
       (event: FocusEvent) => {
-        if (wrapperRef.current && !wrapperRef.current.contains(event.relatedTarget as Node)) {
+        if (
+          wrapperRef.current &&
+          !wrapperRef.current.contains(event.relatedTarget as Node)
+        ) {
           handleOpenChange(false);
         }
       },
-      [handleOpenChange, wrapperRef],
+      [handleOpenChange, wrapperRef]
     );
 
     useEffect(() => {
@@ -168,10 +174,14 @@ const DropdownWrapper = forwardRef<HTMLDivElement, DropdownWrapperProps>(
         }}
         className={className}
         ref={wrapperRef}
-        onClick={() => {
-            if (closeAfterClick) {
-                handleOpenChange(!isOpen);
-            }
+        onClick={(e) => {
+          // Ne fermer que si on clique sur le trigger, pas sur le dropdown
+          if (
+            closeAfterClick &&
+            !dropdownRef.current?.contains(e.target as Node)
+          ) {
+            handleOpenChange(!isOpen);
+          }
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
@@ -210,7 +220,7 @@ const DropdownWrapper = forwardRef<HTMLDivElement, DropdownWrapperProps>(
         )}
       </Flex>
     );
-  },
+  }
 );
 
 DropdownWrapper.displayName = "DropdownWrapper";

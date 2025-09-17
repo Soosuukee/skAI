@@ -12,8 +12,13 @@ import {
   Text,
 } from "@/once-ui/components";
 import { CustomRevealFx } from "@/components/CustomRevealFx";
-import Post from "@/components/blog/Post";
-import { useProvider } from "@/app/hooks/useProvider";
+import { ProviderHomeServiceCard } from "@/components/service/ProviderHomeServiceCard";
+import { ProviderHomeArticleCard } from "@/components/blog/ProviderHomeArticleCard";
+import {
+  useProviderBasic,
+  useProviderArticles,
+  useProviderServices,
+} from "@/app/hooks/providers";
 import { baseURL } from "@/app/resources";
 import { Meta, Schema } from "@/once-ui/modules";
 
@@ -23,12 +28,47 @@ interface ProviderPageProps {
 
 export default function ProviderPage({ params }: ProviderPageProps) {
   const resolvedParams = React.use(params);
-  const { provider, social, about, articles, loading, error } = useProvider(
-    resolvedParams.slug
-  );
+
+  // Utiliser les hooks spécialisés - provider, articles et services pour cette page
+  const {
+    provider,
+    loading: providerLoading,
+    error: providerError,
+  } = useProviderBasic(resolvedParams.slug);
+  const {
+    articles,
+    loading: articlesLoading,
+    error: articlesError,
+  } = useProviderArticles(resolvedParams.slug);
+  const {
+    services,
+    loading: servicesLoading,
+    error: servicesError,
+  } = useProviderServices(resolvedParams.slug);
+
+  // Calculer les états globaux
+  const loading = providerLoading || articlesLoading || servicesLoading;
+  const error = providerError || articlesError || servicesError;
+
+  // Fonction pour convertir les URLs relatives en URLs absolues de l'API
+  const makeAbsolute = (url?: string) => {
+    if (!url) return undefined;
+    if (/^https?:\/\//i.test(url)) return url;
+    try {
+      const apiBase =
+        process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000/api/v1";
+      const origin = new URL(apiBase).origin;
+      return url.startsWith("/")
+        ? `${origin}${url}`
+        : `${apiBase.replace(/\/$/, "")}/${url}`;
+    } catch {
+      return url;
+    }
+  };
 
   // Récupère les 2 derniers articles de blog
-  const blogList = articles.slice(0, 2);
+  const articlesArray = articles || [];
+  const blogList = articlesArray.slice(0, 2);
 
   if (loading) {
     return (
@@ -78,7 +118,8 @@ export default function ProviderPage({ params }: ProviderPageProps) {
             paddingBottom="16"
           >
             <Heading wrap="balance" variant="display-strong-l">
-              Le moteur de l'IA nouvelle génération
+              Bienvenue sur le portfolio de {provider.firstName}{" "}
+              {provider.lastName}
             </Heading>
           </RevealFx>
           <RevealFx
@@ -104,10 +145,10 @@ export default function ProviderPage({ params }: ProviderPageProps) {
               <Flex gap="8" vertical="center">
                 <Avatar
                   style={{ marginLeft: "-0.75rem", marginRight: "0.25rem" }}
-                  src={provider.avatar}
+                  src={makeAbsolute(provider.avatar)}
                   size="m"
                 />
-                A propos
+                À propos
               </Flex>
             </a>
           </RevealFx>
@@ -122,21 +163,52 @@ export default function ProviderPage({ params }: ProviderPageProps) {
             marginBottom="16"
             variant="display-strong-s"
           >
-            Les services proposée par {provider.firstName}
+            Les services proposés par {provider.firstName}
           </Heading>
         </CustomRevealFx>
-        {/* Pour l'instant, on affiche un message car les services ne sont pas encore dynamiques */}
-        <RevealFx translateY={4} fillWidth delay={0.2}>
-          <Text variant="body-default-l">
-            Les services seront bientôt disponibles de manière dynamique.
-          </Text>
-        </RevealFx>
-        <SmartLink
-          href={servicePath}
-          style={{ display: "block", marginTop: "1rem", color: "var(--brand)" }}
-        >
-          Voir toutes les prestations de {provider.firstName}
-        </SmartLink>
+
+        {services.length > 0 ? (
+          <>
+            <Grid columns="2" mobileColumns="1" fillWidth gap="l">
+              {services.slice(0, 2).map((service, idx) => (
+                <ProviderHomeServiceCard
+                  key={service.id}
+                  service={service}
+                  providerSlug={provider.slug}
+                  index={idx}
+                />
+              ))}
+            </Grid>
+            <SmartLink
+              href={servicePath}
+              style={{
+                display: "block",
+                marginTop: "1rem",
+                color: "var(--brand)",
+              }}
+            >
+              Voir toutes les prestations de {provider.firstName}
+            </SmartLink>
+          </>
+        ) : (
+          <>
+            <RevealFx translateY={4} fillWidth delay={0.2}>
+              <Text variant="body-default-l" color="neutral-medium">
+                {provider.firstName} n'a pas encore de services publiés.
+              </Text>
+            </RevealFx>
+            <SmartLink
+              href={servicePath}
+              style={{
+                display: "block",
+                marginTop: "1rem",
+                color: "var(--brand)",
+              }}
+            >
+              Voir la page des services
+            </SmartLink>
+          </>
+        )}
       </Column>
       {/* Section blogs */}
       <RevealFx translateY={4} fillWidth delay={0.6}>
@@ -150,28 +222,21 @@ export default function ProviderPage({ params }: ProviderPageProps) {
         </Heading>
       </RevealFx>
       {/* Articles récents */}
-      <Grid columns="2" mobileColumns="1" fillWidth marginBottom="12" gap="12">
-        {blogList.map((post, idx) => (
-          <CustomRevealFx
-            key={post.slug}
-            translateY={4}
-            delay={0.1 * (idx + 1)}
-            fillWidth
-          >
-            <Post
-              article={post}
-              thumbnail={true}
-              direction="column"
-              providerSlug={provider.slug}
-            />
-          </CustomRevealFx>
+      <Grid columns="2" mobileColumns="1" fillWidth marginBottom="12" gap="l">
+        {blogList.map((article, idx) => (
+          <ProviderHomeArticleCard
+            key={article.slug}
+            article={article}
+            providerSlug={provider.slug}
+            index={idx}
+          />
         ))}
       </Grid>
       <SmartLink
         href={blogPath}
         style={{ display: "block", marginTop: "1rem", color: "var(--brand)" }}
       >
-        Voir plus d'article de {provider.firstName}
+        Voir plus d'articles de {provider.firstName}
       </SmartLink>
     </Column>
   );

@@ -100,12 +100,12 @@ export function Posts({
     );
   }
 
-  const displayedArticles = range
-    ? articlesWithProviders.slice(
-        range[0] - 1,
-        range.length === 2 ? range[1] : articlesWithProviders.length
-      )
-    : articlesWithProviders;
+  const displayedArticles = (() => {
+    if (!range) return articlesWithProviders;
+    const start = range[0] - 1;
+    const end = range.length === 2 ? range[1] : start + 1;
+    return articlesWithProviders.slice(start, end);
+  })();
 
   return (
     <>
@@ -119,7 +119,7 @@ export function Posts({
         >
           {displayedArticles.map((article) => (
             <Post
-              key={article.slug}
+              key={`${article.provider?.slug}-${article.slug}`}
               article={article}
               thumbnail={thumbnail}
               direction={direction}

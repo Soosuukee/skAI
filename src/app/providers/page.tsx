@@ -131,7 +131,7 @@ export default function ProvidersPage() {
                               ? provider.profilePicture
                               : `${
                                   process.env.NEXT_PUBLIC_API_BASE_URL ||
-                                  "http://localhost:8080/api/v1"
+                                  "http://localhost:8081/api/v1"
                                 }${provider.profilePicture}`
                             : undefined)
                         }
@@ -158,9 +158,9 @@ export default function ProvidersPage() {
                             marginTop: 8,
                           }}
                         >
-                          {provider.languages?.map((language) => (
-                            <Tag key={language.id} variant="brand" size="s">
-                              {language.name}
+                          {provider.languages?.map((lang) => (
+                            <Tag key={lang} variant="brand" size="s">
+                              {lang}
                             </Tag>
                           ))}
                         </div>

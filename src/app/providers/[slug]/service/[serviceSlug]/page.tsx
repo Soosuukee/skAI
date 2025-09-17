@@ -11,8 +11,7 @@ import {
 } from "@/once-ui/components";
 import { CustomRevealFx } from "@/components/CustomRevealFx";
 import { ServiceContent } from "@/components/service/ServiceContent";
-import { useProvider } from "@/app/hooks/useProvider";
-import { useProviderServices } from "@/app/hooks/useProviderServices";
+import { useProviderBasic, useProviderServices } from "@/app/hooks/providers";
 import { formatPrice } from "@/app/utils/priceUtils";
 import { Meta, Schema } from "@/once-ui/modules";
 import { ServiceDetailRenderer } from "@/components/service/ServiceDetailRenderer";
@@ -33,7 +32,7 @@ export default function ProviderServiceDetailPage({
     provider,
     loading: providerLoading,
     error: providerError,
-  } = useProvider(resolvedParams.slug);
+  } = useProviderBasic(resolvedParams.slug);
   const {
     services,
     loading: servicesLoading,

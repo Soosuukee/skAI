@@ -9,11 +9,13 @@ const routes = {
   "/service": true,
   "/providers": true,
   "/join": true,
+  "/me": true,
   "/servicecreation": true,
   "/experiencecreation": true,
   "/educationcreation": true,
   "/articlecreation": true,
   "/test-datepicker": true,
+  "/mdx-test": true,
   // Add these routes when you create the corresponding pages
   // "/settings": true,
   // "/profile": true,

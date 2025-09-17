@@ -18,7 +18,12 @@ import {
 import { baseURL } from "@/app/resources";
 import TableOfContents from "@/components/about/TableOfContents";
 import styles from "@/components/about/about.module.scss";
-import { useProvider } from "@/app/hooks/useProvider";
+import {
+  useProviderBasic,
+  useProviderExperience,
+  useProviderEducation,
+  useProviderArticles,
+} from "@/app/hooks/providers";
 import { Meta, Schema } from "@/once-ui/modules";
 
 interface ProviderAboutPageProps {
@@ -27,9 +32,157 @@ interface ProviderAboutPageProps {
 
 export default function ProviderAboutPage({ params }: ProviderAboutPageProps) {
   const resolvedParams = React.use(params);
-  const { provider, social, about, loading, error } = useProvider(
-    resolvedParams.slug
-  );
+
+  const {
+    provider,
+    loading: providerLoading,
+    error: providerError,
+  } = useProviderBasic(resolvedParams.slug);
+  const {
+    experiences,
+    loading: experiencesLoading,
+    error: experiencesError,
+  } = useProviderExperience(resolvedParams.slug);
+  const {
+    educations,
+    loading: educationsLoading,
+    error: educationsError,
+  } = useProviderEducation(resolvedParams.slug);
+  const {
+    articles,
+    loading: articlesLoading,
+    error: articlesError,
+  } = useProviderArticles(resolvedParams.slug);
+
+  // Calculer les états globaux
+  const loading =
+    providerLoading ||
+    experiencesLoading ||
+    educationsLoading ||
+    articlesLoading;
+  const error =
+    providerError || experiencesError || educationsError || articlesError;
+
+  // Créer les données about si on a le provider
+  const about = provider
+    ? {
+        intro: {
+          display: true,
+          title: "Introduction",
+          description: `${provider.firstName} ${
+            provider.lastName
+          } est un professionnel passionné par l'innovation technologique. Spécialisé dans ${
+            provider.job?.title || "l'intelligence artificielle"
+          }, il/elle combine expertise technique et vision stratégique pour créer des solutions intelligentes qui transforment les industries. Avec une approche centrée sur l'utilisateur et une expertise approfondie dans les technologies émergentes, ${
+            provider.firstName
+          } s'efforce de développer des solutions qui répondent aux défis complexes du monde moderne.`,
+        },
+        work: {
+          display: true,
+          title: "Mon expérience professionnelle",
+          experiences: experiences.map((exp) => {
+            const startYear = exp.startedAt
+              ? String(exp.startedAt).slice(0, 4)
+              : "";
+            const endYear = exp.endedAt
+              ? String(exp.endedAt).slice(0, 4)
+              : "Aujourd'hui";
+            const achievements: string[] = [
+              exp.firstTask,
+              ...(exp.secondTask ? [exp.secondTask] : []),
+              ...(exp.thirdTask ? [exp.thirdTask] : []),
+            ].filter(Boolean);
+            return {
+              company: exp.companyName,
+              timeframe: `${startYear} - ${endYear}`.trim(),
+              role: exp.title,
+              achievements,
+              images: exp.companyLogo
+                ? [
+                    {
+                      src: exp.companyLogo,
+                      alt: exp.companyName,
+                      width: 16,
+                      height: 9,
+                    },
+                  ]
+                : [],
+            };
+          }),
+        },
+        studies: {
+          display: true,
+          title: "Études et Formation",
+          institutions: educations.map((edu) => {
+            const startYear = edu.startedAt
+              ? String(edu.startedAt).slice(0, 4)
+              : "";
+            const endYear = edu.endedAt
+              ? String(edu.endedAt).slice(0, 4)
+              : "Aujourd'hui";
+            return {
+              degreeTitle: edu.title,
+              institutionName: edu.institutionName,
+              yearsAttended: `${startYear} - ${endYear}`.trim(),
+              programDescription: edu.description,
+            };
+          }),
+        },
+        technical: {
+          display: true,
+          title: "Mes Technologies et Compétences",
+          skills: (() => {
+            const hardSkills = provider.hardSkills || [];
+            const softSkills = provider.softSkills || [];
+
+            if (!hardSkills.length && !softSkills.length) return [];
+
+            const skills = [];
+
+            if (hardSkills.length > 0) {
+              skills.push({
+                title: "Compétences Techniques",
+                description: hardSkills.join(" · "),
+                images: [],
+              });
+            }
+
+            if (softSkills.length > 0) {
+              skills.push({
+                title: "Compétences Comportementales",
+                description: softSkills.join(" · "),
+                images: [],
+              });
+            }
+
+            return skills;
+          })(),
+        },
+        calendar: {
+          display: false,
+          link: "#",
+        },
+        tableOfContent: {
+          display: true,
+        },
+        avatar: {
+          display: true,
+        },
+      }
+    : null;
+
+  // Social links vides pour l'instant
+  const social: any[] = [];
+
+  // Fonction simple pour les URLs d'images
+  const makeAbsolute = (url?: string) => {
+    if (!url) return undefined;
+    if (/^https?:\/\//i.test(url)) return url;
+    const apiBase =
+      process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000/api/v1";
+    const origin = new URL(apiBase).origin;
+    return url.startsWith("/") ? `${origin}${url}` : `${origin}${url}`;
+  };
 
   if (loading) {
     return (
@@ -49,7 +202,12 @@ export default function ProviderAboutPage({ params }: ProviderAboutPageProps) {
 
   return (
     <>
-      <About provider={provider} social={social} about={about} />
+      <About
+        provider={provider}
+        social={social}
+        about={about}
+        makeAbsolute={makeAbsolute}
+      />
     </>
   );
 }
@@ -58,10 +216,12 @@ function About({
   provider,
   social,
   about,
+  makeAbsolute,
 }: {
   provider: any;
   social: any[];
   about: any;
+  makeAbsolute: (url?: string) => string | undefined;
 }) {
   const structure = [
     {
@@ -106,7 +266,8 @@ function About({
         author={{
           name: `${provider.firstName} ${provider.lastName}`,
           url: `${baseURL}/providers/${provider.slug}/about`,
-          image: `${baseURL}${provider.avatar}`,
+          image:
+            makeAbsolute(provider.avatar) || `${baseURL}${provider.avatar}`,
         }}
       />
       {about.tableOfContent.display && (
@@ -134,7 +295,7 @@ function About({
               flex={3}
               horizontal="center"
             >
-              <Avatar src={provider.avatar} size="xl" />
+              <Avatar src={makeAbsolute(provider.avatar) || ""} size="xl" />
               <Flex gap="8" vertical="center">
                 <Icon onBackground="accent-weak" name="globe" />
                 {provider.location?.name}
@@ -142,8 +303,8 @@ function About({
               {provider.languages && provider.languages.length > 0 && (
                 <Flex wrap gap="8">
                   {provider.languages.map((language: any, index: number) => (
-                    <Tag key={language.name || language} size="l">
-                      {language.name || language}
+                    <Tag key={language} size="l">
+                      {language}
                     </Tag>
                   ))}
                 </Flex>
@@ -325,7 +486,7 @@ function About({
                                     radius="m"
                                     sizes={image.width.toString()}
                                     alt={image.alt}
-                                    src={image.src}
+                                    src={makeAbsolute(image.src) || ""}
                                   />
                                 </Flex>
                               )
@@ -372,7 +533,6 @@ function About({
                         >
                           {institution.yearsAttended}
                         </Text>
-
                         <Text
                           variant="heading-default-xs"
                           onBackground="neutral-weak"
@@ -421,7 +581,7 @@ function About({
                                 radius="m"
                                 sizes={image.width.toString()}
                                 alt={image.alt}
-                                src={image.src}
+                                src={makeAbsolute(image.src) || ""}
                               />
                             </Flex>
                           ))}

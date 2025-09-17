@@ -7,6 +7,7 @@ export { Mailchimp } from "@/components/Mailchimp";
 export { ProjectCard } from "@/components/ProjectCard";
 export { HeadingLink } from "@/components/HeadingLink";
 export { RouteGuard } from "@/components/RouteGuard";
+export { HomeActions } from "@/components/HomeActions";
 export { JoinButton } from "@/components/auth/JoinButton";
 export { default as ExperienceForm } from "@/components/forms/ExperienceForm";
 export { default as EducationForm } from "@/components/forms/EducationForm";

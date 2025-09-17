@@ -466,7 +466,11 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
                       value={currentMonth}
                       onChange={(e) => {
                         e.stopPropagation();
+                        e.preventDefault();
                         handleMonthChangeDirect(Number(e.target.value));
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
                       }}
                       aria-label="Select month"
                     >
@@ -480,7 +484,11 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
                       value={currentYear}
                       onChange={(e) => {
                         e.stopPropagation();
+                        e.preventDefault();
                         handleYearChangeDirect(Number(e.target.value));
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
                       }}
                       aria-label="Select year"
                     >

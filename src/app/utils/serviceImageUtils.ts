@@ -1,15 +1,20 @@
 import serviceImagesData from '@/data/serviceImages.json';
-import { ServiceImage, ServiceImageFilters, ServiceImagesGroup } from '../types/serviceImage';
+import { ServiceImage, ServiceImageFilters } from '../types/serviceImage';
+
+// Type local pour grouper les images par service
+interface ServiceImagesGroup {
+  serviceId: number;
+  images: ServiceImage[];
+}
 
 /**
  * Récupère toutes les images de service
  */
 export const getAllServiceImages = (): ServiceImage[] => {
   return serviceImagesData.map(image => ({
-    imageId: image.image_id,
-    serviceId: image.service_id,
-    title: image.title,
-    url: image.url
+    id: image.serviceImageId,
+    serviceContentId: image.serviceContentId,
+    url: image.imageUrl
   }));
 };
 
@@ -17,14 +22,14 @@ export const getAllServiceImages = (): ServiceImage[] => {
  * Récupère les images d'un service spécifique
  */
 export const getServiceImages = (serviceId: number): ServiceImage[] => {
-  return getAllServiceImages().filter(image => image.serviceId === serviceId);
+  return getAllServiceImages().filter(image => image.serviceContentId === serviceId);
 };
 
 /**
  * Récupère une image spécifique par son ID
  */
 export const getServiceImageById = (imageId: number): ServiceImage | undefined => {
-  return getAllServiceImages().find(image => image.imageId === imageId);
+  return getAllServiceImages().find(image => image.id === imageId);
 };
 
 /**
@@ -33,14 +38,8 @@ export const getServiceImageById = (imageId: number): ServiceImage | undefined =
 export const filterServiceImages = (filters: ServiceImageFilters): ServiceImage[] => {
   let images = getAllServiceImages();
 
-  if (filters.serviceId !== undefined) {
-    images = images.filter(image => image.serviceId === filters.serviceId);
-  }
-
-  if (filters.title) {
-    images = images.filter(image => 
-      image.title.toLowerCase().includes(filters.title!.toLowerCase())
-    );
+  if (filters.serviceContentId !== undefined) {
+    images = images.filter(image => image.serviceContentId === filters.serviceContentId);
   }
 
   return images;
@@ -54,14 +53,14 @@ export const groupServiceImagesByService = (): ServiceImagesGroup[] => {
   const grouped: { [key: number]: ServiceImage[] } = {};
 
   images.forEach(image => {
-    if (!grouped[image.serviceId]) {
-      grouped[image.serviceId] = [];
+    if (!grouped[image.serviceContentId]) {
+      grouped[image.serviceContentId] = [];
     }
-    grouped[image.serviceId].push(image);
+    grouped[image.serviceContentId].push(image);
   });
 
-  return Object.entries(grouped).map(([serviceId, images]) => ({
-    serviceId: parseInt(serviceId),
+  return Object.entries(grouped).map(([serviceContentId, images]) => ({
+    serviceId: parseInt(serviceContentId),
     images
   }));
 };
@@ -71,7 +70,8 @@ export const groupServiceImagesByService = (): ServiceImagesGroup[] => {
  */
 export const getServiceCoverImage = (serviceId: number): ServiceImage | undefined => {
   const serviceImages = getServiceImages(serviceId);
-  return serviceImages.find(image => image.title.includes('cover')) || serviceImages[0];
+  // Cherche d'abord une image avec "cover" dans l'URL, sinon prend la première
+  return serviceImages.find(image => image.url.includes('cover')) || serviceImages[0];
 };
 
 /**
@@ -83,9 +83,9 @@ export const getAllServiceCoverImages = (): ServiceImage[] => {
   const processedServices = new Set<number>();
 
   allImages.forEach(image => {
-    if (image.title.includes('cover') && !processedServices.has(image.serviceId)) {
+    if (image.url.includes('cover') && !processedServices.has(image.serviceContentId)) {
       coverImages.push(image);
-      processedServices.add(image.serviceId);
+      processedServices.add(image.serviceContentId);
     }
   });
 

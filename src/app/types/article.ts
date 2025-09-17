@@ -11,7 +11,7 @@ export interface Article {
   summary: string;             // Résumé de l'article
   isPublished: boolean;        // Si l'article est publié
   isFeatured: boolean;         // Si l'article est mis en avant
-  articleCover: string;        // URL de l'image de couverture
+  cover: string;        // URL de l'image de couverture
   tags: Tag[];                 // Tag/catégorie de l'article
   sections: ArticleSection [];  // Sections de contenu
 }

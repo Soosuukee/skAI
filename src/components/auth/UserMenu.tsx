@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { Flex, Text, Avatar, Button } from "@/once-ui/components";
-import { UserRoleService } from "@/app/utils/userRoleService";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
@@ -15,20 +14,16 @@ export function UserMenu() {
   if (!user) return null;
 
   // Normaliser id/role si l'API renvoie id & type
-  const normalizedUserId = (user as any)?.user_id ?? (user as any)?.id;
   const normalizedRole = (user as any)?.role ?? (user as any)?.type;
-
-  // Récupérer les informations complètes de l'utilisateur (fallback local JSON)
-  const userWithDetails = normalizedUserId
-    ? UserRoleService.getUserWithDetails(normalizedUserId)
-    : null;
+  // Identifiants utiles exposés par l'API externe
+  const normalizedUserId = (user as any)?.id ?? (user as any)?.user_id;
 
   const makeAbsolute = (url?: string) => {
     if (!url) return undefined;
     if (/^https?:\/\//i.test(url)) return url;
     try {
       const apiBase =
-        process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080/api/v1";
+        process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000/api/v1";
       const origin = new URL(apiBase).origin;
       return url.startsWith("/")
         ? `${origin}${url}`
@@ -56,19 +51,7 @@ export function UserMenu() {
     avatarSrc = makeAbsolute(directAvatar) || avatarSrc;
   }
 
-  // 2) Sinon, fallback sur les détails enrichis locaux (providers/clients.json)
-  if (userWithDetails) {
-    if (!directFirst && userWithDetails.provider) {
-      displayName = `${userWithDetails.provider.firstName} ${userWithDetails.provider.lastName}`;
-      avatarSrc = userWithDetails.provider.avatar;
-    } else if (!directFirst && userWithDetails.client) {
-      displayName = `${userWithDetails.client.firstName} ${userWithDetails.client.lastName}`;
-      avatarSrc = userWithDetails.client.avatar;
-    } else if (!directFirst && userWithDetails.admin) {
-      displayName = `${userWithDetails.admin.firstName} ${userWithDetails.admin.lastName}`;
-      avatarSrc = userWithDetails.admin.avatar;
-    }
-  }
+  // Pas de fallback local: si l'API ne fournit pas de nom, on garde l'email tronqué
 
   // Fermer le menu si on clique à l'extérieur
   useEffect(() => {

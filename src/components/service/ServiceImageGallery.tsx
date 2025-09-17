@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { ServiceImage } from "@/app/types/serviceImage";
-import { useServiceImages } from "@/app/hooks/useServiceImages";
+import { useServiceImages } from "@/app/hooks/services";
 import styles from "./ServiceImageGallery.module.scss";
 
 interface ServiceImageGalleryProps {

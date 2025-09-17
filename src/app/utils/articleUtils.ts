@@ -62,7 +62,8 @@ export async function getAllArticles(): Promise<Article[]> {
     if (!response.ok) {
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
-    const data = await parseJsonSafe<any[]>(response);
+    const json = await parseJsonSafe<{ success: boolean; data: any[] }>(response);
+    const data = json.data;
     return data.map(normalizeArticle).map(withResolvedCover);
   } catch (error) {
     console.error('Erreur lors de la récupération des articles:', error);
@@ -79,7 +80,8 @@ export async function getArticlesByProvider(providerId: number): Promise<Article
     if (!response.ok) {
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
-    const data = await parseJsonSafe<any[]>(response);
+    const json = await parseJsonSafe<{ success: boolean; data: any[] }>(response);
+    const data = json.data;
     return data.map(normalizeArticle).map(withResolvedCover);
   } catch (error) {
     console.error('Erreur lors de la récupération des articles du provider:', error);
@@ -97,8 +99,8 @@ export async function getArticleBySlug(slug: string): Promise<Article | undefine
       if (response.status === 404) return undefined;
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
-    const data = await parseJsonSafe<any>(response);
-    return withResolvedCover(normalizeArticle(data));
+    const json = await parseJsonSafe<{ success: boolean; data: any }>(response);
+    return withResolvedCover(normalizeArticle(json.data));
   } catch (error) {
     console.error('Erreur lors de la récupération de l\'article par slug:', error);
     return undefined;
@@ -115,8 +117,8 @@ export async function getArticleBySlugAndProvider(articleSlug: string, providerI
       if (response.status === 404) return undefined;
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
-    const data = await parseJsonSafe<any>(response);
-    return withResolvedCover(normalizeArticle(data));
+    const json = await parseJsonSafe<{ success: boolean; data: any }>(response);
+    return withResolvedCover(normalizeArticle(json.data));
   } catch (error) {
     console.error('Erreur lors de la récupération de l\'article par slug et provider:', error);
     return undefined;

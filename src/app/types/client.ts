@@ -6,10 +6,12 @@ export interface Client {
     profilePicture: string | null;
     joinedAt: string;
     slug: string;
-    countryId: number;
+    countryId?: number;
     city: string;
     state?: string | null;
     postalCode?: string | null;
     address?: string | null;
     role: 'client';
+    // Nouveaux champs disponibles via JWT Lexik
+    country?: string; // Nom du pays au lieu de juste l'ID
   }

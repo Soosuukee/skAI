@@ -2,6 +2,7 @@ import React from "react";
 import { Column, Heading, Flex, SmartLink } from "@/once-ui/components";
 import { baseURL } from "@/app/resources";
 import { Meta } from "@/once-ui/modules";
+import { HomeActions } from "@/components";
 
 export async function generateMetadata() {
   return Meta.generate({
@@ -61,6 +62,7 @@ export default function RootPage() {
           >
             Voir les prestataires
           </SmartLink>
+          <HomeActions />
         </Flex>
       </Column>
     </Column>

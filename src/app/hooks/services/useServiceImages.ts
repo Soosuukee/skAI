@@ -7,8 +7,8 @@ import {
   groupServiceImagesByService,
   getServiceCoverImage,
   getAllServiceCoverImages
-} from '../utils/serviceImageUtils';
-import { ServiceImage, ServiceImageFilters } from '../types/serviceImage';
+} from '../../utils/serviceImageUtils';
+import { ServiceImage, ServiceImageFilters } from '../../types/serviceImage';
 
 /**
  * Hook pour récupérer toutes les images de service
@@ -49,7 +49,18 @@ export const useGroupedServiceImages = () => {
  * Hook pour récupérer l'image de couverture d'un service
  */
 export const useServiceCoverImage = (serviceId: number) => {
-  return useMemo(() => getServiceCoverImage(serviceId), [serviceId]);
+  const image = useMemo(() => getServiceCoverImage(serviceId), [serviceId]);
+  
+  return {
+    coverImage: image ? {
+      src: image.url,
+      alt: `Image de couverture du service ${serviceId}`,
+      width: 400,
+      height: 225
+    } : undefined,
+    loading: false,
+    error: null
+  };
 };
 
 /**

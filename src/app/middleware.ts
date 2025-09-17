@@ -3,8 +3,9 @@ import type { NextRequest } from "next/server";
 
 // Routes qui nécessitent une authentification
 const protectedRoutes = [
-  "/dashboard", 
+  "/dashboard",
   "/profile",
+  "/me",
   "/admin",
 ];
 
@@ -24,11 +25,14 @@ const publicRoutes = [
   "/providers",
   "/service",
   "/join",
+  "/me",
+  "/login",
   "/servicecreation",
   "/experiencecreation",
   "/educationcreation",
   "/articlecreation",
   "/test-datepicker",
+  "/mdx-test",
   "/work",
   "/api",
 ];

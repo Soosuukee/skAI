@@ -31,6 +31,7 @@ interface ArticleFormProps {
   onSubmit: (values: ArticleFormValues) => Promise<void> | void;
   submittingLabel?: string;
   submitLabel?: string;
+  onLiveUpdate?: (data: any) => void; // Nouvelle prop pour récupérer les données en temps réel
 }
 
 const defaultValues: ArticleFormValues = {
@@ -41,6 +42,7 @@ const defaultValues: ArticleFormValues = {
   summary: "",
   isPublished: false,
   isFeatured: false,
+  cover: "",
   articleCoverFile: null,
 };
 
@@ -53,6 +55,7 @@ export default function ArticleForm({
   onSubmit,
   submittingLabel = "Enregistrement...",
   submitLabel = "Enregistrer",
+  onLiveUpdate,
 }: ArticleFormProps) {
   const [values, setValues] = useState<ArticleFormValues>({
     ...defaultValues,
@@ -66,8 +69,26 @@ export default function ArticleForm({
   ]);
   const [newImage, setNewImage] = useState<{ url: string }>({ url: "" });
 
+  // Fonction helper pour envoyer les données mises à jour
+  const sendLiveUpdate = (
+    newValues: ArticleFormValues,
+    newSections: SectionDraft[]
+  ) => {
+    if (onLiveUpdate) {
+      onLiveUpdate({
+        ...newValues,
+        sections: newSections,
+      });
+    }
+  };
+
   const handleChange = (field: keyof ArticleFormValues, value: any) => {
-    setValues((prev) => ({ ...prev, [field]: value }));
+    setValues((prev) => {
+      const newValues = { ...prev, [field]: value };
+      // Envoyer les données mises à jour pour l'aperçu en temps réel
+      sendLiveUpdate(newValues, sections);
+      return newValues;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -140,13 +161,15 @@ export default function ArticleForm({
                     id={`section-title-${si}`}
                     label={`Titre de la section ${si + 1}`}
                     value={section.title}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setSections((prev) =>
-                        prev.map((s, i) =>
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setSections((prev) => {
+                        const newSections = prev.map((s, i) =>
                           i === si ? { ...s, title: e.target.value } : s
-                        )
-                      )
-                    }
+                        );
+                        sendLiveUpdate(values, newSections);
+                        return newSections;
+                      });
+                    }}
                   />
                   {section.contents.map((content, ci) => (
                     <Card key={ci} style={{ padding: 12 }}>
@@ -157,9 +180,9 @@ export default function ArticleForm({
                           value={content.content}
                           onChange={(
                             e: React.ChangeEvent<HTMLTextAreaElement>
-                          ) =>
-                            setSections((prev) =>
-                              prev.map((s, i) =>
+                          ) => {
+                            setSections((prev) => {
+                              const newSections = prev.map((s, i) =>
                                 i !== si
                                   ? s
                                   : {
@@ -170,9 +193,11 @@ export default function ArticleForm({
                                           : c
                                       ),
                                     }
-                              )
-                            )
-                          }
+                              );
+                              sendLiveUpdate(values, newSections);
+                              return newSections;
+                            });
+                          }}
                         />
                         {/* Images for this content block */}
                         <Column gap="4">

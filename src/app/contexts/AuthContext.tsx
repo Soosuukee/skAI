@@ -7,16 +7,17 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import { User } from "@/app/utils/userUtils";
+import { Provider } from "@/app/types/provider";
+import { Client } from "@/app/types/client";
+export type AppUser = Provider | Client;
 import * as authService from "@/app/utils/authService";
 
 interface AuthContextType {
-  user: User | null;
+  user: AppUser | null;
   isLoading: boolean;
   login: (
     email: string,
-    password: string,
-    userType?: "provider" | "client" | "admin"
+    password: string
   ) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   checkAuth: () => Promise<void>;
@@ -29,7 +30,7 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Vérifier l'authentification au chargement
@@ -42,7 +43,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const token = localStorage.getItem("authToken") || undefined;
       const result = await authService.checkAuth(token);
       if (result.authenticated && result.user) {
-        setUser(result.user as User);
+        setUser(result.user as AppUser);
       } else {
         setUser(null);
       }
@@ -57,16 +58,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const login = async (
-    email: string,
-    password: string,
-    userType?: "provider" | "client" | "admin"
-  ) => {
+  const login = async (email: string, password: string) => {
     try {
-      const data = await authService.login(email, password, userType);
+      const data = await authService.login(email, password);
       if (data.success) {
         if (data.token) localStorage.setItem("authToken", data.token);
-        if (data.user) setUser(data.user as User);
+        if (data.user) setUser(data.user as AppUser);
         return { success: true };
       }
       return { success: false, message: data.message };

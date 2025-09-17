@@ -11,9 +11,7 @@ interface LoginFormProps {
 export function LoginForm({ onClose }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState<"provider" | "client" | "admin">(
-    "client"
-  );
+  // Plus besoin de userType avec JWT Lexik - le type est déterminé automatiquement
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
@@ -40,7 +38,7 @@ export function LoginForm({ onClose }: LoginFormProps) {
     setLoading(true);
     setError("");
 
-    const result = await login(email, password, userType);
+    const result = await login(email, password);
 
     if (result.success) {
       onClose();
@@ -61,15 +59,7 @@ export function LoginForm({ onClose }: LoginFormProps) {
     setPassword(e.target.value);
   };
 
-  const cycleUserType = (e?: React.MouseEvent<HTMLButtonElement>) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    setUserType((prev) =>
-      prev === "client" ? "provider" : prev === "provider" ? "admin" : "client"
-    );
-  };
+  // Fonction supprimée - plus besoin de cycleUserType avec JWT Lexik
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     // Ferme seulement si on clique sur l'overlay, pas sur le contenu
@@ -136,21 +126,7 @@ export function LoginForm({ onClose }: LoginFormProps) {
               />
             </Column>
 
-            <Flex gap="8" vertical="center">
-              <Text variant="body-default-s" color="neutral-medium">
-                Type d'utilisateur:
-              </Text>
-              <Button
-                type="button"
-                variant="secondary"
-                size="s"
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                  cycleUserType(e)
-                }
-              >
-                {userType}
-              </Button>
-            </Flex>
+            {/* Plus besoin de sélectionner le type d'utilisateur - JWT Lexik le détermine automatiquement */}
 
             {error && (
               <Text variant="body-default-s" color="error">
@@ -177,6 +153,8 @@ export function LoginForm({ onClose }: LoginFormProps) {
               <strong>Client :</strong> client1@example.com
               <br />
               <strong>Mot de passe :</strong> test123
+              <br />
+              <em>Le type d'utilisateur est détecté automatiquement</em>
             </Text>
           </Column>
         </form>

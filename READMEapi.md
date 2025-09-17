@@ -1,6 +1,6 @@
 ## IaPlatform API – Guide pour le Front
 
-Base URL: `http://localhost:8080/api/v1`
+Base URL: `http://localhost:8081/api/v1`
 
 - CORS: origine reflétée automatiquement (pas limité à une URL). Cookies autorisés.
 - Placeholders: `{id}` (`{id:\d+}`), `{providerSlug}`, `{clientSlug}`, `{serviceSlug}`, `{articleSlug}`, `{tagSlug}`.
@@ -9,7 +9,7 @@ Base URL: `http://localhost:8080/api/v1`
 
 - (Public) POST `/auth/login`: connexion, crée une session (cookie PHPSESSID).
 - (Privé) POST `/auth/logout`: déconnexion de la session courante.
-- (Privé) GET `/auth/me`: infos de l’utilisateur courant (selon session).
+- (Privé) GET `/me`: infos de l'utilisateur courant (selon token JWT).
 - (Public) POST `/auth/register`: inscription (client ou provider selon payload).
 - (Privé) POST `/auth/change-password`: changer le mot de passe.
 

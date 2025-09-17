@@ -1,243 +1,233 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import {
+  Column,
+  Flex,
   Heading,
   Text,
   SmartImage,
-  Column,
-  RevealFx,
-  Flex,
-  Tag,
+  Input,
+  Textarea,
 } from "@/once-ui/components";
-import { formatDate } from "@/app/utils/formatDate";
-import { useRouter, usePathname } from "next/navigation";
-import { Article } from "@/app/types/article";
-import { Provider } from "@/app/types/provider";
+import { CustomRevealFx } from "@/components/CustomRevealFx";
 
-export function ArticleRenderer() {
-  const [article, setArticle] = useState<Article | null>(null);
-  const [provider, setProvider] = useState<Provider | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const router = useRouter();
-  const pathname = usePathname();
-
-  useEffect(() => {
-    async function fetchArticleData() {
-      // Extraire les paramètres depuis l'URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const articleSlug = urlParams.get("slug");
-      const providerSlug = urlParams.get("provider");
-
-      console.log("Debug - articleSlug:", articleSlug);
-      console.log("Debug - providerSlug:", providerSlug);
-
-      if (!articleSlug) {
-        setError("Slug de l'article manquant");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        console.log(
-          "Debug - Fetching article from:",
-          `/api/articles/${articleSlug}`
-        );
-        // Récupérer l'article depuis l'API
-        const articleResponse = await fetch(`/api/articles/${articleSlug}`);
-        if (!articleResponse.ok) {
-          throw new Error("Article non trouvé");
-        }
-        const articleData: Article = await articleResponse.json();
-        setArticle(articleData);
-
-        console.log("Debug - Article data:", articleData);
-
-        // Récupérer le provider depuis l'API
-        try {
-          // Utiliser le providerId de l'article pour récupérer le provider
-          console.log("Debug - Article providerId:", articleData.providerId);
-          console.log(
-            "Debug - Fetching provider from:",
-            `/api/providers/id/${articleData.providerId}`
-          );
-
-          const providerResponse = await fetch(
-            `/api/providers/id/${articleData.providerId}`
-          );
-          if (providerResponse.ok) {
-            const providerData: Provider = await providerResponse.json();
-            setProvider(providerData);
-            console.log("Debug - Provider data:", providerData);
-          } else {
-            console.warn(
-              `Provider non trouvé pour l'ID: ${articleData.providerId}`
-            );
-          }
-        } catch (providerError) {
-          console.error(
-            "Erreur lors de la récupération du provider:",
-            providerError
-          );
-          // On continue sans le provider si il y a une erreur
-        }
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Une erreur est survenue"
-        );
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchArticleData();
-  }, [pathname]);
-
-  if (loading) {
-    return (
-      <Column maxWidth="m" gap="xl" horizontal="center" paddingY="24">
-        <Text>Chargement de l'article...</Text>
-      </Column>
-    );
+// Fonction pour convertir les URLs relatives en URLs absolues de l'API
+const makeAbsolute = (url?: string) => {
+  if (!url) return undefined;
+  if (/^https?:\/\//i.test(url)) return url;
+  try {
+    const apiBase =
+      process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000/api/v1";
+    const origin = new URL(apiBase).origin;
+    return url.startsWith("/")
+      ? `${origin}${url}`
+      : `${apiBase.replace(/\/$/, "")}/${url}`;
+  } catch {
+    return url;
   }
+};
 
-  if (error || !article) {
-    return (
-      <Column maxWidth="m" gap="xl" horizontal="center" paddingY="24">
-        <Text color="error">Erreur: {error || "Article non trouvé"}</Text>
-      </Column>
-    );
-  }
-
-  const renderSection = (section: any, index: number) => {
-    const delay = (index + 1) * 0.1;
-
-    switch (section.type) {
-      case "heading":
-        return (
-          <RevealFx key={index} translateY={4} delay={delay}>
-            <Heading
-              variant={
-                section.level === 1 ? "display-strong-s" : "heading-strong-l"
-              }
-              marginBottom="m"
-              marginTop={section.level === 1 ? "0" : "xl"}
-            >
-              {section.content}
-            </Heading>
-          </RevealFx>
-        );
-
-      case "paragraph":
-        return (
-          <RevealFx key={index} translateY={4} delay={delay}>
-            <Text variant="body-default-l" marginBottom="m">
-              {section.content}
-            </Text>
-          </RevealFx>
-        );
-
-      case "list":
-        return (
-          <RevealFx key={index} translateY={4} delay={delay}>
-            <ul style={{ marginBottom: "1rem", paddingLeft: "1.5rem" }}>
-              {section.items?.map((item: string, itemIndex: number) => (
-                <li key={itemIndex} style={{ marginBottom: "0.5rem" }}>
-                  <Text variant="body-default-l">{item}</Text>
-                </li>
-              ))}
-            </ul>
-          </RevealFx>
-        );
-
-      case "image":
-        return (
-          <RevealFx key={index} translateY={4} delay={delay}>
-            <SmartImage
-              src={section.src || ""}
-              alt={section.alt || ""}
-              aspectRatio={section.aspectRatio || "16/9"}
-              radius="l"
-              marginBottom="16"
-            />
-          </RevealFx>
-        );
-
-      default:
-        return (
-          <RevealFx key={index} translateY={4} delay={delay}>
-            <Text variant="body-default-l" marginBottom="m">
-              {section.content}
-            </Text>
-          </RevealFx>
-        );
-    }
-  };
-
+// Composant simple pour le rendu MDX en temps réel
+export const ArticleRenderer: React.FC<{
+  title?: string;
+  summary?: string;
+  cover?: string;
+  sections?: Array<{
+    title: string;
+    contents: Array<{
+      content: string;
+      images: Array<{ url: string }>;
+    }>;
+  }>;
+}> = ({
+  title = "Titre de l'article",
+  summary = "Résumé de l'article...",
+  cover = "",
+  sections = [],
+}) => {
   return (
-    <Column maxWidth="m" gap="xl" horizontal="center">
-      {/* Header de l'article */}
-      <Column fillWidth paddingY="24" gap="m">
-        <RevealFx translateY={4} delay={0.1} fillWidth>
-          <Heading wrap="balance" variant="display-strong-l">
-            {article.title}
-          </Heading>
-        </RevealFx>
+    <Column gap="l" fillWidth>
+      {/* En-tête de l'article */}
+      <CustomRevealFx translateY={4} delay={0.1} fillWidth>
+        <Column padding="l" border="neutral-alpha-medium" radius="m" gap="m">
+          {/* Image de couverture */}
+          {cover && (
+            <SmartImage
+              src={makeAbsolute(cover) || ""}
+              alt={`Image de couverture - ${title}`}
+              width={600}
+              height={338}
+              radius="s"
+              style={{
+                objectFit: "cover",
+                aspectRatio: "16/9",
+                width: "100%",
+                maxHeight: "400px",
+              }}
+            />
+          )}
 
-        <RevealFx translateY={4} fillWidth delay={0.2}>
-          <Text variant="body-default-l" color="neutral-medium">
-            {article.summary}
-          </Text>
-        </RevealFx>
-
-        <RevealFx translateY={4} fillWidth delay={0.3}>
-          <Flex gap="16" vertical="center">
-            {provider && (
-              <Text variant="body-default-s" color="neutral-medium">
-                Par {provider.firstName} {provider.lastName}
-              </Text>
-            )}
-            <Text variant="body-default-s" color="neutral-medium">
-              {formatDate(article.publishedAt, false)}
+          {/* Titre et résumé */}
+          <Column gap="s">
+            <Heading as="h1" variant="display-strong-l">
+              {title}
+            </Heading>
+            <Text variant="body-default-l" color="neutral-medium">
+              {summary}
             </Text>
-            {article.tag && <Tag label={article.tag} variant="neutral" />}
-          </Flex>
-        </RevealFx>
-      </Column>
-
-      {/* Image de couverture */}
-      {article.articleCover && (
-        <RevealFx translateY={4} fillWidth delay={0.4}>
-          <SmartImage
-            src={article.articleCover}
-            alt={`Couverture de l'article: ${article.title}`}
-            aspectRatio="16 / 9"
-            radius="l"
-          />
-        </RevealFx>
-      )}
-
-      {/* Contenu de l'article */}
-      <Column as="article" fillWidth>
-        {article.section?.map((section, index) =>
-          renderSection(section, index)
-        )}
-      </Column>
-
-      {/* Footer */}
-      <RevealFx translateY={4} fillWidth delay={0.5}>
-        <Column gap="16" horizontal="center" paddingY="32">
-          <Text variant="body-default-l" color="neutral-medium">
-            {provider &&
-              `Retour au blog de ${provider.firstName} ${provider.lastName}`}
-          </Text>
+          </Column>
         </Column>
-      </RevealFx>
+      </CustomRevealFx>
+
+      {/* Contenu de l'article - Sections du formulaire */}
+      {sections.map((section, sectionIndex) => (
+        <CustomRevealFx
+          key={sectionIndex}
+          translateY={4}
+          delay={0.2 + sectionIndex * 0.1}
+          fillWidth
+        >
+          <Column padding="l" border="neutral-alpha-medium" radius="m" gap="m">
+            {/* Titre de section */}
+            {section.title && (
+              <Heading as="h2" variant="display-strong-m">
+                {section.title}
+              </Heading>
+            )}
+
+            {/* Contenu de la section */}
+            {section.contents.map((content, contentIndex) => (
+              <div key={contentIndex}>
+                {/* Texte du contenu */}
+                {content.content && (
+                  <Text variant="body-default-l" marginY="m">
+                    {content.content}
+                  </Text>
+                )}
+
+                {/* Images du contenu */}
+                {content.images.map((image, imageIndex) => (
+                  <SmartImage
+                    key={imageIndex}
+                    src={makeAbsolute(image.url) || ""}
+                    alt={`Image ${imageIndex + 1}`}
+                    width={600}
+                    height={400}
+                    radius="m"
+                    style={{
+                      width: "100%",
+                      maxWidth: "100%",
+                      height: "auto",
+                      margin: "16px 0",
+                    }}
+                  />
+                ))}
+              </div>
+            ))}
+          </Column>
+        </CustomRevealFx>
+      ))}
     </Column>
   );
-}
+};
+
+// Composant de test simple avec formulaire + aperçu en temps réel
+export const SimpleMDXPreview: React.FC = () => {
+  const [title, setTitle] = useState("Mon titre d'article");
+  const [subtitle, setSubtitle] = useState("Mon sous-titre");
+  const [text, setText] = useState(
+    "Voici le contenu de mon article. Il sera rendu en temps réel !"
+  );
+
+  // Génération du MDX string en temps réel
+  const mdxString = useMemo(() => {
+    return `# ${title}\n\n## ${subtitle}\n\n${text}`;
+  }, [title, subtitle, text]);
+
+  return (
+    <Column maxWidth="l" gap="xl" horizontal="center" paddingY="24">
+      <Heading variant="display-strong-m">Test MDX en temps réel</Heading>
+
+      <Flex gap="l" fillWidth>
+        {/* Formulaire à gauche */}
+        <Column gap="m" style={{ flex: 1 }}>
+          <Heading variant="display-strong-s">Formulaire</Heading>
+
+          <Column gap="s">
+            <Text variant="label-default-m">Titre</Text>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Entrez votre titre..."
+              style={{ width: "100%" }}
+            />
+          </Column>
+
+          <Column gap="s">
+            <Text variant="label-default-m">Sous-titre</Text>
+            <Input
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              placeholder="Entrez votre sous-titre..."
+              style={{ width: "100%" }}
+            />
+          </Column>
+
+          <Column gap="s">
+            <Text variant="label-default-m">Contenu</Text>
+            <Textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Entrez votre contenu..."
+              rows={6}
+              style={{ width: "100%" }}
+            />
+          </Column>
+        </Column>
+
+        {/* Aperçu MDX à droite */}
+        <Column gap="m" style={{ flex: 1 }}>
+          <Heading variant="display-strong-s">Aperçu MDX</Heading>
+
+          <Column
+            padding="l"
+            border="neutral-alpha-medium"
+            radius="m"
+            gap="m"
+            style={{ minHeight: "200px" }}
+          >
+            {/* Rendu simple du titre, sous-titre et du texte */}
+            <Heading as="h1" variant="display-strong-l">
+              {title}
+            </Heading>
+            <Heading as="h2" variant="display-strong-m">
+              {subtitle}
+            </Heading>
+            <Text variant="body-default-l">{text}</Text>
+          </Column>
+
+          {/* Code MDX généré */}
+          <Column gap="s">
+            <Text variant="label-default-m">Code MDX généré :</Text>
+            <pre
+              style={{
+                backgroundColor: "var(--neutral-alpha-light)",
+                padding: "12px",
+                borderRadius: "6px",
+                fontSize: "12px",
+                fontFamily: "monospace",
+                overflow: "auto",
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              {mdxString}
+            </pre>
+          </Column>
+        </Column>
+      </Flex>
+    </Column>
+  );
+};
+
+export default ArticleRenderer;

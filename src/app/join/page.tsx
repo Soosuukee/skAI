@@ -10,19 +10,21 @@ import {
   Card,
 } from "@/once-ui/components";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { getApiBaseUrl } from "@/app/utils/api";
 import { useRouter } from "next/navigation";
 
 export default function JoinPage() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [formData, setFormData] = useState({
+    userType: "provider" as "provider" | "customer",
     firstName: "",
     lastName: "",
     email: "",
-    verificationCode: "",
+    password: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   const router = useRouter();
 
   // Rediriger si déjà connecté
@@ -46,9 +48,32 @@ export default function JoinPage() {
 
     try {
       if (step === 1) {
-        // validations basiques: prénom, nom, email
-        if (!formData.firstName || !formData.lastName || !formData.email) {
-          setError("Veuillez renseigner prénom, nom et email");
+        // validations basiques: type, prénom, nom, email, mot de passe
+        if (
+          !formData.userType ||
+          !formData.firstName ||
+          !formData.lastName ||
+          !formData.email ||
+          !formData.password
+        ) {
+          setError(
+            "Veuillez renseigner le type de compte, prénom, nom, email et mot de passe"
+          );
+          return;
+        }
+
+        // Noms et prénoms: uniquement des lettres (accents inclus), pas de chiffres ni caractères spéciaux
+        const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ]+$/;
+        if (!nameRegex.test(formData.firstName.trim())) {
+          setError(
+            "Le prénom ne doit contenir que des lettres (sans chiffres ni caractères spéciaux)"
+          );
+          return;
+        }
+        if (!nameRegex.test(formData.lastName.trim())) {
+          setError(
+            "Le nom ne doit contenir que des lettres (sans chiffres ni caractères spéciaux)"
+          );
           return;
         }
         const emailRegex = /.+@.+\..+/;
@@ -56,21 +81,45 @@ export default function JoinPage() {
           setError("Adresse email invalide");
           return;
         }
-        setStep(2);
-        return;
-      }
-
-      if (step === 2) {
-        if (formData.verificationCode.trim() !== "1234") {
-          setError("Code de vérification invalide");
+        // Mot de passe: minimum 8 caractères
+        const passwordRegex = /^.{8,}$/;
+        if (!passwordRegex.test(formData.password)) {
+          setError("Le mot de passe doit contenir au moins 8 caractères");
           return;
         }
-        // Email vérifié, on passe à l'étape suivante (à définir)
-        setStep(3);
+        // Soumission directe: appel API d'inscription externe
+        const baseUrl = getApiBaseUrl();
+        const registerUrl = `${baseUrl}/auth/register`;
+        const res = await fetch(registerUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userType: formData.userType,
+            email: formData.email,
+            password: formData.password,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+          }),
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => null);
+          setError(data?.message || "Inscription impossible");
+          return;
+        }
+
+        // Succès: connecter automatiquement puis rediriger vers l'accueil
+        const loginResult = await login(formData.email, formData.password);
+        if (!loginResult.success) {
+          setError(loginResult.message || "Connexion automatique impossible");
+          return;
+        }
+        router.push("/");
         return;
       }
 
-      // Étape 3: en attente de tes instructions pour les étapes suivantes
+      // Étapes de vérification supprimées
     } finally {
       setLoading(false);
     }
@@ -99,6 +148,38 @@ export default function JoinPage() {
             <Column gap="16">
               {step === 1 && (
                 <Column gap="16">
+                  {/* Sélection du type d'utilisateur */}
+                  <Column gap="8">
+                    <Text variant="label-default-m">Type de compte</Text>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <Button
+                        type="button"
+                        variant={
+                          formData.userType === "provider"
+                            ? "primary"
+                            : "secondary"
+                        }
+                        onClick={() =>
+                          handleInputChange("userType", "provider")
+                        }
+                      >
+                        Prestataire
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={
+                          formData.userType === "customer"
+                            ? "primary"
+                            : "secondary"
+                        }
+                        onClick={() =>
+                          handleInputChange("userType", "customer")
+                        }
+                      >
+                        Client
+                      </Button>
+                    </div>
+                  </Column>
                   <Column gap="8">
                     <Input
                       id="firstName"
@@ -133,19 +214,14 @@ export default function JoinPage() {
                       required
                     />
                   </Column>
-                </Column>
-              )}
-
-              {step === 2 && (
-                <Column gap="16">
                   <Column gap="8">
                     <Input
-                      id="verificationCode"
-                      label="Code de vérification"
-                      placeholder="Entrez le code reçu (1234)"
-                      value={formData.verificationCode}
+                      id="password"
+                      label="Mot de passe"
+                      type="password"
+                      value={formData.password}
                       onChange={(e) =>
-                        handleInputChange("verificationCode", e.target.value)
+                        handleInputChange("password", e.target.value)
                       }
                       required
                     />
@@ -153,17 +229,7 @@ export default function JoinPage() {
                 </Column>
               )}
 
-              {step === 3 && (
-                <Column gap="16">
-                  <Text
-                    variant="body-default-m"
-                    color="neutral-medium"
-                    style={{ textAlign: "center" }}
-                  >
-                    Email vérifié. Prochaine étape à définir.
-                  </Text>
-                </Column>
-              )}
+              {/* Étapes de vérification supprimées */}
 
               {error && (
                 <Text variant="body-default-s" color="error">
@@ -179,13 +245,11 @@ export default function JoinPage() {
                 {loading ? "Veuillez patienter..." : "Continuer"}
               </Button>
 
-              {step !== 2 && (
-                <Text
-                  variant="body-default-s"
-                  color="neutral-medium"
-                  style={{ textAlign: "center" }}
-                ></Text>
-              )}
+              <Text
+                variant="body-default-s"
+                color="neutral-medium"
+                style={{ textAlign: "center" }}
+              ></Text>
             </Column>
           </form>
         </Column>

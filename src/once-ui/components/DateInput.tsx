@@ -130,6 +130,7 @@ export const DateInput: React.FC<DateInputProps> = ({
       onOpenChange={setIsOpen}
       className={className}
       style={{ ...style }}
+      closeAfterClick={false}
     />
   );
 };

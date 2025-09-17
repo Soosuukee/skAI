@@ -33,7 +33,8 @@ export async function getAllServices(): Promise<Service[]> {
     if (!response.ok) {
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
-    return await parseJsonSafe<Service[]>(response);
+    const json = await parseJsonSafe<{ success: boolean; data: Service[] }>(response);
+    return json.data;
   } catch (error) {
     console.error('Erreur lors de la récupération des services:', error);
     return [];
@@ -49,12 +50,8 @@ export async function getServicesByProvider(providerId: number): Promise<Service
     if (!response.ok) {
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
-    const services: Service[] = await parseJsonSafe<Service[]>(response);
-    
-    return services.map(service => ({
-      ...service,
-      slug: service.slug || service.title.toLowerCase().replace(/\s+/g, '-')
-    }));
+    const srvJson = await parseJsonSafe<{ success: boolean; data: Service[] }>(response);
+    return srvJson.data;
   } catch (error) {
     console.error('Erreur lors de la récupération des services du provider:', error);
     return [];
@@ -91,7 +88,8 @@ export async function getServiceBySlug(slug: string): Promise<Service | undefine
       if (response.status === 404) return undefined;
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
-    const service: Service = await parseJsonSafe<Service>(response);
+    const json = await parseJsonSafe<{ success: boolean; data: Service }>(response);
+    const service = json.data;
     
     return {
       ...service,
@@ -113,7 +111,8 @@ export async function getServiceBySlugAndProvider(serviceSlug: string, providerI
       if (response.status === 404) return undefined;
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
-    const service: Service = await parseJsonSafe<Service>(response);
+    const json = await parseJsonSafe<{ success: boolean; data: Service }>(response);
+    const service = json.data;
     
     return {
       ...service,
@@ -166,13 +165,15 @@ export async function getAllServicesWithProviders() {
     if (!servicesResponse.ok) {
       throw new Error(`Erreur HTTP: ${servicesResponse.status}`);
     }
-    const services = await parseJsonSafe<any[]>(servicesResponse);
+    const srvJson = await parseJsonSafe<{ success: boolean; data: any[] }>(servicesResponse);
+    const services = srvJson.data;
 
     const providersResponse = await fetch(`${API_BASE_URL}/providers`, { credentials: 'include' });
     if (!providersResponse.ok) {
       throw new Error(`Erreur HTTP: ${providersResponse.status}`);
     }
-    const providers = await parseJsonSafe<any[]>(providersResponse);
+    const provJson = await parseJsonSafe<{ success: boolean; data: any[] }>(providersResponse);
+    const providers = provJson.data;
 
     // Associer chaque service avec son provider (API renvoie id et profilePicture)
     const servicesWithProviders = services.map((service) => {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Service } from '@/app/types/service';
 import { getServicesByProviderSlug, getServiceBySlug } from '@/app/utils/serviceUtils';
 
-export function useProviderServices(providerSlug: string) {
+export function useProviderServicesLegacy(providerSlug: string) {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

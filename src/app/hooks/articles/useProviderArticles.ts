@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Article } from "@/app/types/article";
+import { getApiBaseUrl } from "@/app/utils/api";
 
 export const useProviderArticles = (providerSlug: string) => {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -19,14 +20,18 @@ export const useProviderArticles = (providerSlug: string) => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(`/api/providers/${providerSlug}/articles`);
+        const base = getApiBaseUrl();
+        const response = await fetch(`${base}/providers/${providerSlug}/articles`, {
+          credentials: "include",
+        });
         
         if (!response.ok) {
           throw new Error(`Erreur HTTP: ${response.status}`);
         }
 
-        const data = await response.json();
-        setArticles(data);
+        const json = await response.json();
+        const data = json?.data ?? json;
+        setArticles(Array.isArray(data) ? data as Article[] : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Erreur lors du chargement des articles");
       } finally {
