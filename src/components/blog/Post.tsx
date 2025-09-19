@@ -52,7 +52,7 @@ export default function Post({
         mobileDirection="column"
         fillWidth
       >
-        {article.articleCover && thumbnail && (
+        {(article as any).articleCover && thumbnail && (
           <SmartImage
             fillWidth
             priority
@@ -61,7 +61,7 @@ export default function Post({
             border="neutral-alpha-weak"
             cursor="interactive"
             radius="l"
-            src={article.articleCover}
+            src={(article as any).articleCover}
             alt={"Thumbnail of " + article.title}
             aspectRatio="16 / 9"
           />
@@ -85,7 +85,7 @@ export default function Post({
                 <SmartImage
                   src={providerAvatar}
                   alt={authorName || "Auteur"}
-                  height={2}
+                  style={{ width: 24, height: 24 }}
                   aspectRatio="1 / 1"
                   radius="full"
                 />

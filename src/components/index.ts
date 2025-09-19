@@ -9,6 +9,8 @@ export { HeadingLink } from "@/components/HeadingLink";
 export { RouteGuard } from "@/components/RouteGuard";
 export { HomeActions } from "@/components/HomeActions";
 export { JoinButton } from "@/components/auth/JoinButton";
+export { LoginForm } from "@/components/forms/LoginForm";
+export { default as JoinForm } from "@/components/forms/JoinForm";
 export { default as ExperienceForm } from "@/components/forms/ExperienceForm";
 export { default as EducationForm } from "@/components/forms/EducationForm";
 export { default as ServiceForm } from "@/components/forms/ServiceForm";

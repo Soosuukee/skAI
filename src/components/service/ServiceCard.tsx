@@ -58,7 +58,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
         {/* Image de couverture */}
         {service.cover ? (
           <SmartImage
-            src={makeAbsolute(service.cover)}
+            src={makeAbsolute(service.cover) as string}
             alt={`Image de couverture - ${service.title}`}
             width={300}
             height={169}
@@ -91,7 +91,16 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
           <Heading as="h3" variant="display-strong-s">
             {service.title}
           </Heading>
-          <Text variant="body-default-m" color="neutral-medium" lines={3}>
+          <Text
+            variant="body-default-m"
+            color="neutral-medium"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
             {service.summary}
           </Text>
         </Column>

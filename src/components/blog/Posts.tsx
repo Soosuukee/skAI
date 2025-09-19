@@ -5,6 +5,9 @@ import { getSortedArticles } from "@/app/utils/articleUtils";
 import { Article } from "@/app/types/article";
 import { Grid, Text, Column } from "@/once-ui/components";
 import Post from "./Post";
+import { getApiBaseUrl } from "@/app/utils/api";
+import { getAllProviders } from "@/app/utils/providerUtils";
+import type { Provider } from "@/app/types/provider";
 
 interface PostsProps {
   range?: [number] | [number, number];
@@ -40,34 +43,50 @@ export function Posts({
       try {
         setLoading(true);
         const articles = await getSortedArticles();
+        const apiBaseUrl = getApiBaseUrl();
+
+        // Fetch all providers once, then map by id
+        const providers: Provider[] = await getAllProviders();
+        const providersById = new Map<number, Provider>(
+          providers.map((p) => [p.id, p])
+        );
 
         // Récupérer les providers pour chaque article
         const articlesWithProviders: ArticleWithProvider[] = await Promise.all(
           articles.map(async (article) => {
-            try {
-              const providerResponse = await fetch(
-                `/api/providers/id/${article.providerId}`
-              );
-              if (providerResponse.ok) {
-                const provider = await providerResponse.json();
-                return {
-                  ...article,
-                  provider: {
-                    slug: provider.slug,
-                    firstName: provider.firstName,
-                    lastName: provider.lastName,
-                    avatar: provider.avatar,
-                  },
-                };
+            const p = providersById.get(article.providerId);
+            if (!p) return article as ArticleWithProvider;
+            // Optionally construct an avatar URL if needed
+            let avatar: string | undefined = undefined;
+            const profilePicture = (p as any).profilePicture as
+              | string
+              | undefined;
+            if (profilePicture) {
+              if (/^https?:\/\//.test(profilePicture)) {
+                avatar = profilePicture;
+              } else {
+                try {
+                  const origin = new URL(apiBaseUrl).origin;
+                  avatar = profilePicture.startsWith("/")
+                    ? `${origin}${profilePicture}`
+                    : `${apiBaseUrl}${
+                        profilePicture.startsWith("/") ? "" : "/"
+                      }${profilePicture}`;
+                } catch {
+                  avatar = profilePicture;
+                }
               }
-              return article as ArticleWithProvider;
-            } catch (error) {
-              console.error(
-                `Erreur lors de la récupération du provider pour l'article ${article.slug}:`,
-                error
-              );
-              return article as ArticleWithProvider;
             }
+
+            return {
+              ...article,
+              provider: {
+                slug: p.slug,
+                firstName: p.firstName,
+                lastName: p.lastName,
+                avatar,
+              },
+            } as ArticleWithProvider;
           })
         );
 

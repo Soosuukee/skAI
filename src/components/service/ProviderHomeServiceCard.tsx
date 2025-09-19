@@ -89,7 +89,16 @@ export const ProviderHomeServiceCard: React.FC<
           <Heading as="h3" variant="display-strong-xs">
             {service.title}
           </Heading>
-          <Text variant="body-default-s" color="neutral-medium" lines={2}>
+          <Text
+            variant="body-default-s"
+            color="neutral-medium"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
             {service.summary}
           </Text>
         </Column>

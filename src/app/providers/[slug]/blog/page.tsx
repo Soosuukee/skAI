@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { Heading, RevealFx, Column, Text } from "@/once-ui/components";
+import { Heading, RevealFx, Column, Grid, Text } from "@/once-ui/components";
 import { CustomRevealFx } from "@/components/CustomRevealFx";
+import Post from "@/components/blog/Post";
 import { useProviderBasic, useProviderArticles } from "@/app/hooks/providers";
-import { ProviderArticles } from "@/components/blog/ProviderArticles";
 import { baseURL } from "@/app/resources";
 import { Meta, Schema } from "@/once-ui/modules";
 
@@ -82,7 +82,45 @@ export default function ProviderBlogPage({ params }: ProviderBlogPageProps) {
       </Column>
 
       {/* Liste des articles */}
-      <ProviderArticles articles={articles} providerSlug={provider.slug} />
+      {articles.length > 0 ? (
+        <Column fillWidth gap="l">
+          <RevealFx translateY={4} fillWidth delay={0.3}>
+            <Heading as="h2" variant="display-strong-s">
+              Tous les articles ({articles.length})
+            </Heading>
+          </RevealFx>
+
+          <Grid columns="2" mobileColumns="1" fillWidth gap="16">
+            {articles.map((article, idx) => (
+              <CustomRevealFx
+                key={article.slug}
+                translateY={4}
+                delay={0.1 * (idx + 1)}
+                fillWidth
+              >
+                <Post
+                  article={article}
+                  thumbnail={true}
+                  direction="column"
+                  providerSlug={provider.slug}
+                />
+              </CustomRevealFx>
+            ))}
+          </Grid>
+        </Column>
+      ) : (
+        <RevealFx translateY={4} fillWidth delay={0.3}>
+          <Column gap="16" horizontal="center" paddingY="48">
+            <Heading as="h2" variant="display-strong-s">
+              Aucun article pour le moment
+            </Heading>
+            <Text variant="body-default-l" color="neutral-medium">
+              {provider.firstName} n'a pas encore publié d'articles. Revenez
+              bientôt !
+            </Text>
+          </Column>
+        </RevealFx>
+      )}
     </Column>
   );
 }

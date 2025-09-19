@@ -147,7 +147,8 @@ export function LoginForm({ onClose }: LoginFormProps) {
               color="neutral-medium"
               style={{ textAlign: "center", marginTop: "8px" }}
             >
-              Comptes de test :<br />
+              Comptes de test :
+              <br />
               <strong>Prestataire :</strong> jensen.huang@nvidia.com
               <br />
               <strong>Client :</strong> client1@example.com
