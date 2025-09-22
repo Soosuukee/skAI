@@ -17,6 +17,7 @@ import { CustomRevealFx } from "@/components/CustomRevealFx";
 import { baseURL } from "@/app/resources";
 import { Meta, Schema } from "@/once-ui/modules";
 import { useProviders } from "@/app/hooks/useProviders";
+import { Language } from "@/app/types/language";
 
 export default function ProvidersPage() {
   const { providers: providersData, loading, error } = useProviders();
@@ -87,6 +88,12 @@ export default function ProvidersPage() {
           }}
         >
           {providersData.map((provider, idx) => {
+            // Constantes pour améliorer la lisibilité
+            const jobTitle = provider.job?.title;
+            const countryName = provider.country?.name;
+            const avatarSrc =
+              (provider as any).avatar || provider.profilePicture;
+
             return (
               <CustomRevealFx
                 key={provider.slug}
@@ -124,32 +131,28 @@ export default function ProvidersPage() {
                     {/* Avatar et infos de base */}
                     <Flex gap="16" vertical="center">
                       <Avatar
-                        src={
-                          provider.avatar ||
-                          (provider.profilePicture
-                            ? provider.profilePicture.startsWith("http")
-                              ? provider.profilePicture
-                              : `${
-                                  process.env.NEXT_PUBLIC_API_BASE_URL ||
-                                  "http://localhost:8081/api/v1"
-                                }${provider.profilePicture}`
-                            : undefined)
-                        }
+                        src={avatarSrc || undefined}
                         size="xl"
                         style={{ flexShrink: 0 }}
+                        onError={(e) => {
+                          // En cas d'erreur de chargement, on cache l'image
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
                       />
                       <Column gap="4">
                         <Heading as="h3" variant="heading-strong-l">
                           {provider.firstName} {provider.lastName}
                         </Heading>
-                        {provider.job && (
+                        {jobTitle && (
                           <Text variant="body-default-s" color="neutral-medium">
-                            {provider.job.title}
+                            {jobTitle}
                           </Text>
                         )}
-                        <Text variant="body-default-s" color="neutral-medium">
-                          📍 {String(provider.country?.name)}
-                        </Text>
+                        {countryName && (
+                          <Text variant="body-default-s" color="neutral-medium">
+                            📍 {countryName}
+                          </Text>
+                        )}
                         <div
                           style={{
                             display: "flex",
@@ -158,9 +161,9 @@ export default function ProvidersPage() {
                             marginTop: 8,
                           }}
                         >
-                          {provider.languages?.map((lang) => (
-                            <Tag key={lang} variant="brand" size="s">
-                              {lang}
+                          {provider.languages?.map((lang: Language) => (
+                            <Tag key={lang.name} variant="brand" size="s">
+                              {lang.name}
                             </Tag>
                           ))}
                         </div>

@@ -8,7 +8,18 @@ const nextConfig: NextConfig = {
   // Configuration des images si besoin de remotePatterns
   images: {
     remotePatterns: [
-      // { protocol: 'https', hostname: 'exemple.com', port: '', pathname: '/chemin/**' },
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        port: '8000',
+        pathname: '/images/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '127.0.0.1',
+        port: '8000',
+        pathname: '/images/**',
+      },
     ],
   },
   // Expérimental pour MDX sur Rust

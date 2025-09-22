@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ProviderWithRelations } from '@/app/types/provider';
+import { Provider } from '@/app/types/provider';
 import { getAllProvidersWithDetails } from '@/app/utils/providerUtils';
 
 export function useProviders() {
-  const [providers, setProviders] = useState<ProviderWithRelations[]>([]);
+  const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

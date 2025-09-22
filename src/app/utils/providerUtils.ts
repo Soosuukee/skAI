@@ -1,18 +1,15 @@
 import { Provider } from "@/app/types/provider";
 import { Job } from "@/app/types/job";
 import { Country } from "@/app/types/country";
+import { Language } from "@/app/types/language";
+import { SoftSkill } from "@/app/types/softskill";
+import { HardSkill } from "@/app/types/hardskill";
 import { getApiBaseUrl } from "@/app/utils/api";
 
 // URL de base de l'API (externe)
 const API_BASE_URL = getApiBaseUrl();
 
-// Type enrichi utilisé par l'UI
-export type ProviderWithRelations = Provider & {
-  avatar?: string;
-  job?: Job | undefined;
-  languages: string[];
-  country?: Country | undefined;
-};
+// Type enrichi utilisé par l'UI - maintenant Provider contient déjà toutes les relations
 
 // Helper pour gérer { data: ... } ou retour direct
 function extractData<T = any>(json: any): T {
@@ -64,31 +61,9 @@ export async function getAllProvidersWithDetails() {
     const providers = await getAllProviders();
     const providersWithDetails = await Promise.all(
       providers.map(async (provider) => {
-        // Fetch job and country only; use provider.languages directly
-        const [jobResponse, countryResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/jobs/${provider.jobId}`),
-          fetch(`${API_BASE_URL}/countries/${provider.countryId}`),
-        ]);
-        let job;
-        if (jobResponse.ok) {
-          const jobJson = (await jobResponse.json()) as {
-            success: boolean;
-            data: Job;
-          };
-          job = jobJson.data;
-        } else {
-          job = undefined;
-        }
-        let country;
-        if (countryResponse.ok) {
-          const countryJson = (await countryResponse.json()) as {
-            success: boolean;
-            data: Country;
-          };
-          country = countryJson.data;
-        } else {
-          country = undefined;
-        }
+        // Les données job et country sont déjà incluses dans la réponse API
+        const job = provider.job;
+        const country = provider.country;
         const languages = provider.languages || [];
         return {
           ...provider,
@@ -96,7 +71,7 @@ export async function getAllProvidersWithDetails() {
           job,
           languages,
           country,
-        } as ProviderWithRelations;
+        } as Provider;
       })
     );
     return providersWithDetails;
@@ -138,43 +113,21 @@ export async function getProviderBySlug(
  */
 export async function getProviderAllBySlug(
   slug: string
-): Promise<ProviderWithRelations | undefined> {
+): Promise<Provider | undefined> {
   try {
     const provider = await getProviderBySlug(slug);
     if (!provider) return undefined;
-    // Fetch job; use provider.languages directly
-    const jobResponse = await fetch(`${API_BASE_URL}/jobs/${provider.jobId}`);
-    const countryResponse = await fetch(
-      `${API_BASE_URL}/countries/${provider.countryId}`
-    );
-    let job;
-    if (jobResponse.ok) {
-      const jobJson = (await jobResponse.json()) as {
-        success: boolean;
-        data: Job;
-      };
-      job = jobJson.data;
-    } else {
-      job = undefined;
-    }
-    const languages = provider.languages || [];
-    let country;
-    if (countryResponse.ok) {
-      const countryJson = (await countryResponse.json()) as {
-        success: boolean;
-        data: Country;
-      };
-      country = countryJson.data;
-    } else {
-      country = undefined;
-    }
+    // Les données job et country sont déjà incluses dans la réponse API
+    const job = provider.job;
+    const country = provider.country;
+    const languages = provider.languages ;
 
     return {
       ...provider,
       job,
       languages,
       country,
-    } as ProviderWithRelations;
+    } as Provider;
   } catch (error) {
     console.error(
       "Erreur lors de la récupération complète du provider par slug:",
@@ -191,32 +144,10 @@ export async function getProviderBySlugWithDetails(slug: string) {
   try {
     const provider = await getProviderBySlug(slug);
     if (!provider) return undefined;
-    // Fetch job; use provider.languages
-    const jobResponse = await fetch(`${API_BASE_URL}/jobs/${provider.jobId}`);
-    const countryResponse = await fetch(
-      `${API_BASE_URL}/countries/${provider.countryId}`
-    );
-    let job;
-    if (jobResponse.ok) {
-      const jobJson = (await jobResponse.json()) as {
-        success: boolean;
-        data: Job;
-      };
-      job = jobJson.data;
-    } else {
-      job = undefined;
-    }
+    // Les données job et country sont déjà incluses dans la réponse API
+    const job = provider.job;
+    const country = provider.country;
     const languages = provider.languages || [];
-    let country;
-    if (countryResponse.ok) {
-      const countryJson = (await countryResponse.json()) as {
-        success: boolean;
-        data: Country;
-      };
-      country = countryJson.data;
-    } else {
-      country = undefined;
-    }
 
     return {
       ...provider,
@@ -224,7 +155,7 @@ export async function getProviderBySlugWithDetails(slug: string) {
       job,
       languages,
       country,
-    } as ProviderWithRelations;
+    } as Provider;
   } catch (error) {
     console.error(
       "Erreur lors de la récupération du provider avec détails:",
@@ -261,40 +192,16 @@ export async function getProviderByIdWithDetails(providerId: number) {
   try {
     const provider = await getProviderById(providerId);
     if (!provider) return undefined;
-    // Fetch job; use provider.languages
-    const jobResponse = await fetch(
-      `${API_BASE_URL}/jobs/${provider?.jobId ?? ""}`
-    );
-    const countryResponse = await fetch(
-      `${API_BASE_URL}/countries/${provider.countryId}`
-    );
-    let job;
-    if (jobResponse.ok) {
-      const jobJson = (await jobResponse.json()) as {
-        success: boolean;
-        data: Job;
-      };
-      job = jobJson.data;
-    } else {
-      job = undefined;
-    }
+    // Les données job et country sont déjà incluses dans la réponse API
+    const job = provider.job;
+    const country = provider.country;
     const languages = provider.languages || [];
-    let country;
-    if (countryResponse.ok) {
-      const countryJson = (await countryResponse.json()) as {
-        success: boolean;
-        data: Country;
-      };
-      country = countryJson.data;
-    } else {
-      country = undefined;
-    }
     return {
       ...provider,
       job,
       languages,
       country,
-    } as ProviderWithRelations;
+    } as Provider;
   } catch (error) {
     console.error(
       "Erreur lors de la récupération du provider par détails:",

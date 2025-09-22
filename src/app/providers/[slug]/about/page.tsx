@@ -142,7 +142,9 @@ export default function ProviderAboutPage({ params }: ProviderAboutPageProps) {
             if (hardSkills.length > 0) {
               skills.push({
                 title: "Compétences Techniques",
-                description: hardSkills.join(" · "),
+                description: hardSkills
+                  .map((skill) => skill.title || skill)
+                  .join(" · "),
                 images: [],
               });
             }
@@ -150,7 +152,9 @@ export default function ProviderAboutPage({ params }: ProviderAboutPageProps) {
             if (softSkills.length > 0) {
               skills.push({
                 title: "Compétences Comportementales",
-                description: softSkills.join(" · "),
+                description: softSkills
+                  .map((skill) => skill.title || skill)
+                  .join(" · "),
                 images: [],
               });
             }

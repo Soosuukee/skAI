@@ -21,6 +21,7 @@ export default function JoinForm() {
     lastName: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -53,11 +54,10 @@ export default function JoinForm() {
           !formData.firstName ||
           !formData.lastName ||
           !formData.email ||
-          !formData.password
+          !formData.password ||
+          !formData.confirmPassword
         ) {
-          setError(
-            "Veuillez renseigner le type de compte, prénom, nom, email et mot de passe"
-          );
+          setError("Veuillez renseigner tous les champs obligatoires");
           return;
         }
 
@@ -82,6 +82,12 @@ export default function JoinForm() {
         const passwordRegex = /^.{8,}$/;
         if (!passwordRegex.test(formData.password)) {
           setError("Le mot de passe doit contenir au moins 8 caractères");
+          return;
+        }
+
+        // Vérifier que les mots de passe correspondent
+        if (formData.password !== formData.confirmPassword) {
+          setError("Les mots de passe ne correspondent pas");
           return;
         }
         const baseUrl = getApiBaseUrl();
@@ -199,6 +205,18 @@ export default function JoinForm() {
                     value={formData.password}
                     onChange={(e) =>
                       handleInputChange("password", e.target.value)
+                    }
+                    required
+                  />
+                </Column>
+                <Column gap="8">
+                  <Input
+                    id="confirmPassword"
+                    label="Confirmer le mot de passe"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      handleInputChange("confirmPassword", e.target.value)
                     }
                     required
                   />

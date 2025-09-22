@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "@/once-ui/components";
 import { useAuth } from "@/app/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 interface JoinButtonProps {
   variant?: "primary" | "secondary" | "tertiary" | "danger";
@@ -18,9 +18,10 @@ export function JoinButton({
 }: JoinButtonProps) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
-  // Ne pas afficher le bouton si l'utilisateur est connecté ou si on est en cours de chargement
-  if (isLoading || user) {
+  // Ne pas afficher le bouton si l'utilisateur est connecté, si on est en cours de chargement, ou si on est sur la page /join
+  if (isLoading || user || pathname === "/join") {
     return null;
   }
 

@@ -136,18 +136,30 @@ export default function MePage() {
       <Text>Email: {user.email}</Text>
       <Text>Role: {user.role}</Text>
       {user.role === "provider" && (user as any).job && (
-        <Text>Job: {(user as any).job}</Text>
+        <Text>Job: {(user as any).job.title || (user as any).job}</Text>
       )}
-      {(user as any).country && <Text>Country: {(user as any).country}</Text>}
+      {(user as any).country && (
+        <Text>Country: {(user as any).country.name}</Text>
+      )}
       {user.role === "provider" &&
         (user as any).hardSkills &&
         (user as any).hardSkills.length > 0 && (
-          <Text>Hard Skills: {(user as any).hardSkills.join(", ")}</Text>
+          <Text>
+            Hard Skills:{" "}
+            {(user as any).hardSkills
+              .map((skill: any) => skill.title || skill)
+              .join(", ")}
+          </Text>
         )}
       {user.role === "provider" &&
         (user as any).softSkills &&
         (user as any).softSkills.length > 0 && (
-          <Text>Soft Skills: {(user as any).softSkills.join(", ")}</Text>
+          <Text>
+            Soft Skills:{" "}
+            {(user as any).softSkills
+              .map((skill: any) => skill.title || skill)
+              .join(", ")}
+          </Text>
         )}
       <Flex gap="8">
         <Button

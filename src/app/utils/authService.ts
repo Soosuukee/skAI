@@ -79,7 +79,7 @@ export async function login(email: string, password: string): Promise<AuthRespon
   // Récupérer les informations utilisateur via /me
   let user: any;
   try {
-    const meRes = await fetch(`${baseUrl}/me`, {
+    const meRes = await fetch(`${baseUrl}/auth/me`, {
       headers: { 'Authorization': `Bearer ${token}` },
       credentials: "include"
     });
@@ -110,7 +110,7 @@ export async function checkAuth(token?: string): Promise<{ authenticated: boolea
     headers['Authorization'] = `Bearer ${authToken}`;
   }
 
-  const res = await fetch(`${baseUrl}/me`, {
+  const res = await fetch(`${baseUrl}/auth/me`, {
     headers,
     credentials: "include",
   });
