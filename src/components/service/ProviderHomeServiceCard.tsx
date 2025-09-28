@@ -37,7 +37,7 @@ const makeAbsolute = (url?: string) => {
 export const ProviderHomeServiceCard: React.FC<
   ProviderHomeServiceCardProps
 > = ({ service, providerSlug, index = 0 }) => {
-  const serviceLink = `/providers/${providerSlug}/service/${service.id}`;
+  const serviceLink = `/providers/${providerSlug}/service/${service.slug}`;
 
   return (
     <CustomRevealFx translateY={4} delay={0.1 * (index + 1)} fillWidth>

@@ -11,10 +11,11 @@ import {
 } from "@/once-ui/components";
 import { CustomRevealFx } from "@/components/CustomRevealFx";
 import { ServiceContent } from "@/components/service/ServiceContent";
-import { useProviderBasic, useProviderServices } from "@/app/hooks/providers";
+import { useProvider, useProviderServices } from "@/app/hooks/providers";
 import { formatPrice } from "@/app/utils/priceUtils";
 import { Meta, Schema } from "@/once-ui/modules";
 import { ServiceDetailRenderer } from "@/components/service/ServiceDetailRenderer";
+import { ServiceMDXRenderer } from "@/components/service/ServiceMDXRenderer";
 
 interface ProviderServiceDetailPageProps {
   params: Promise<{ slug: string; serviceSlug: string }>;
@@ -32,7 +33,7 @@ export default function ProviderServiceDetailPage({
     provider,
     loading: providerLoading,
     error: providerError,
-  } = useProviderBasic(resolvedParams.slug);
+  } = useProvider(resolvedParams.slug);
   const {
     services,
     loading: servicesLoading,
@@ -138,7 +139,7 @@ export default function ProviderServiceDetailPage({
 
           {/* Contenu détaillé du service */}
           <div className="mt-8">
-            <ServiceDetailRenderer service={service} provider={provider} />
+            <ServiceMDXRenderer service={service} provider={provider} />
           </div>
         </Column>
       </RevealFx>

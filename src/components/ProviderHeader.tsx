@@ -19,7 +19,7 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { LoginButton } from "./auth/LoginButton";
 import { UserMenu } from "./auth/UserMenu";
 import { JoinButton } from "./auth/JoinButton";
-import { useProviderBasic } from "@/app/hooks/providers";
+import { useProvider } from "@/app/hooks/providers";
 import { useProviderSlug } from "@/app/hooks/useNavigationContext";
 
 type ProviderHeaderProps = {
@@ -30,7 +30,7 @@ export const ProviderHeader = ({ showLogo = true }: ProviderHeaderProps) => {
   const pathname = usePathname() ?? "";
   const { user, isLoading } = useAuth();
   const providerSlug = useProviderSlug();
-  const { provider } = useProviderBasic(providerSlug || "");
+  const { provider } = useProvider(providerSlug || "");
 
   if (!providerSlug) {
     return null;

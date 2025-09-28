@@ -39,7 +39,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
   providerSlug,
   index = 0,
 }) => {
-  const serviceLink = `/providers/${providerSlug}/service/${service.id}`;
+  const serviceLink = `/providers/${providerSlug}/service/${service.slug}`;
 
   return (
     <CustomRevealFx translateY={4} delay={0.1 * (index + 1)} fillWidth>

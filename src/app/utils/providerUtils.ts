@@ -91,7 +91,7 @@ export async function getProviderBySlug(
   slug: string
 ): Promise<Provider | undefined> {
   try {
-    const response = await fetch(`${API_BASE_URL}/providers/slug/${slug}`);
+    const response = await fetch(`${API_BASE_URL}/providers/${slug}`);
     if (!response.ok) {
       if (response.status === 404) return undefined;
       throw new Error(`Erreur HTTP: ${response.status}`);

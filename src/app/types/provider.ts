@@ -15,14 +15,16 @@ export interface Provider {
   profilePicture: string | null;
   joinedAt: string;
   slug: string;
-  job: Job;  // Retiré le ? car toujours présent dans l'API
-  country: Country;  // Retiré le ? car toujours présent dans l'API
+  job: Job;
+  country: Country;
   city: string;
-  state?: string | null;
-  postalCode?: string | null;
-  address?: string | null;
-  hardSkills?: HardSkill[];
-  softSkills?: SoftSkill[];
+  state: string;
+  postalCode: string;
+  address: string;
+  description: string | null;
+  birthDate: string | null;
+  hardSkills: HardSkill[];
+  softSkills: SoftSkill[];
   languages: Language[];
   role: "provider";
 }

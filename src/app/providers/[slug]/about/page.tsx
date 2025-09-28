@@ -17,9 +17,12 @@ import {
 
 import { baseURL } from "@/app/resources";
 import TableOfContents from "@/components/about/TableOfContents";
+import { ProviderExperiences } from "@/components/about/ProviderExperiences";
+import { ProviderEducation } from "@/components/about/ProviderEducation";
+import { ProviderSkills } from "@/components/about/ProviderSkills";
 import styles from "@/components/about/about.module.scss";
 import {
-  useProviderBasic,
+  useProvider,
   useProviderExperience,
   useProviderEducation,
   useProviderArticles,
@@ -37,7 +40,21 @@ export default function ProviderAboutPage({ params }: ProviderAboutPageProps) {
     provider,
     loading: providerLoading,
     error: providerError,
-  } = useProviderBasic(resolvedParams.slug);
+  } = useProvider(resolvedParams.slug);
+
+  console.log("=== ABOUT PAGE DEBUG ===");
+  console.log("Slug reçu:", resolvedParams.slug);
+  console.log("Provider dans about:", provider);
+  console.log("Provider type:", typeof provider);
+  console.log("Provider est null?", provider === null);
+  console.log("Provider est undefined?", provider === undefined);
+  console.log("Loading:", providerLoading);
+  console.log("Error:", providerError);
+  if (provider) {
+    console.log("Provider firstName:", provider.firstName);
+    console.log("Provider lastName:", provider.lastName);
+  }
+  console.log("=== END ABOUT DEBUG ===");
   const {
     experiences,
     loading: experiencesLoading,
@@ -63,104 +80,33 @@ export default function ProviderAboutPage({ params }: ProviderAboutPageProps) {
   const error =
     providerError || experiencesError || educationsError || articlesError;
 
-  // Créer les données about si on a le provider
+  // Configuration simple pour l'affichage
   const about = provider
     ? {
         intro: {
           display: true,
           title: "Introduction",
-          description: `${provider.firstName} ${
-            provider.lastName
-          } est un professionnel passionné par l'innovation technologique. Spécialisé dans ${
-            provider.job?.title || "l'intelligence artificielle"
-          }, il/elle combine expertise technique et vision stratégique pour créer des solutions intelligentes qui transforment les industries. Avec une approche centrée sur l'utilisateur et une expertise approfondie dans les technologies émergentes, ${
-            provider.firstName
-          } s'efforce de développer des solutions qui répondent aux défis complexes du monde moderne.`,
+          description:
+            provider.description ||
+            `${provider.firstName} ${
+              provider.lastName
+            } est un professionnel passionné par l'innovation technologique. Spécialisé dans ${
+              provider.job?.title || "l'intelligence artificielle"
+            }, il/elle combine expertise technique et vision stratégique pour créer des solutions intelligentes qui transforment les industries. Avec une approche centrée sur l'utilisateur et une expertise approfondie dans les technologies émergentes, ${
+              provider.firstName
+            } s'efforce de développer des solutions qui répondent aux défis complexes du monde moderne.`,
         },
         work: {
           display: true,
-          title: "Mon expérience professionnelle",
-          experiences: experiences.map((exp) => {
-            const startYear = exp.startedAt
-              ? String(exp.startedAt).slice(0, 4)
-              : "";
-            const endYear = exp.endedAt
-              ? String(exp.endedAt).slice(0, 4)
-              : "Aujourd'hui";
-            const achievements: string[] = [
-              exp.firstTask,
-              ...(exp.secondTask ? [exp.secondTask] : []),
-              ...(exp.thirdTask ? [exp.thirdTask] : []),
-            ].filter(Boolean);
-            return {
-              company: exp.companyName,
-              timeframe: `${startYear} - ${endYear}`.trim(),
-              role: exp.title,
-              achievements,
-              images: exp.companyLogo
-                ? [
-                    {
-                      src: exp.companyLogo,
-                      alt: exp.companyName,
-                      width: 16,
-                      height: 9,
-                    },
-                  ]
-                : [],
-            };
-          }),
+          title: "Expérience professionnelle",
         },
         studies: {
           display: true,
           title: "Études et Formation",
-          institutions: educations.map((edu) => {
-            const startYear = edu.startedAt
-              ? String(edu.startedAt).slice(0, 4)
-              : "";
-            const endYear = edu.endedAt
-              ? String(edu.endedAt).slice(0, 4)
-              : "Aujourd'hui";
-            return {
-              degreeTitle: edu.title,
-              institutionName: edu.institutionName,
-              yearsAttended: `${startYear} - ${endYear}`.trim(),
-              programDescription: edu.description,
-            };
-          }),
         },
         technical: {
           display: true,
           title: "Mes Technologies et Compétences",
-          skills: (() => {
-            const hardSkills = provider.hardSkills || [];
-            const softSkills = provider.softSkills || [];
-
-            if (!hardSkills.length && !softSkills.length) return [];
-
-            const skills = [];
-
-            if (hardSkills.length > 0) {
-              skills.push({
-                title: "Compétences Techniques",
-                description: hardSkills
-                  .map((skill) => skill.title || skill)
-                  .join(" · "),
-                images: [],
-              });
-            }
-
-            if (softSkills.length > 0) {
-              skills.push({
-                title: "Compétences Comportementales",
-                description: softSkills
-                  .map((skill) => skill.title || skill)
-                  .join(" · "),
-                images: [],
-              });
-            }
-
-            return skills;
-          })(),
         },
         calendar: {
           display: false,
@@ -211,6 +157,8 @@ export default function ProviderAboutPage({ params }: ProviderAboutPageProps) {
         social={social}
         about={about}
         makeAbsolute={makeAbsolute}
+        experiences={experiences}
+        educations={educations}
       />
     </>
   );
@@ -221,11 +169,15 @@ function About({
   social,
   about,
   makeAbsolute,
+  experiences,
+  educations,
 }: {
   provider: any;
   social: any[];
   about: any;
   makeAbsolute: (url?: string) => string | undefined;
+  experiences: any[];
+  educations: any[];
 }) {
   const structure = [
     {
@@ -236,21 +188,22 @@ function About({
     {
       title: about.work.title,
       display: about.work.display,
-      items: about.work.experiences.map(
-        (experience: any) => experience.company
-      ),
+      items: experiences.map((exp: any) => exp.companyName),
     },
     {
       title: about.studies.title,
       display: about.studies.display,
-      items: about.studies.institutions.map(
-        (institution: any) => institution.institutionName
-      ),
+      items: educations.map((edu: any) => edu.institutionName),
     },
     {
       title: about.technical.title,
       display: about.technical.display,
-      items: about.technical.skills.map((skill: any) => skill.title),
+      items: [
+        ...(provider.hardSkills?.length > 0 ? ["Compétences Techniques"] : []),
+        ...(provider.softSkills?.length > 0
+          ? ["Compétences Comportementales"]
+          : []),
+      ],
     },
   ];
 
@@ -307,8 +260,8 @@ function About({
               {provider.languages && provider.languages.length > 0 && (
                 <Flex wrap gap="8">
                   {provider.languages.map((language: any, index: number) => (
-                    <Tag key={language} size="l">
-                      {language}
+                    <Tag key={language.id || language.name || index} size="l">
+                      {language.name || language}
                     </Tag>
                   ))}
                 </Flex>
@@ -419,182 +372,24 @@ function About({
             )}
 
             {about.work.display && (
-              <>
-                <Heading
-                  as="h2"
-                  id={about.work.title}
-                  variant="display-strong-s"
-                  marginBottom="m"
-                >
-                  {about.work.title}
-                </Heading>
-                <Column fillWidth gap="l" marginBottom="40">
-                  {about.work.experiences.map(
-                    (experience: any, index: number) => (
-                      <Column
-                        key={`${experience.company}-${experience.role}-${index}`}
-                        fillWidth
-                      >
-                        <Flex
-                          fillWidth
-                          horizontal="space-between"
-                          vertical="end"
-                          marginBottom="4"
-                        >
-                          <Text
-                            id={experience.company}
-                            variant="heading-strong-l"
-                          >
-                            {experience.company}
-                          </Text>
-                          <Text
-                            variant="heading-default-xs"
-                            onBackground="neutral-weak"
-                          >
-                            {experience.timeframe}
-                          </Text>
-                        </Flex>
-                        <Text
-                          variant="body-default-s"
-                          onBackground="brand-weak"
-                          marginBottom="m"
-                        >
-                          {experience.role}
-                        </Text>
-                        <Column as="ul" gap="16">
-                          {experience.achievements.map(
-                            (achievement: string, index: number) => (
-                              <Text
-                                as="li"
-                                variant="body-default-m"
-                                key={`${experience.company}-${index}`}
-                              >
-                                {achievement}
-                              </Text>
-                            )
-                          )}
-                        </Column>
-                        {experience.images && experience.images.length > 0 && (
-                          <Flex fillWidth paddingTop="m" paddingLeft="40" wrap>
-                            {experience.images.map(
-                              (image: any, index: number) => (
-                                <Flex
-                                  key={index}
-                                  border="neutral-medium"
-                                  radius="m"
-                                  minWidth={image.width}
-                                  height={image.height}
-                                >
-                                  <SmartImage
-                                    enlarge
-                                    radius="m"
-                                    sizes={image.width.toString()}
-                                    alt={image.alt}
-                                    src={makeAbsolute(image.src) || ""}
-                                  />
-                                </Flex>
-                              )
-                            )}
-                          </Flex>
-                        )}
-                      </Column>
-                    )
-                  )}
-                </Column>
-              </>
+              <ProviderExperiences
+                experiences={experiences}
+                makeAbsolute={makeAbsolute}
+              />
             )}
 
             {about.studies.display && (
-              <>
-                <Heading
-                  as="h2"
-                  id={about.studies.title}
-                  variant="display-strong-s"
-                  marginBottom="m"
-                >
-                  {about.studies.title}
-                </Heading>
-                <Column fillWidth gap="l" marginBottom="40">
-                  {about.studies.institutions.map(
-                    (institution: any, index: number) => (
-                      <Column
-                        key={`${institution.institutionName}-${index}`}
-                        fillWidth
-                        gap="4"
-                      >
-                        <Text variant="heading-strong-xl">
-                          {institution.degreeTitle}
-                        </Text>
-                        <Text
-                          id={institution.institutionName}
-                          variant="label-default-l"
-                        >
-                          {institution.institutionName}
-                        </Text>
-                        <Text
-                          variant="heading-default-xs"
-                          onBackground="brand-strong"
-                        >
-                          {institution.yearsAttended}
-                        </Text>
-                        <Text
-                          variant="heading-default-xs"
-                          onBackground="neutral-weak"
-                        >
-                          {institution.programDescription}
-                        </Text>
-                      </Column>
-                    )
-                  )}
-                </Column>
-              </>
+              <ProviderEducation
+                educations={educations}
+                makeAbsolute={makeAbsolute}
+              />
             )}
 
             {about.technical.display && (
-              <>
-                <Heading
-                  as="h2"
-                  id={about.technical.title}
-                  variant="display-strong-s"
-                  marginBottom="40"
-                >
-                  {about.technical.title}
-                </Heading>
-                <Column fillWidth gap="l">
-                  {about.technical.skills.map((skill: any, index: number) => (
-                    <Column key={`${skill}-${index}`} fillWidth gap="4">
-                      <Text variant="heading-strong-l">{skill.title}</Text>
-                      <Text
-                        variant="body-default-m"
-                        onBackground="neutral-weak"
-                      >
-                        {skill.description}
-                      </Text>
-                      {skill.images && skill.images.length > 0 && (
-                        <Flex fillWidth paddingTop="m" gap="12" wrap>
-                          {skill.images.map((image: any, index: number) => (
-                            <Flex
-                              key={index}
-                              border="neutral-medium"
-                              radius="m"
-                              minWidth={image.width}
-                              height={image.height}
-                            >
-                              <SmartImage
-                                enlarge
-                                radius="m"
-                                sizes={image.width.toString()}
-                                alt={image.alt}
-                                src={makeAbsolute(image.src) || ""}
-                              />
-                            </Flex>
-                          ))}
-                        </Flex>
-                      )}
-                    </Column>
-                  ))}
-                </Column>
-              </>
+              <ProviderSkills
+                hardSkills={provider.hardSkills || []}
+                softSkills={provider.softSkills || []}
+              />
             )}
           </Column>
         </Flex>

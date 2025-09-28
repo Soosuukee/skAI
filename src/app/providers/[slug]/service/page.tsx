@@ -4,7 +4,7 @@ import React from "react";
 import { Column } from "@/once-ui/components";
 import { baseURL } from "@/app/resources";
 import { Meta, Schema } from "@/once-ui/modules";
-import { useProviderBasic, useProviderServices } from "@/app/hooks/providers";
+import { useProvider, useProviderServices } from "@/app/hooks/providers";
 import { ProviderServices } from "@/components/service/ProviderServices";
 import { RevealFx, Heading } from "@/once-ui/components";
 
@@ -62,7 +62,7 @@ export default function ProviderServicePage({
     provider,
     loading: providerLoading,
     error: providerError,
-  } = useProviderBasic(resolvedParams.slug);
+  } = useProvider(resolvedParams.slug);
   const {
     services,
     loading: servicesLoading,

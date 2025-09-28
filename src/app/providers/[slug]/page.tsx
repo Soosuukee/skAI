@@ -15,7 +15,7 @@ import { CustomRevealFx } from "@/components/CustomRevealFx";
 import { ProviderHomeServiceCard } from "@/components/service/ProviderHomeServiceCard";
 import { ProviderHomeArticleCard } from "@/components/blog/ProviderHomeArticleCard";
 import {
-  useProviderBasic,
+  useProvider,
   useProviderArticles,
   useProviderServices,
 } from "@/app/hooks/providers";
@@ -34,7 +34,7 @@ export default function ProviderPage({ params }: ProviderPageProps) {
     provider,
     loading: providerLoading,
     error: providerError,
-  } = useProviderBasic(resolvedParams.slug);
+  } = useProvider(resolvedParams.slug);
   const {
     articles,
     loading: articlesLoading,

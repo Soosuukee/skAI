@@ -1,15 +1,17 @@
 "use client";
 
 import React from "react";
-import { Column, Text, Heading, Badge } from "@/once-ui/components";
-import { formatPrice } from "@/app/utils/priceUtils";
+import { Column, Heading, Text } from "@/once-ui/components";
 import { Service } from "@/app/types/service";
+import { formatPrice } from "@/app/utils/priceUtils";
 
 interface ServiceDetailRendererProps {
   service: Service;
   provider: {
     firstName: string;
     lastName: string;
+    email?: string;
+    phone?: string;
   };
 }
 
@@ -17,23 +19,22 @@ export const ServiceDetailRenderer: React.FC<ServiceDetailRendererProps> = ({
   service,
   provider,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
   return (
     <Column gap="xl" fillWidth>
+      {/* Titre principal du service */}
+      <Heading as="h1" variant="display-strong-l">
+        {service.title}
+      </Heading>
+
       {/* Aperçu du service */}
       <Column gap="m">
         <Heading as="h2" variant="display-strong-m">
           Aperçu du service
         </Heading>
         <Text variant="body-default-l" color="neutral-medium">
-          {service.description}
+          {service.summary ||
+            service.description ||
+            "Description du service non disponible."}
         </Text>
       </Column>
 
@@ -211,6 +212,16 @@ export const ServiceDetailRenderer: React.FC<ServiceDetailRendererProps> = ({
           Pour plus d'informations sur ce service ou pour discuter de votre
           projet, n'hésitez pas à me contacter.
         </Text>
+        {provider.email && (
+          <Text variant="body-default-l">
+            <strong>Email :</strong> {provider.email}
+          </Text>
+        )}
+        {provider.phone && (
+          <Text variant="body-default-l">
+            <strong>Téléphone :</strong> {provider.phone}
+          </Text>
+        )}
       </Column>
 
       {/* Footer */}

@@ -4,7 +4,7 @@ import React from "react";
 import { Heading, RevealFx, Column, Grid, Text } from "@/once-ui/components";
 import { CustomRevealFx } from "@/components/CustomRevealFx";
 import Post from "@/components/blog/Post";
-import { useProviderBasic, useProviderArticles } from "@/app/hooks/providers";
+import { useProvider, useProviderArticles } from "@/app/hooks/providers";
 import { baseURL } from "@/app/resources";
 import { Meta, Schema } from "@/once-ui/modules";
 
@@ -20,7 +20,7 @@ export default function ProviderBlogPage({ params }: ProviderBlogPageProps) {
     provider,
     loading: providerLoading,
     error: providerError,
-  } = useProviderBasic(resolvedParams.slug);
+  } = useProvider(resolvedParams.slug);
   const {
     articles,
     loading: articlesLoading,

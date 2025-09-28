@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Provider } from "@/app/types/provider";
-import { Job } from "@/app/types/job";
-import { getApiBaseUrl } from "@/app/utils/api";
+import { getProviderBySlugWithDetails } from "@/app/utils/providerUtils";
+import { Country } from "@/app/types/country";
 
 const providerBasicCache = new Map<
   string,
@@ -13,21 +13,9 @@ const providerBasicCache = new Map<
 >();
 
 const CACHE_TTL = 10 * 60 * 1000;
-// Interface pour les données de base du provider (étend Provider)
-export interface ProviderBasic extends Omit<Provider, "role" | "job"> {
-  role: string;
-  avatar: string;
-  languages: string[];
-  job?: Job;
-  location?: {
-    name: string;
-    city: string;
-    country?: string;
-  };
-}
 
-export function useProviderBasic(slug: string) {
-  const [provider, setProvider] = useState<ProviderBasic | null>(null);
+export function useProvider(slug: string) {
+  const [provider, setProvider] = useState<Provider | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,54 +34,28 @@ export function useProviderBasic(slug: string) {
           return;
         }
 
-        const apiBaseUrl = getApiBaseUrl();
-
-        // Récupérer seulement le provider et son job
-        const providerResponse = await fetch(`${apiBaseUrl}/providers/${slug}`);
-
-        if (!providerResponse.ok) {
+        // Utiliser la fonction existante pour récupérer le provider
+        const provider = await getProviderBySlugWithDetails(slug);
+        
+        if (!provider) {
           throw new Error("Provider not found");
         }
+        
+        console.log("=== DEBUG PROVIDER ===");
+        console.log("Slug demandé:", slug);
+        console.log("Provider complet:", provider);
+        console.log("Type de provider:", typeof provider);
+        console.log("Provider est null/undefined?", provider === null || provider === undefined);
+        console.log("Provider firstName:", provider?.firstName);
+        console.log("Provider lastName:", provider?.lastName);
+        console.log("Clés du provider:", Object.keys(provider || {}));
+        console.log("=== END DEBUG ===");
 
-        const providerResponseData = await providerResponse.json();
-        const providerData = providerResponseData.data;
-
-        // Récupérer le job avec l'ID du provider
-        const jobId = providerData.jobId;
-        let jobData: Job | undefined;
-
-        if (jobId) {
-          const jobResponse = await fetch(`${apiBaseUrl}/jobs/${jobId}`);
-          jobData = jobResponse.ok ? await jobResponse.json() : undefined;
-        }
-
-        // Créer l'objet provider de base
-        const providerBasic: ProviderBasic = {
-          id: providerData.id,
-          slug: providerData.slug,
-          firstName: providerData.firstName,
-          lastName: providerData.lastName,
-          email: providerData.email,
-          profilePicture: providerData.profilePicture,
-          joinedAt: providerData.joinedAt,
-          jobId: providerData.jobId,
-          countryId: providerData.countryId,
-          city: providerData.city,
-          state: providerData.state,
-          postalCode: providerData.postalCode,
-          address: providerData.address,
-          role: jobData?.title || "Expert IA",
-          avatar: providerData.profilePicture,
-          languages: providerData.languages || [],
-          job: jobData,
-          location: providerData.location,
-        };
-
-        setProvider(providerBasic);
+        setProvider(provider);
 
         // Mettre en cache les données
         providerBasicCache.set(cacheKey, {
-          data: providerBasic,
+          data: provider,
           timestamp: Date.now(),
           ttl: CACHE_TTL,
         });
