@@ -27,11 +27,11 @@ function buildCoverUrl(cover?: string): string | undefined {
 }
 
 function withResolvedCover(article: Article): Article {
-  return { ...article, articleCover: buildCoverUrl(article.articleCover) as any };
+  return { ...article, cover: buildCoverUrl((article as any).cover || (article as any).articleCover) as any } as any;
 }
 
 function normalizeArticle(raw: any): Article {
-  const articleCover = raw.articleCover ?? raw.cover;
+  const cover = raw.cover ?? raw.articleCover;
   const articleId = raw.articleId ?? raw.id;
   const providerId = raw.providerId ?? raw.provider_id ?? raw.providerID;
   const languageId = raw.languageId ?? raw.language_id ?? raw.languageID ?? raw.languageId; // keep as-is if provided
@@ -46,10 +46,9 @@ function normalizeArticle(raw: any): Article {
     summary: raw.summary,
     isPublished: Boolean(raw.isPublished ?? true),
     isFeatured: Boolean(raw.isFeatured ?? false),
-    articleCover,
-    // Optional fields (tag/sections) may exist on raw; we don't enforce here
-    tags: (raw.tags as any) ?? undefined,
-    sections: (raw.sections as any) ?? undefined,
+    cover,
+    tags: (raw.tags as any) ?? [],
+    sections: (raw.sections as any) ?? (raw.section as any) ?? [],
   } as unknown as Article;
 }
 
@@ -208,5 +207,71 @@ export async function generateArticleStaticParamsByProvider(providerId: number) 
   } catch (error) {
     console.error('Erreur lors de la génération des paramètres statiques des articles par provider:', error);
     return [];
+  }
+}
+
+export async function getArticlesByProviderSlug(providerSlug: string): Promise<Article[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/providers/${providerSlug}/articles`);
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    const json = await parseJsonSafe<Article[]>(response);
+    return json.map((article) => normalizeArticle(article)).map(withResolvedCover);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des articles du provider:', error);
+    return [];
+  }
+}
+
+/**
+ * Récupère un article détaillé pour un provider (par slug) et un article (slug ou id)
+ */
+export async function getArticleDetailForProvider(
+  providerSlug: string,
+  articleSlugOrId: string,
+): Promise<{ provider: any; article: Article } | null> {
+  try {
+    const providerRes = await fetch(`${API_BASE_URL}/providers/${providerSlug}`, {
+      credentials: 'include',
+    });
+    if (!providerRes.ok) return null;
+    const providerJson = await parseJsonSafe<{ success: boolean; data: any }>(providerRes);
+    const provider = providerJson.data;
+
+    const articlesRes = await fetch(`${API_BASE_URL}/providers/${providerSlug}/articles`, {
+      credentials: 'include',
+    });
+    if (!articlesRes.ok) return null;
+    const articlesPayload = await parseJsonSafe<any>(articlesRes);
+    const articles: any[] = Array.isArray(articlesPayload)
+      ? articlesPayload
+      : (articlesPayload?.data ?? []);
+
+    const normalizedSlug = articleSlugOrId
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    const raw = articles.find((a) => {
+      const slug = (a.slug as string) ||
+        (a.title as string)
+          .normalize('NFD')
+          .replace(/\p{Diacritic}/gu, '')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+      return slug === normalizedSlug || String(a.id) === articleSlugOrId || String(a.articleId) === articleSlugOrId;
+    });
+    if (!raw) return null;
+
+    const article = withResolvedCover(normalizeArticle(raw));
+
+    return { provider, article };
+  } catch (error) {
+    console.error('Erreur lors de la récupération de l\'article détaillé:', error);
+    return null;
   }
 }

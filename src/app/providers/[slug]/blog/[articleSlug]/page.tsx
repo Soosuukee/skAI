@@ -8,91 +8,73 @@ import {
 } from "@/once-ui/components";
 import { CustomRevealFx } from "@/components/CustomRevealFx";
 
-import { Meta, Schema } from "@/once-ui/modules";
+import { Meta } from "@/once-ui/modules";
 import { formatDate } from "@/app/utils/formatDate";
-import { getArticleBySlug } from "@/app/utils/articleUtils";
+import { getArticleDetailForProvider } from "@/app/utils/articleUtils";
 import { notFound } from "next/navigation";
 
 interface ProviderArticlePageProps {
   params: Promise<{ slug: string; articleSlug: string }>;
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string | string[]; articleSlug: string | string[] }>;
+}) {
+  const routeParams = await params;
+  const providerSlug = Array.isArray(routeParams.slug)
+    ? routeParams.slug[0]
+    : routeParams.slug;
+  const articleSlug = Array.isArray(routeParams.articleSlug)
+    ? routeParams.articleSlug[0]
+    : routeParams.articleSlug;
+
+  const result = await getArticleDetailForProvider(providerSlug, articleSlug);
+  if (!result) return {};
+  const { article } = result;
+
+  return Meta.generate({
+    title: article.title,
+    description: article.summary,
+    baseURL: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    path: `/providers/${routeParams.slug}/blog/${article.slug}`,
+    type: "article",
+    publishedTime: article.publishedAt,
+    image: article.cover,
+  });
+}
+
 export default async function ProviderArticlePage({
   params,
 }: ProviderArticlePageProps) {
   const { slug, articleSlug } = await params;
-  console.log("Debug - Slug:", slug, "ArticleSlug:", articleSlug);
-
-  // Récupérer l'article depuis l'API
-  const article = await getArticleBySlug(articleSlug);
-  console.log("Debug - Article trouvé:", article ? "Oui" : "Non");
-  if (!article) {
-    notFound();
-  }
-
-  // Récupérer le provider depuis l'API
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-  const providerResponse = await fetch(
-    `${baseUrl}/api/providers/id/${article.providerId}`
-  );
-  console.log("Debug - Provider response status:", providerResponse.status);
-  if (!providerResponse.ok) {
-    notFound();
-  }
-  const provider = await providerResponse.json();
-  console.log("Debug - Provider slug:", provider.slug, "Expected slug:", slug);
-
-  // Vérifier que l'article appartient bien au provider
-  if (provider.slug !== slug) {
-    console.log("Debug - Slug mismatch, calling notFound()");
-    notFound();
-  }
-
-  // Utiliser une URL dynamique pour baseURL
-  const baseURL =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : "http://localhost:3000";
+  const result = await getArticleDetailForProvider(slug, articleSlug);
+  if (!result) notFound();
+  const { provider, article } = result!;
 
   return (
     <Column maxWidth="m" gap="xl" horizontal="center">
-      <Schema
-        as="webPage"
-        baseURL={baseURL}
-        path={`/providers/${provider.slug}/blog/${article.slug}`}
-        title={article.title}
-        description={article.summary}
-        image={article.articleCover}
-        author={{
-          name: `${provider.firstName} ${provider.lastName}`,
-          url: `/providers/${provider.slug}/about`,
-          image: provider.avatar,
-        }}
-      />
-
-      {/* Header de l'article */}
       <Column fillWidth paddingY="24" gap="m">
         <CustomRevealFx translateY={4} delay={0.1} fillWidth>
           <Heading wrap="balance" variant="display-strong-l">
             {article.title}
           </Heading>
         </CustomRevealFx>
-
         <RevealFx translateY={4} fillWidth delay={0.2}>
           <Text variant="body-default-l" color="neutral-medium">
             {article.summary}
           </Text>
         </RevealFx>
-
         <RevealFx translateY={4} fillWidth delay={0.3}>
           <Column gap="8">
             <Text variant="body-default-s" color="neutral-medium">
               Par {provider.firstName} {provider.lastName} •{" "}
               {formatDate(article.publishedAt, false)}
             </Text>
-            {article.tag && (
+            {Array.isArray(article.tags) && article.tags.length > 0 && (
               <Text variant="body-default-s" color="neutral-medium">
-                Tag: {article.tag}
+                Tags: {article.tags.map((t: any) => t?.name ?? t).join(", ")}
               </Text>
             )}
           </Column>
@@ -100,10 +82,10 @@ export default async function ProviderArticlePage({
       </Column>
 
       {/* Image de couverture */}
-      {article.articleCover && (
+      {article.cover && (
         <RevealFx translateY={4} fillWidth delay={0.4}>
           <SmartImage
-            src={article.articleCover}
+            src={article.cover}
             alt={`Couverture de l'article: ${article.title}`}
             aspectRatio="16 / 9"
             radius="l"
@@ -113,71 +95,45 @@ export default async function ProviderArticlePage({
 
       {/* Contenu de l'article */}
       <Column as="article" fillWidth>
-        {article.section?.map((section: any, index: number) => {
+        {article.sections?.map((section: any, index: number) => {
           const delay = (index + 1) * 0.1;
 
-          switch (section.type) {
-            case "heading":
-              return (
-                <RevealFx key={index} translateY={4} delay={delay}>
-                  <Heading
-                    variant={
-                      section.level === 1
-                        ? "display-strong-s"
-                        : "heading-strong-l"
-                    }
-                    marginBottom="m"
-                    marginTop={section.level === 1 ? "0" : "xl"}
-                  >
-                    {section.content}
+          return (
+            <RevealFx
+              key={section.articleSectionId ?? index}
+              translateY={4}
+              delay={delay}
+            >
+              <Column gap="s">
+                {section.title && (
+                  <Heading as="h2" variant="display-strong-s" marginBottom="m">
+                    {section.title}
                   </Heading>
-                </RevealFx>
-              );
-
-            case "paragraph":
-              return (
-                <RevealFx key={index} translateY={4} delay={delay}>
-                  <Text variant="body-default-l" marginBottom="m">
-                    {section.content}
-                  </Text>
-                </RevealFx>
-              );
-
-            case "list":
-              return (
-                <RevealFx key={index} translateY={4} delay={delay}>
-                  <ul style={{ marginBottom: "1rem", paddingLeft: "1.5rem" }}>
-                    {section.items?.map((item: string, itemIndex: number) => (
-                      <li key={itemIndex} style={{ marginBottom: "0.5rem" }}>
-                        <Text variant="body-default-l">{item}</Text>
-                      </li>
-                    ))}
-                  </ul>
-                </RevealFx>
-              );
-
-            case "image":
-              return (
-                <RevealFx key={index} translateY={4} delay={delay}>
-                  <SmartImage
-                    src={section.src || ""}
-                    alt={section.alt || ""}
-                    aspectRatio={section.aspectRatio || "16/9"}
-                    radius="l"
-                    marginBottom="16"
-                  />
-                </RevealFx>
-              );
-
-            default:
-              return (
-                <RevealFx key={index} translateY={4} delay={delay}>
-                  <Text variant="body-default-l" marginBottom="m">
-                    {section.content}
-                  </Text>
-                </RevealFx>
-              );
-          }
+                )}
+                {Array.isArray(section.content) &&
+                  section.content.map((content: any, cIdx: number) => (
+                    <Column key={content.articleContentId ?? cIdx} gap="s">
+                      {content.content && (
+                        <Text variant="body-default-l" marginBottom="m">
+                          {content.content}
+                        </Text>
+                      )}
+                      {Array.isArray(content.images) &&
+                        content.images.map((img: any, iIdx: number) => (
+                          <SmartImage
+                            key={img.articleImageId ?? iIdx}
+                            src={img.url}
+                            alt={section.title || article.title}
+                            aspectRatio="16/9"
+                            radius="l"
+                            marginBottom="16"
+                          />
+                        ))}
+                    </Column>
+                  ))}
+              </Column>
+            </RevealFx>
+          );
         })}
       </Column>
 

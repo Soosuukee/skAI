@@ -2,6 +2,7 @@ import "@/once-ui/styles/index.scss";
 import "@/once-ui/tokens/index.scss";
 
 import classNames from "classnames";
+import MobileHeader from "@/components/MobileHeader";
 
 import { Footer, DynamicHeader, RouteGuard } from "@/components";
 import { baseURL, effects, style, font, home } from "@/app/resources";
@@ -19,10 +20,11 @@ import { Meta } from "@/once-ui/modules";
 
 export async function generateMetadata() {
   return Meta.generate({
-    title: home.title,
-    description: home.description,
+    title: "skAi",
+    description:
+      "Plateforme pour découvrir des prestataires spécialisés en intelligence artificielle",
     baseURL: baseURL,
-    path: home.path,
+    path: "/",
     image: home.image,
   });
 }
@@ -128,6 +130,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               />
               <Flex fillWidth minHeight="16" hide="s"></Flex>
               <DynamicHeader />
+              {/* Mobile header with burger (only when logged in) */}
+              <MobileHeader />
               <Flex
                 zIndex={0}
                 fillWidth

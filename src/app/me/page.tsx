@@ -10,9 +10,16 @@ import {
   Button,
   Input,
   Flex,
+  Heading,
 } from "@/once-ui/components";
 import { getApiBaseUrl } from "@/app/utils/api";
 // Removed explicit Provider import; using discriminated union from AuthContext
+import {
+  useProviderServices,
+  useProviderArticles,
+} from "@/app/hooks/providers";
+
+import MeQuickMenu from "@/components/me/MeQuickMenu";
 
 export default function MePage() {
   // Même logique que UserMenu pour la gestion des URLs
@@ -57,6 +64,19 @@ export default function MePage() {
   if (!user) {
     return null;
   }
+
+  // Charger services et articles si l'utilisateur est un provider
+  const providerSlug = user.role === "provider" ? (user as any).slug || "" : "";
+  const {
+    services,
+    loading: servicesLoading,
+    error: servicesError,
+  } = useProviderServices(providerSlug);
+  const {
+    articles,
+    loading: articlesLoading,
+    error: articlesError,
+  } = useProviderArticles(providerSlug);
 
   const [showPwdForm, setShowPwdForm] = React.useState(false);
   const [newPassword, setNewPassword] = React.useState("");
@@ -123,97 +143,79 @@ export default function MePage() {
   };
 
   return (
-    <Column gap="16" padding="24" style={{ maxWidth: "480px" }}>
-      <Avatar src={avatarSrc} size="xl" style={{ alignSelf: "center" }} />
-      <Text variant="heading-strong-m" style={{ textAlign: "center" }}>
-        {(user.firstName || (user as any).first_name) &&
-        (user.lastName || (user as any).last_name)
-          ? `${user.firstName || (user as any).first_name} ${
-              user.lastName || (user as any).last_name
-            }`
-          : user.email}
-      </Text>
-      <Text>Email: {user.email}</Text>
-      <Text>Role: {user.role}</Text>
-      {user.role === "provider" && (user as any).job && (
-        <Text>Job: {(user as any).job.title || (user as any).job}</Text>
-      )}
-      {(user as any).country && (
-        <Text>Country: {(user as any).country.name}</Text>
-      )}
-      {user.role === "provider" &&
-        (user as any).hardSkills &&
-        (user as any).hardSkills.length > 0 && (
-          <Text>
-            Hard Skills:{" "}
-            {(user as any).hardSkills
-              .map((skill: any) => skill.title || skill)
-              .join(", ")}
+    <Column gap="16" padding="24" fillWidth>
+      <Flex gap="24" fillWidth mobileDirection="column">
+        <MeQuickMenu />
+        <Column gap="16" style={{ flex: 1 }}>
+          <Text variant="display-strong-m">
+            Bonjour {user.firstName || (user as any).first_name}{" "}
+            {user.lastName || (user as any).last_name}
           </Text>
-        )}
-      {user.role === "provider" &&
-        (user as any).softSkills &&
-        (user as any).softSkills.length > 0 && (
-          <Text>
-            Soft Skills:{" "}
-            {(user as any).softSkills
-              .map((skill: any) => skill.title || skill)
-              .join(", ")}
-          </Text>
-        )}
-      <Flex gap="8">
-        <Button
-          variant="secondary"
-          onClick={() => {
-            logout();
-            router.push("/");
-          }}
-        >
-          Se déconnecter
-        </Button>
-        <Button variant="primary" onClick={() => setShowPwdForm((v) => !v)}>
-          {showPwdForm ? "Annuler" : "Changer mon mot de passe"}
-        </Button>
-      </Flex>
+          <Avatar src={avatarSrc} size="xl" />
+          <Flex gap="8">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                logout();
+                router.push("/");
+              }}
+            >
+              Se déconnecter
+            </Button>
+            <Button variant="secondary" href="/me/settings">
+              Modifier mes informations
+            </Button>
+          </Flex>
 
-      {showPwdForm && (
-        <Column gap="12" padding="12" border="neutral-alpha-medium" radius="m">
-          <Text variant="heading-strong-s">Mettre à jour le mot de passe</Text>
-          <Input
-            id="newPassword"
-            label="Nouveau mot de passe"
-            type="password"
-            value={newPassword}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setNewPassword(e.target.value)
-            }
-          />
-          <Input
-            id="confirmPassword"
-            label="Confirmer le mot de passe"
-            type="password"
-            value={confirmPassword}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setConfirmPassword(e.target.value)
-            }
-          />
-          {pwdError && <Text color="error">{pwdError}</Text>}
-          {pwdSuccess && <Text color="positive">{pwdSuccess}</Text>}
-          <Button
-            variant="primary"
-            disabled={pwdLoading}
-            onClick={handlePasswordUpdate}
-          >
-            {pwdLoading ? "Mise à jour..." : "Enregistrer"}
-          </Button>
-          <Text variant="body-default-xs" color="neutral-medium">
-            Endpoint ciblé:{" "}
-            {String(user.role).toLowerCase() === "provider"
-              ? "/api/v1/providers/{id}/password"
-              : "/api/v1/clients/{id}/password"}
-          </Text>
+          {showPwdForm && (
+            <Column
+              gap="12"
+              padding="12"
+              border="neutral-alpha-medium"
+              radius="m"
+            >
+              <Text variant="heading-strong-s">
+                Mettre à jour le mot de passe
+              </Text>
+              <Input
+                id="newPassword"
+                label="Nouveau mot de passe"
+                type="password"
+                value={newPassword}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setNewPassword(e.target.value)
+                }
+              />
+              <Input
+                id="confirmPassword"
+                label="Confirmer le mot de passe"
+                type="password"
+                value={confirmPassword}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setConfirmPassword(e.target.value)
+                }
+              />
+              {pwdError && <Text color="error">{pwdError}</Text>}
+              {pwdSuccess && <Text color="positive">{pwdSuccess}</Text>}
+              <Button
+                variant="primary"
+                disabled={pwdLoading}
+                onClick={handlePasswordUpdate}
+              >
+                {pwdLoading ? "Mise à jour..." : "Enregistrer"}
+              </Button>
+              <Text variant="body-default-xs" color="neutral-medium">
+                Endpoint ciblé:{" "}
+                {String(user.role).toLowerCase() === "provider"
+                  ? "/api/v1/providers/{id}/password"
+                  : "/api/v1/clients/{id}/password"}
+              </Text>
+            </Column>
+          )}
+
+          {/* Sections services/articles supprimées de /me. Utiliser /me/service et /me/article */}
         </Column>
-      )}
+      </Flex>
     </Column>
   );
 }

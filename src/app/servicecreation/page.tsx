@@ -11,15 +11,18 @@ export default function ServiceCreationPage() {
   };
 
   return (
-    <Column gap="24" style={{ maxWidth: "1200px", width: "100%" }}>
+    <Column gap="24" fillWidth style={{ width: "85%", marginInline: "auto" }}>
       <Heading variant="display-strong-m">Créer un service</Heading>
       <Text color="neutral-medium">
         Prévisualisation du formulaire de création de service.
       </Text>
       <ServiceForm
         onSubmit={handleSubmit}
-        submitLabel="Prévisualiser"
+        submitLabel="Soumettre"
         submittingLabel="..."
+        texts={{
+          tagsHeading: "Attribuer des tags à votre service",
+        }}
       />
     </Column>
   );

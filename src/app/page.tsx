@@ -6,8 +6,9 @@ import { HomeActions } from "@/components";
 
 export async function generateMetadata() {
   return Meta.generate({
-    title: "skAi - Platform",
-    description: "Welcome to skAi platform",
+    title: "skAi",
+    description:
+      "Plateforme de mise en relation avec des experts en intelligence artificielle",
     baseURL: baseURL,
     path: "/",
   });

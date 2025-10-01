@@ -41,77 +41,73 @@ export const ProviderHomeServiceCard: React.FC<
 
   return (
     <CustomRevealFx translateY={4} delay={0.1 * (index + 1)} fillWidth>
-      <Column
-        padding="l"
-        border="neutral-alpha-medium"
-        radius="m"
-        gap="m"
-        style={{
-          height: "100%",
-          transition: "transform 0.2s ease",
-          cursor: "pointer",
-        }}
-        onClick={() => (window.location.href = serviceLink)}
-      >
-        {/* Image de couverture - plus petite pour la page d'accueil */}
-        {service.cover ? (
-          <SmartImage
-            src={makeAbsolute(service.cover) || ""}
-            alt={`Image de couverture - ${service.title}`}
-            width={250}
-            height={141}
-            radius="s"
-            style={{
-              objectFit: "cover",
-              aspectRatio: "16/9",
-              width: "100%",
-              maxHeight: "150px",
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              width: "100%",
-              height: "150px",
-              backgroundColor: "#f0f0f0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: "8px",
-            }}
-          >
-            <Text color="neutral-medium">Pas d'image</Text>
-          </div>
-        )}
+      <SmartLink href={serviceLink} style={{ textDecoration: "none" }}>
+        <Column
+          padding="l"
+          border="neutral-alpha-medium"
+          radius="m"
+          gap="m"
+          style={{
+            height: "100%",
+            transition: "transform 0.2s ease",
+            cursor: "pointer",
+          }}
+        >
+          {service.cover ? (
+            <SmartImage
+              src={makeAbsolute(service.cover) || ""}
+              alt={`Image de couverture - ${service.title}`}
+              width={250}
+              height={141}
+              radius="s"
+              style={{
+                objectFit: "cover",
+                aspectRatio: "16/9",
+                width: "100%",
+                maxHeight: "150px",
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                width: "100%",
+                height: "150px",
+                backgroundColor: "#f0f0f0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "8px",
+              }}
+            >
+              <Text color="neutral-medium">Pas d'image</Text>
+            </div>
+          )}
 
-        {/* Contenu textuel - plus compact */}
-        <Column gap="s" style={{ flex: 1 }}>
-          <Heading as="h3" variant="display-strong-xs">
-            {service.title}
-          </Heading>
-          <Text
-            variant="body-default-s"
-            color="neutral-medium"
-            style={{
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            }}
-          >
-            {service.summary}
-          </Text>
-        </Column>
+          <Column gap="s" style={{ flex: 1 }}>
+            <Heading as="h3" variant="display-strong-xs">
+              {service.title}
+            </Heading>
+            <Text
+              variant="body-default-s"
+              color="neutral-medium"
+              style={{
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+            >
+              {service.summary}
+            </Text>
+          </Column>
 
-        {/* Lien "En savoir plus" */}
-        <Flex horizontal="end" fillWidth>
-          <SmartLink href={serviceLink} style={{ textDecoration: "none" }}>
+          <Flex horizontal="end" fillWidth>
             <Text variant="body-default-xs" color="primary">
               En savoir plus →
             </Text>
-          </SmartLink>
-        </Flex>
-      </Column>
+          </Flex>
+        </Column>
+      </SmartLink>
     </CustomRevealFx>
   );
 };

@@ -27,8 +27,8 @@ function ProviderServiceContent({
         as="webPage"
         baseURL={baseURL}
         path={`/providers/${provider.slug}/service`}
-        title={`Services de ${provider.firstName} ${provider.lastName}`}
-        description={`Découvrez les services professionnels de ${provider.firstName} ${provider.lastName}`}
+        title={`Services proposés par ${provider.firstName} ${provider.lastName}`}
+        description={`Consultez les services proposés par ${provider.firstName} ${provider.lastName}.`}
         image={`${baseURL}/og?title=${encodeURIComponent(
           `${provider.firstName} ${provider.lastName} - Services`
         )}`}
@@ -46,7 +46,7 @@ function ProviderServiceContent({
         paddingLeft="12"
       >
         <Heading as="h1" marginBottom="16" variant="display-strong-s">
-          Services de {provider.firstName} {provider.lastName}
+          Services proposés par {provider.firstName} {provider.lastName}
         </Heading>
         <ProviderServices services={services} providerSlug={providerSlug} />
       </RevealFx>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Flex, Text, Avatar, Button } from "@/once-ui/components";
+import { Flex, Text, Avatar, Button, SmartLink } from "@/once-ui/components";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
@@ -120,94 +120,58 @@ export function UserMenu() {
         </Text>
       </Button>
 
+      {/* Overlay and right drawer */}
       {isOpen && (
-        <div
-          style={{
-            position: "absolute",
-            top: "100%",
-            right: 0,
-            marginTop: "4px",
-            background: "var(--surface)",
-            border: "1px solid var(--neutral-alpha-medium)",
-            borderRadius: "8px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-            zIndex: 1000,
-            minWidth: "160px",
-          }}
-        >
-          <Flex direction="column" padding="4">
+        <>
+          <div
+            onClick={() => setIsOpen(false)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.3)",
+              zIndex: 9999,
+            }}
+          />
+          <Flex
+            position="fixed"
+            top="0"
+            right="0"
+            background="surface"
+            borderLeft="neutral-alpha-medium"
+            padding="16"
+            direction="column"
+            gap="12"
+            style={{
+              height: "100%",
+              width: "80vw",
+              maxWidth: 320,
+              transform: isOpen ? "translateX(0)" : "translateX(100%)",
+              transition: "transform 0.2s ease",
+              zIndex: 10000,
+              boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+            }}
+          >
+            <SmartLink href="/me" onClick={() => setIsOpen(false)}>
+              <Text variant="heading-strong-m">Mon profil</Text>
+            </SmartLink>
+            <SmartLink href="/servicecreation" onClick={() => setIsOpen(false)}>
+              <Text variant="heading-strong-m">Créer un service</Text>
+            </SmartLink>
+            <SmartLink href="/articlecreation" onClick={() => setIsOpen(false)}>
+              <Text variant="heading-strong-m">Créer un article</Text>
+            </SmartLink>
+            <SmartLink href="/ask" onClick={() => setIsOpen(false)}>
+              <Text variant="heading-strong-m">Mes demandes</Text>
+            </SmartLink>
             <Button
-              variant="tertiary"
-              style={{
-                justifyContent: "flex-start",
-                padding: "8px 12px",
-                borderRadius: "4px",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "0.9rem",
-                transition: "background 0.2s ease",
-              }}
-              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.currentTarget.style.background = "var(--neutral-alpha-weak)";
-              }}
-              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.currentTarget.style.background = "transparent";
-              }}
-              onClick={handleProfileClick}
-            >
-              <Text variant="body-default-s">Mon profil</Text>
-            </Button>
-
-            <Button
-              variant="tertiary"
-              style={{
-                justifyContent: "flex-start",
-                padding: "8px 12px",
-                borderRadius: "4px",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "0.9rem",
-                transition: "background 0.2s ease",
-              }}
-              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.currentTarget.style.background = "var(--neutral-alpha-weak)";
-              }}
-              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.currentTarget.style.background = "transparent";
-              }}
-              onClick={handleRequestsClick}
-            >
-              <Text variant="body-default-s">Mes demandes</Text>
-            </Button>
-
-            <Button
-              variant="tertiary"
-              style={{
-                justifyContent: "flex-start",
-                padding: "8px 12px",
-                borderRadius: "4px",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "0.9rem",
-                transition: "background 0.2s ease",
-              }}
-              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.currentTarget.style.background = "var(--neutral-alpha-weak)";
-              }}
-              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.currentTarget.style.background = "transparent";
-              }}
+              variant="secondary"
               onClick={handleLogoutClick}
+              style={{ marginTop: "auto" }}
             >
-              <Text variant="body-default-s" color="error">
-                Se déconnecter
-              </Text>
+              Se déconnecter
             </Button>
           </Flex>
-        </div>
+        </>
       )}
     </div>
   );

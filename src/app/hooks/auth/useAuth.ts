@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getUserWithProvider } from "@/app/utils/userUtils";
 import * as authService from "@/app/utils/authService";
 
 interface User {

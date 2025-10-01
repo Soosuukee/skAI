@@ -120,10 +120,11 @@ export async function getProviderAllBySlug(
     // Les données job et country sont déjà incluses dans la réponse API
     const job = provider.job;
     const country = provider.country;
-    const languages = provider.languages ;
+    const languages = provider.languages || [];
 
     return {
       ...provider,
+      avatar: buildAvatarUrl((provider as any).profilePicture) || provider.avatar,
       job,
       languages,
       country,

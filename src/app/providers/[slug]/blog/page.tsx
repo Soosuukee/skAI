@@ -53,8 +53,8 @@ export default function ProviderBlogPage({ params }: ProviderBlogPageProps) {
         as="webPage"
         baseURL={baseURL}
         path={`/providers/${provider.slug}/blog`}
-        title={`Les articles écrits par ${provider.firstName}`}
-        description={`Read what ${provider.firstName} ${provider.lastName} has been up to recently`}
+        title={`Articles rédigés par ${provider.firstName} ${provider.lastName}`}
+        description={`Consultez les articles rédigés par ${provider.firstName} ${provider.lastName}.`}
         image={`${baseURL}/og?title=${encodeURIComponent(
           `${provider.firstName} ${provider.lastName} - Blog`
         )}`}
@@ -69,7 +69,7 @@ export default function ProviderBlogPage({ params }: ProviderBlogPageProps) {
       <Column fillWidth paddingY="24" gap="m">
         <CustomRevealFx translateY={4} delay={0.1} fillWidth>
           <Heading wrap="balance" variant="display-strong-l">
-            Les articles écrits par {provider.firstName}
+            Articles rédigés par {provider.firstName} {provider.lastName}
           </Heading>
         </CustomRevealFx>
         <RevealFx translateY={4} fillWidth delay={0.2}>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Column,
   Input,
@@ -8,10 +8,11 @@ import {
   Button,
   CustomButton,
   Text,
-  Card,
   Flex,
   Checkbox,
+  IconButton,
 } from "@/once-ui/components";
+import { ContentTags } from "@/components/ContentTags";
 import { Service } from "@/app/types/service";
 
 export type ServiceFormValues = Omit<
@@ -36,7 +37,20 @@ interface ServiceFormProps {
   onSubmit: (values: ServiceFormValues) => Promise<void> | void;
   submittingLabel?: string;
   submitLabel?: string;
+  texts?: ServiceFormTexts;
 }
+
+interface ServiceFormTexts {
+  priceHelp?: string;
+  describeHeading?: string;
+  tagsHeading?: string;
+}
+
+const defaultTexts: Required<ServiceFormTexts> = {
+  priceHelp: "Renseignez un prix min/max ou laissez vide.",
+  describeHeading: "Décrivez votre service",
+  tagsHeading: "Tags",
+};
 
 const defaultValues: ServiceFormValues = {
   title: "",
@@ -44,8 +58,8 @@ const defaultValues: ServiceFormValues = {
   slug: "",
   isActive: true,
   isFeatured: false,
-  minPrice: 0,
-  maxPrice: 0,
+  minPrice: null as any,
+  maxPrice: null as any,
   sections: [],
   tags: [],
   subtitle: "",
@@ -58,7 +72,9 @@ export default function ServiceForm({
   onSubmit,
   submittingLabel = "Enregistrement...",
   submitLabel = "Enregistrer",
+  texts,
 }: ServiceFormProps) {
+  const t = { ...defaultTexts, ...(texts || {}) };
   const [values, setValues] = useState<ServiceFormValues>({
     ...defaultValues,
     ...initialValues,
@@ -68,6 +84,7 @@ export default function ServiceForm({
   const [sections, setSections] = useState<SectionDraft[]>([
     { title: "", content: "", images: [] },
   ]);
+  const [tagSlugs, setTagSlugs] = useState<string[]>([]);
   const [newImage, setNewImage] = useState<SectionImageDraft>({
     url: "",
     title: "",
@@ -75,8 +92,55 @@ export default function ServiceForm({
   const coverInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleChange = (field: keyof ServiceFormValues, value: any) => {
+    if (field === "minPrice" || field === "maxPrice") {
+      const v = value as string;
+      const normalized =
+        v === "" || v === null || v === undefined ? null : Number(v);
+      setValues((prev) => ({
+        ...prev,
+        [field]: isNaN(normalized as number) ? null : (normalized as any),
+      }));
+      return;
+    }
     setValues((prev) => ({ ...prev, [field]: value }));
   };
+
+  // Hydrate form when initialValues change (edit mode)
+  useEffect(() => {
+    if (initialValues) {
+      setValues((prev) => ({
+        ...prev,
+        ...initialValues,
+        minPrice: (initialValues as any).onQuote
+          ? null
+          : initialValues.minPrice ?? null,
+        maxPrice: (initialValues as any).onQuote
+          ? null
+          : initialValues.maxPrice ?? null,
+      }));
+
+      // Map API sections (with contents[]) to local drafts
+      const apiSections: any[] = (initialValues as any).sections || [];
+      if (apiSections.length > 0) {
+        const mapped = apiSections.map((s) => {
+          const contents: any[] = s.contents || s.content || [];
+          const text = Array.isArray(contents)
+            ? contents
+                .map((c) => c?.content)
+                .filter(Boolean)
+                .join("\n\n")
+            : "";
+          const imgs = Array.isArray(contents)
+            ? contents.flatMap((c) =>
+                (c?.images || []).map((im: any) => ({ url: im?.url || im }))
+              )
+            : [];
+          return { title: s.title || "", content: text, images: imgs };
+        });
+        setSections(mapped);
+      }
+    }
+  }, [initialValues]);
 
   const addSection = () => {
     setSections((prev) => [...prev, { title: "", content: "", images: [] }]);
@@ -130,7 +194,7 @@ export default function ServiceForm({
     setLoading(true);
     setError(undefined);
     try {
-      if (!values.title) {
+      if (!values.title || values.title.trim().length < 3) {
         setError("Veuillez renseigner le titre");
         return;
       }
@@ -140,19 +204,41 @@ export default function ServiceForm({
         );
         return;
       }
+      const minP = values.onQuote ? null : values.minPrice ?? null;
+      const maxP = values.onQuote ? null : values.maxPrice ?? null;
+      if (minP !== null && minP < 0) {
+        setError("Le prix minimum ne peut pas être négatif");
+        return;
+      }
+      if (maxP !== null && maxP < 0) {
+        setError("Le prix maximum ne peut pas être négatif");
+        return;
+      }
+      if (minP !== null && maxP !== null && maxP < minP) {
+        setError("Le prix maximum doit être supérieur ou égal au prix minimum");
+        return;
+      }
+      // Transformer les sections locales (title, content, images[]) vers le format API
+      const mappedSections = sections.map((s) => ({
+        title: s.title,
+        contents: s.content
+          ? [
+              {
+                content: s.content,
+                images: (s.images || []).map((im) => ({ url: im.url })),
+              },
+            ]
+          : [],
+      }));
+
       const payload: ServiceFormValues = {
         ...values,
-        minPrice:
-          values.minPrice === null || values.minPrice === undefined
-            ? null
-            : Number(values.minPrice),
-        maxPrice:
-          values.maxPrice === null || values.maxPrice === undefined
-            ? null
-            : Number(values.maxPrice),
+        minPrice: values.onQuote ? null : minP === null ? null : Number(minP),
+        maxPrice: values.onQuote ? null : maxP === null ? null : Number(maxP),
         summary: values.summary || "",
-        // sections est un draft local; on laisse vide ici pour respecter le type
-        sections: [],
+        sections: mappedSections as any,
+        // Exposer les tags sélectionnés côté payload si besoin
+        tags: (values as any).tags ?? tagSlugs,
       };
       await onSubmit(payload);
     } catch (err: any) {
@@ -163,60 +249,64 @@ export default function ServiceForm({
   };
 
   return (
-    <Card style={{ width: "100%" }}>
-      <form onSubmit={handleSubmit}>
-        <Column gap="16" padding="24">
-          <Column gap="8">
-            <Input
-              id="title"
-              label="Titre"
-              value={values.title}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange("title", e.target.value)
-              }
-              required
-            />
-          </Column>
-          <Column gap="8">
-            <Input
-              id="subtitle"
-              label="Sous-titre (résumé)"
-              value={values.subtitle || ""}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange("subtitle", e.target.value)
-              }
-            />
-          </Column>
-          <Column gap="8">
-            <input
-              ref={coverInputRef}
-              id="coverImageFile"
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange(
-                  "coverImageFile",
-                  e.target.files && e.target.files[0] ? e.target.files[0] : null
-                )
-              }
-            />
-            <CustomButton
-              variant="secondary"
-              onClick={(e: any) => {
-                e.preventDefault();
-                coverInputRef.current?.click();
-              }}
-            >
-              Choisir une image de couverture
-            </CustomButton>
-            {values.coverImageFile && (
-              <Text variant="body-default-s" color="neutral-medium">
-                {values.coverImageFile.name}
-              </Text>
-            )}
-          </Column>
-          {/* Champ slug supprimé de l'UI */}
+    <form
+      onSubmit={handleSubmit}
+      style={{ width: "85%", marginInline: "auto" }}
+    >
+      <Column gap="16" padding="24" fillWidth>
+        <Column gap="8">
+          <Input
+            id="title"
+            label="Titre"
+            value={values.title}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleChange("title", e.target.value)
+            }
+            required
+          />
+        </Column>
+        <Column gap="8">
+          <Input
+            id="subtitle"
+            label="Résumé"
+            placeholder=""
+            value={values.subtitle || ""}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleChange("subtitle", e.target.value)
+            }
+          />
+        </Column>
+        <Column gap="8">
+          <input
+            ref={coverInputRef}
+            id="coverImageFile"
+            type="file"
+            accept=".png,.jpg,.jpeg,.webp,.avif"
+            style={{ display: "none" }}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleChange(
+                "coverImageFile",
+                e.target.files && e.target.files[0] ? e.target.files[0] : null
+              )
+            }
+          />
+          <CustomButton
+            variant="secondary"
+            onClick={(e: any) => {
+              e.preventDefault();
+              coverInputRef.current?.click();
+            }}
+          >
+            Choisir une image de couverture
+          </CustomButton>
+          {values.coverImageFile && (
+            <Text variant="body-default-s" color="neutral-medium">
+              {values.coverImageFile.name}
+            </Text>
+          )}
+        </Column>
+        {/* Champ slug supprimé de l'UI */}
+        {!values.onQuote && (
           <Flex gap="16" wrap>
             <Column gap="8">
               <Input
@@ -241,132 +331,161 @@ export default function ServiceForm({
               />
             </Column>
           </Flex>
-          <Flex gap="16" wrap>
-            <Checkbox
-              id="onQuote"
-              label="Service sur devis"
-              checked={Boolean(values.onQuote)}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange("onQuote", e.target.checked)
-              }
-            />
-          </Flex>
-          {!values.onQuote && (
-            <Text variant="body-default-s" color="neutral-medium">
-              Renseignez un prix min/max ou laissez vide.
-            </Text>
-          )}
-          {/* Champ durée estimée retiré (non dans l'interface Service) */}
-          <Flex gap="16" wrap>
-            <Checkbox
-              id="isActive"
-              label="Actif"
-              checked={Boolean(values.isActive)}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange("isActive", e.target.checked)
-              }
-            />
-            <Checkbox
-              id="isFeatured"
-              label="Mis en avant"
-              checked={Boolean(values.isFeatured)}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange("isFeatured", e.target.checked)
-              }
-            />
-          </Flex>
+        )}
+        <Flex gap="16" wrap>
+          <Checkbox
+            id="onQuote"
+            label="Service sur devis"
+            checked={Boolean(values.onQuote)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleChange("onQuote", e.target.checked)
+            }
+          />
+        </Flex>
+        {!values.onQuote && (
+          <Text variant="body-default-s" color="neutral-medium">
+            {t.priceHelp}
+          </Text>
+        )}
+        {/* Champ durée estimée retiré (non dans l'interface Service) */}
+        <Flex gap="16" wrap>
+          <Checkbox
+            id="isActive"
+            label="Rendre le service actif"
+            checked={Boolean(values.isActive)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleChange("isActive", e.target.checked)
+            }
+          />
+          <Checkbox
+            id="isFeatured"
+            label="Le mettre en avant"
+            checked={Boolean(values.isFeatured)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              handleChange("isFeatured", e.target.checked)
+            }
+          />
+        </Flex>
 
-          <Column gap="12">
-            <Text variant="heading-strong-s">Decrivez votre service</Text>
-            {sections.map((section, index) => (
-              <Card key={index} style={{ padding: 16 }}>
-                <Column gap="12">
-                  <Input
-                    id={`section-title-${index}`}
-                    label={`Titre de la section ${index + 1}`}
-                    value={section.title}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      updateSectionTitle(index, e.target.value)
-                    }
-                  />
-                  <Column gap="8">
-                    <Textarea
-                      id={`section-content-${index}`}
-                      label={
-                        index === 0
-                          ? "Description (obligatoire)"
-                          : "Description"
-                      }
-                      value={section.content}
-                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                        updateSectionContent(index, e.target.value)
-                      }
-                      required={index === 0}
-                    />
-                  </Column>
-                  <Column gap="8">
-                    <Input
-                      id={`section-image-title-${index}`}
-                      label="Titre image (optionnel)"
-                      value={newImage.title || ""}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setNewImage((prev) => ({
-                          ...prev,
-                          title: e.target.value,
-                        }))
-                      }
-                    />
-                    {section.images.length > 0 && (
-                      <Column gap="4">
-                        {section.images.map((img, ii) => (
-                          <Flex
-                            key={ii}
-                            horizontal="space-between"
-                            vertical="center"
-                          >
-                            <Text>{img.title || img.url}</Text>
-                            <CustomButton
-                              variant="secondary"
-                              onClick={(e: any) => {
-                                e.preventDefault();
-                                removeImageFromSection(index, ii);
-                              }}
-                            >
-                              Supprimer
-                            </CustomButton>
-                          </Flex>
-                        ))}
-                      </Column>
-                    )}
-                  </Column>
-                </Column>
-              </Card>
-            ))}
-            <CustomButton
-              onClick={(e: any) => {
-                e.preventDefault();
-                addSection();
-              }}
+        <Column gap="12">
+          <Text variant="heading-strong-s">{t.describeHeading}</Text>
+          {sections.map((section, index) => (
+            <Column
+              key={index}
+              border="neutral-alpha-medium"
+              radius="m"
+              style={{ padding: 16 }}
             >
-              Ajouter une section
-            </CustomButton>
-          </Column>
-
-          {error && (
-            <Text variant="body-default-s" color="error">
-              {error}
-            </Text>
-          )}
-
+              <Flex horizontal="space-between" vertical="center">
+                <Text variant="label-default-m">Section {index + 1}</Text>
+                <IconButton
+                  icon="close"
+                  variant="tertiary"
+                  tooltip="Supprimer la section"
+                  onClick={(e: any) => {
+                    e.preventDefault();
+                    setSections((prev) => {
+                      const next = prev.filter((_, i) => i !== index);
+                      return next.length > 0
+                        ? next
+                        : [{ title: "", content: "", images: [] }];
+                    });
+                  }}
+                />
+              </Flex>
+              <Column gap="12">
+                <Input
+                  id={`section-title-${index}`}
+                  label="Donner un titre à votre section"
+                  value={section.title}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    updateSectionTitle(index, e.target.value)
+                  }
+                />
+                <Column gap="8">
+                  <Textarea
+                    id={`section-content-${index}`}
+                    label="Paragraphe"
+                    value={section.content}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                      updateSectionContent(index, e.target.value)
+                    }
+                    required={index === 0}
+                  />
+                </Column>
+                <Column gap="8">
+                  <input
+                    id={`section-image-file-${index}`}
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.webp,.avif"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const file = e.target.files && e.target.files[0];
+                      if (file) {
+                        const url = URL.createObjectURL(file);
+                        setNewImage({ url });
+                        // ajouter directement l'image à la section
+                        setSections((prev) =>
+                          prev.map((s, i) =>
+                            i === index
+                              ? { ...s, images: [...s.images, { url }] }
+                              : s
+                          )
+                        );
+                      }
+                    }}
+                  />
+                  {section.images.length > 0 && (
+                    <Column gap="4">
+                      {section.images.map((img, ii) => (
+                        <Flex
+                          key={ii}
+                          horizontal="space-between"
+                          vertical="center"
+                        >
+                          <Text>{img.url}</Text>
+                          <CustomButton
+                            variant="secondary"
+                            onClick={(e: any) => {
+                              e.preventDefault();
+                              removeImageFromSection(index, ii);
+                            }}
+                          >
+                            Supprimer
+                          </CustomButton>
+                        </Flex>
+                      ))}
+                    </Column>
+                  )}
+                </Column>
+              </Column>
+            </Column>
+          ))}
           <CustomButton
-            role="button"
-            onClick={() => {}}
-            aria-disabled={loading}
+            onClick={(e: any) => {
+              e.preventDefault();
+              addSection();
+            }}
           >
-            {loading ? submittingLabel : submitLabel}
+            Ajouter une section ?
           </CustomButton>
         </Column>
-      </form>
-    </Card>
+
+        {/* Tags */}
+        <Column gap="8">
+          <Text variant="heading-strong-s">{t.tagsHeading}</Text>
+          <ContentTags selected={tagSlugs} onChange={setTagSlugs} />
+        </Column>
+
+        {error && (
+          <Text variant="body-default-s" color="error">
+            {error}
+          </Text>
+        )}
+
+        <Button variant="primary" type="submit" disabled={loading}>
+          {loading ? submittingLabel : submitLabel}
+        </Button>
+      </Column>
+    </form>
   );
 }

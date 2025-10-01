@@ -162,9 +162,15 @@ export const Header = ({ showLogo = true }: HeaderProps) => {
             {!isLoading && (
               <>
                 {user ? (
-                  <UserMenu />
+                  <>
+                    {/* Desktop: afficher UserMenu */}
+                    <div className="s-flex-hide">
+                      <UserMenu />
+                    </div>
+                    {/* Mobile: MobileHeader gère l'UI */}
+                  </>
                 ) : (
-                  <Flex gap="8" vertical="center">
+                  <Flex gap="8" vertical="center" className="s-flex-hide">
                     <JoinButton variant="tertiary" size="s" />
                     <LoginButton />
                   </Flex>

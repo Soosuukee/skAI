@@ -492,14 +492,24 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
                       }}
                       aria-label="Select year"
                     >
-                      {Array.from({ length: 40 }).map((_, i) => {
-                        const year = new Date().getFullYear() - 20 + i;
-                        return (
-                          <option key={year} value={year}>
-                            {year}
-                          </option>
-                        );
-                      })}
+                      {(() => {
+                        const nowYear = new Date().getFullYear();
+                        const minYear = minDate
+                          ? minDate.getFullYear()
+                          : nowYear - 100;
+                        const maxYear = maxDate
+                          ? maxDate.getFullYear()
+                          : nowYear + 100;
+                        const total = Math.max(0, maxYear - minYear + 1);
+                        return Array.from({ length: total }).map((_, i) => {
+                          const year = minYear + i;
+                          return (
+                            <option key={year} value={year}>
+                              {year}
+                            </option>
+                          );
+                        });
+                      })()}
                     </select>
                   </>
                 ) : (

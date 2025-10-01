@@ -34,13 +34,7 @@ export default function Blog() {
         </CustomRevealFx>
         <Column fillWidth flex={1}>
           <CustomRevealFx translateY={4} fillWidth delay={0.2}>
-            <Posts range={[1, 1]} thumbnail direction="column" />
-          </CustomRevealFx>
-          <CustomRevealFx translateY={4} fillWidth delay={0.3}>
-            <Posts range={[2, 3]} thumbnail />
-          </CustomRevealFx>
-          <CustomRevealFx translateY={4} fillWidth delay={0.4}>
-            <Posts range={[4]} thumbnail />
+            <Posts thumbnail />
           </CustomRevealFx>
         </Column>
       </Column>

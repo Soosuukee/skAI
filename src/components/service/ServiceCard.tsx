@@ -43,77 +43,103 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
 
   return (
     <CustomRevealFx translateY={4} delay={0.1 * (index + 1)} fillWidth>
-      <Column
-        padding="l"
-        border="neutral-alpha-medium"
-        radius="m"
-        gap="m"
-        style={{
-          height: "100%",
-          transition: "transform 0.2s ease",
-          cursor: "pointer",
-        }}
-        onClick={() => (window.location.href = serviceLink)}
-      >
-        {/* Image de couverture */}
-        {service.cover ? (
-          <SmartImage
-            src={makeAbsolute(service.cover) as string}
-            alt={`Image de couverture - ${service.title}`}
-            width={300}
-            height={169}
-            radius="s"
-            style={{
-              objectFit: "cover",
-              aspectRatio: "16/9",
-              width: "100%",
-              maxHeight: "200px",
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              width: "100%",
-              height: "200px",
-              backgroundColor: "#f0f0f0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: "8px",
-            }}
-          >
-            <Text color="neutral-medium">Pas d'image de couverture</Text>
-          </div>
-        )}
+      <SmartLink href={serviceLink} style={{ textDecoration: "none" }}>
+        <Flex
+          className="s-flex-hide"
+          border="neutral-alpha-medium"
+          radius="m"
+          overflow="hidden"
+          style={{ height: 220, cursor: "pointer" }}
+        >
+          {service.cover ? (
+            <Flex style={{ flex: "0 0 35%", maxWidth: "35%" }}>
+              <SmartImage
+                src={makeAbsolute(service.cover) as string}
+                alt={`Image de couverture - ${service.title}`}
+                aspectRatio="16/9"
+                style={{ width: "100%", height: "220px", objectFit: "cover" }}
+              />
+            </Flex>
+          ) : (
+            <Flex
+              style={{
+                flex: "0 0 35%",
+                maxWidth: "35%",
+                height: "220px",
+                background: "#f0f0f0",
+              }}
+              vertical="center"
+              horizontal="center"
+            >
+              <Text color="neutral-medium">Pas d'image</Text>
+            </Flex>
+          )}
 
-        {/* Contenu textuel */}
-        <Column gap="s" style={{ flex: 1 }}>
-          <Heading as="h3" variant="display-strong-s">
-            {service.title}
-          </Heading>
-          <Text
-            variant="body-default-m"
-            color="neutral-medium"
-            style={{
-              display: "-webkit-box",
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            }}
-          >
-            {service.summary}
-          </Text>
-        </Column>
-
-        {/* Lien "En savoir plus" */}
-        <Flex horizontal="end" fillWidth>
-          <SmartLink href={serviceLink} style={{ textDecoration: "none" }}>
-            <Text variant="body-default-s" color="primary">
-              En savoir plus →
+          <Flex flex="1" padding="16" direction="column" gap="8">
+            <Heading as="h3" variant="display-strong-s" style={{ margin: 0 }}>
+              {service.title}
+            </Heading>
+            <Text
+              variant="body-default-m"
+              color="neutral-medium"
+              style={{ flexGrow: 1 }}
+            >
+              {service.summary}
             </Text>
-          </SmartLink>
+            <Flex horizontal="space-between" vertical="center">
+              <Text variant="body-default-s" color="neutral-strong">
+                {service.minPrice != null
+                  ? `À partir de ${service.minPrice}€`
+                  : "Tarif sur devis"}
+              </Text>
+              <Text variant="body-default-s" color="primary">
+                En savoir plus →
+              </Text>
+            </Flex>
+          </Flex>
         </Flex>
-      </Column>
+
+        <Column
+          className="s-flex-show"
+          border="neutral-alpha-medium"
+          radius="m"
+          overflow="hidden"
+          gap="0"
+          style={{ cursor: "pointer" }}
+        >
+          {service.cover ? (
+            <SmartImage
+              src={makeAbsolute(service.cover) as string}
+              alt={`Image de couverture - ${service.title}`}
+              aspectRatio="16/9"
+              style={{ width: "100%", height: "180px", objectFit: "cover" }}
+            />
+          ) : (
+            <Flex
+              style={{ width: "100%", height: "180px", background: "#f0f0f0" }}
+              vertical="center"
+              horizontal="center"
+            >
+              <Text color="neutral-medium">Pas d'image</Text>
+            </Flex>
+          )}
+          <Column padding="16" gap="8">
+            <Heading as="h3" variant="display-strong-s" style={{ margin: 0 }}>
+              {service.title}
+            </Heading>
+            <Flex horizontal="space-between" vertical="center">
+              <Text variant="body-default-s" color="neutral-strong">
+                {service.minPrice != null
+                  ? `À partir de ${service.minPrice}€`
+                  : "Tarif sur devis"}
+              </Text>
+              <Text variant="body-default-s" color="primary">
+                Consulter le service →
+              </Text>
+            </Flex>
+          </Column>
+        </Column>
+      </SmartLink>
     </CustomRevealFx>
   );
 };

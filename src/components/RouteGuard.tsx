@@ -41,6 +41,7 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
         // Define dynamic route patterns with their corresponding base routes
         const dynamicRoutePatterns = [
           { pattern: "/provider", baseRoute: "/providers" },
+          { pattern: "/me", baseRoute: "/me" },
         ] as const;
 
         for (const { pattern, baseRoute } of dynamicRoutePatterns) {

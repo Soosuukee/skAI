@@ -63,7 +63,9 @@ export function AllServices() {
           key={`${service.id ?? service.serviceId ?? service.slug}`}
           className={styles.service}
         >
+          {/* Desktop / Tablet: row layout */}
           <Flex
+            className="s-flex-hide"
             background="surface"
             border="neutral-alpha-medium"
             radius="m-4"
@@ -82,7 +84,6 @@ export function AllServices() {
               e.currentTarget.style.transform = "translateY(0)";
             }}
           >
-            {/* Image de couverture du service */}
             {service.cover ? (
               <SmartImage
                 src={service.cover}
@@ -108,12 +109,10 @@ export function AllServices() {
               </div>
             )}
 
-            {/* Contenu du service */}
             <Flex vertical="start" flex={1} gap="8">
               <Heading variant="heading-strong-s" marginBottom="4">
                 {service.title}
               </Heading>
-
               <p
                 style={{
                   color: "var(--neutral-alpha-high)",
@@ -125,8 +124,6 @@ export function AllServices() {
                 {service.summary ||
                   "Description courte du service - Lorem ipsum dolor sit amet, consectetur adipiscing elit."}
               </p>
-
-              {/* Informations du prestataire */}
               <Flex gap="8" vertical="center">
                 <Avatar src={service.provider.avatar} size="s" />
                 <span
@@ -143,7 +140,6 @@ export function AllServices() {
               </Flex>
             </Flex>
 
-            {/* Lien vers le service */}
             <SmartLink
               href={`/providers/${service.provider.slug}/service/${service.slug}`}
               style={{
@@ -160,6 +156,78 @@ export function AllServices() {
               Voir le service
             </SmartLink>
           </Flex>
+
+          {/* Mobile: stacked card with cover on top */}
+          <Column
+            className="s-flex-show"
+            background="surface"
+            border="neutral-alpha-medium"
+            radius="m-4"
+            padding="16"
+            gap="12"
+            style={{ boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }}
+          >
+            {service.cover ? (
+              <SmartImage
+                src={service.cover}
+                alt={service.title}
+                radius="m"
+                style={{
+                  width: "100%",
+                  aspectRatio: "16/9",
+                  objectFit: "cover",
+                  maxHeight: "200px",
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: "100%",
+                  height: "200px",
+                  background: "var(--neutral-alpha-low)",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "var(--neutral-alpha-medium)",
+                }}
+              >
+                📋
+              </div>
+            )}
+
+            <Heading variant="heading-strong-s" align="center">
+              {service.title}
+            </Heading>
+            <Text align="center" onBackground="neutral-weak">
+              {service.summary ||
+                "Description courte du service - Lorem ipsum dolor sit amet, consectetur adipiscing elit."}
+            </Text>
+            <Flex gap="8" vertical="center" horizontal="center">
+              <Avatar src={service.provider.avatar} size="s" />
+              <span
+                style={{ fontSize: "0.85rem", color: "var(--neutral-alpha-medium)" }}
+              >
+                par <strong>{service.provider.firstName} {service.provider.lastName}</strong>
+              </span>
+            </Flex>
+            <Flex horizontal="center">
+              <SmartLink
+                href={`/providers/${service.provider.slug}/service/${service.slug}`}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  background: "var(--brand)",
+                  color: "var(--brand-on-background)",
+                  textDecoration: "none",
+                  fontSize: "0.9rem",
+                  fontWeight: "500",
+                }}
+              >
+                Voir le service
+              </SmartLink>
+            </Flex>
+          </Column>
         </div>
       ))}
     </Column>

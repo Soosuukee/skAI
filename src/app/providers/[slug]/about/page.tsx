@@ -150,17 +150,188 @@ export default function ProviderAboutPage({ params }: ProviderAboutPageProps) {
     );
   }
 
+  const baseURL =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
   return (
-    <>
-      <About
-        provider={provider}
-        social={social}
-        about={about}
-        makeAbsolute={makeAbsolute}
-        experiences={experiences}
-        educations={educations}
+    <Column maxWidth="m" gap="xl" horizontal="center">
+      <Schema
+        as="webPage"
+        baseURL={baseURL}
+        path={`/providers/${provider.slug}/about`}
+        title={`À propos de ${provider.firstName} ${provider.lastName}`}
+        description={`En savoir plus sur ${provider.firstName} ${provider.lastName}, ${provider.role}.`}
+        image={`${baseURL}/og?title=${encodeURIComponent(
+          `À propos de ${provider.firstName} ${provider.lastName}`
+        )}`}
       />
-    </>
+
+      <RevealFx translateY={4} fillWidth delay={0.1}>
+        <Heading variant="display-strong-l">
+          À propos de {provider.firstName} {provider.lastName}
+        </Heading>
+      </RevealFx>
+      <RevealFx fillWidth speed="medium" translateY={4}>
+        <Flex fillWidth mobileDirection="column" horizontal="center">
+          {about.avatar.display && (
+            <Column
+              className={styles.avatar}
+              position="sticky"
+              minWidth="160"
+              paddingX="l"
+              paddingBottom="xl"
+              gap="m"
+              flex={3}
+              horizontal="center"
+            >
+              <Avatar
+                src={makeAbsolute(provider.profilePicture || undefined) || ""}
+                size="xl"
+              />
+              <Flex gap="8" vertical="center">
+                <Icon onBackground="accent-weak" name="globe" />
+                {provider.country?.name}
+              </Flex>
+              {provider.languages && provider.languages.length > 0 && (
+                <Flex wrap gap="8">
+                  {provider.languages.map((language: any, index: number) => (
+                    <Tag key={language.id || language.name || index} size="l">
+                      {language.name || language}
+                    </Tag>
+                  ))}
+                </Flex>
+              )}
+              <Button
+                href={`/providers/${provider.slug}/service`}
+                variant="primary"
+              >
+                Mes Services
+              </Button>
+            </Column>
+          )}
+          <Column className={styles.blockAlign} flex={9} maxWidth={40}>
+            <Column
+              id={about.intro.title}
+              fillWidth
+              minHeight="160"
+              vertical="center"
+              marginBottom="32"
+            >
+              {about.calendar.display && (
+                <Flex
+                  fitWidth
+                  border="brand-alpha-medium"
+                  className={styles.blockAlign}
+                  style={{
+                    backdropFilter: "blur(var(--static-space-1))",
+                  }}
+                  background="brand-alpha-weak"
+                  radius="full"
+                  padding="4"
+                  gap="8"
+                  marginBottom="m"
+                  vertical="center"
+                >
+                  <Icon
+                    paddingLeft="12"
+                    name="calendar"
+                    onBackground="brand-weak"
+                  />
+                  <Flex paddingX="8">Schedule a call</Flex>
+                  <IconButton
+                    href={about.calendar.link}
+                    data-border="rounded"
+                    variant="secondary"
+                    icon="chevronRight"
+                  />
+                </Flex>
+              )}
+              <Heading className={styles.textAlign} variant="display-strong-xl">
+                {provider.firstName} {provider.lastName}
+              </Heading>
+              <Text
+                className={styles.textAlign}
+                variant="display-default-xs"
+                onBackground="neutral-weak"
+              >
+                {provider.job?.title || "Expert IA"}
+              </Text>
+              {social.length > 0 && (
+                <Flex
+                  className={styles.blockAlign}
+                  paddingTop="20"
+                  paddingBottom="8"
+                  gap="8"
+                  wrap
+                  horizontal="center"
+                  fitWidth
+                  data-border="rounded"
+                >
+                  {social.map(
+                    (item) =>
+                      item.link && (
+                        <React.Fragment key={item.name}>
+                          <Button
+                            className="s-flex-hide"
+                            key={item.name}
+                            href={item.link}
+                            prefixIcon={item.icon}
+                            label={item.name}
+                            size="s"
+                            variant="secondary"
+                          />
+                          <IconButton
+                            className="s-flex-show"
+                            size="l"
+                            key={`${item.name}-icon`}
+                            href={item.link}
+                            icon={item.icon}
+                            variant="secondary"
+                          />
+                        </React.Fragment>
+                      )
+                  )}
+                </Flex>
+              )}
+            </Column>
+
+            {about.intro.display && (
+              <Column
+                textVariant="body-default-l"
+                fillWidth
+                gap="m"
+                marginBottom="xl"
+              >
+                {about.intro.description}
+              </Column>
+            )}
+
+            {about.work.display && (
+              <ProviderExperiences
+                experiences={experiences}
+                makeAbsolute={makeAbsolute}
+              />
+            )}
+
+            {about.studies.display && (
+              <ProviderEducation
+                educations={educations}
+                makeAbsolute={makeAbsolute}
+              />
+            )}
+
+            {about.technical.display && (
+              <ProviderSkills
+                hardSkills={provider.hardSkills || []}
+                softSkills={provider.softSkills || []}
+              />
+            )}
+          </Column>
+        </Flex>
+      </RevealFx>
+    </Column>
   );
 }
 
@@ -215,7 +386,7 @@ function About({
         title={`A propos de ${provider.firstName} ${provider.lastName}`}
         description={`Rencontrez ${provider.firstName} ${
           provider.lastName
-        }, expert IA de ${provider.location?.name ?? ""}`}
+        }, expert IA de ${provider.country?.name ?? ""}`}
         path={`/providers/${provider.slug}/about`}
         image={`${baseURL}/og?title=${encodeURIComponent(
           `${provider.firstName} ${provider.lastName}`
@@ -224,7 +395,10 @@ function About({
           name: `${provider.firstName} ${provider.lastName}`,
           url: `${baseURL}/providers/${provider.slug}/about`,
           image:
-            makeAbsolute(provider.avatar) || `${baseURL}${provider.avatar}`,
+            makeAbsolute(provider.profilePicture || undefined) ||
+            (provider.profilePicture
+              ? `${baseURL}${provider.profilePicture}`
+              : undefined),
         }}
       />
       {about.tableOfContent.display && (
@@ -252,10 +426,13 @@ function About({
               flex={3}
               horizontal="center"
             >
-              <Avatar src={makeAbsolute(provider.avatar) || ""} size="xl" />
+              <Avatar
+                src={makeAbsolute(provider.profilePicture || undefined) || ""}
+                size="xl"
+              />
               <Flex gap="8" vertical="center">
                 <Icon onBackground="accent-weak" name="globe" />
-                {provider.location?.name}
+                {provider.country?.name}
               </Flex>
               {provider.languages && provider.languages.length > 0 && (
                 <Flex wrap gap="8">

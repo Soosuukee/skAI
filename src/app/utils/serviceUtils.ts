@@ -204,3 +204,69 @@ export async function getAllServicesWithProviders() {
   }
 }
 
+export async function getServiceDetailForProvider(
+  providerSlug: string,
+  serviceSlugOrId: string,
+): Promise<{ provider: any; service: any } | null> {
+  try {
+    const providerRes = await fetch(`${API_BASE_URL}/providers/${providerSlug}`, {
+      credentials: 'include',
+    });
+    if (!providerRes.ok) return null;
+    const providerJson = await parseJsonSafe<{ success: boolean; data: any }>(providerRes);
+    const provider = providerJson.data;
+
+    const servicesRes = await fetch(`${API_BASE_URL}/providers/${providerSlug}/services`, {
+      credentials: 'include',
+    });
+    if (!servicesRes.ok) return null;
+    const servicesPayload = await parseJsonSafe<any>(servicesRes);
+    const services: any[] = Array.isArray(servicesPayload)
+      ? servicesPayload
+      : (servicesPayload?.data ?? []);
+
+    const normalizedSlug = serviceSlugOrId
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    const service = services.find((s) => {
+      const slug = (s.slug as string) ||
+        (s.title as string)
+          .normalize('NFD')
+          .replace(/\p{Diacritic}/gu, '')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '');
+      return (
+        slug === normalizedSlug ||
+        String(s.id) === serviceSlugOrId ||
+        String(s.serviceId) === serviceSlugOrId
+      );
+    });
+
+    if (!service) return null;
+
+    return {
+      provider,
+      service: {
+        ...service,
+        slug:
+          service.slug ||
+          (service.title as string)
+            .normalize('NFD')
+            .replace(/\p{Diacritic}/gu, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, ''),
+        cover: buildAbsoluteImageUrl(service.cover) || service.cover,
+      },
+    };
+  } catch (error) {
+    console.error('Erreur lors de la récupération du service détaillé:', error);
+    return null;
+  }
+}
+
